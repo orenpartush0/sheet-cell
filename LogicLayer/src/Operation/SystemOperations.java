@@ -10,4 +10,5 @@ public enum SystemOperations implements Operation{
 
             throw new NumberFormatException("Ref operation requires one argument");
         }
+    }
 }
