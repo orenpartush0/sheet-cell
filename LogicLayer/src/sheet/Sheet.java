@@ -12,15 +12,17 @@ public class Sheet implements HasDataOnOtherCells {
     public String sheetName;
     private int version = INITIAL_VERSION;
     Map<String, Cell> cells = new HashMap<>();
+    private int currentVersion;
 
     public Sheet(String sheetTitle, int numberOfRows, int numberOfColumns) {
         sheetName = sheetTitle;
         int cellId = 0;
+        currentVersion = 0;
 
         for (int i = 0; i < numberOfRows; i++) {
             for (int j = 0; j < numberOfColumns; j++) {
                 String square = String.valueOf('A' + i) + String.valueOf(j + 1);
-                cells.put(square, new Cell(square,this));
+                cells.put(square, new Cell(square,this,0));
             }
         }
     }
@@ -38,7 +40,8 @@ public class Sheet implements HasDataOnOtherCells {
     }
 
     public void UpdateCellByIndex(String square, String newValue) {
-        cells.get(square).UpdateCell(newValue);
+        currentVersion++;
+        cells.get(square).UpdateCell(newValue,currentVersion);
     }
 
     @Override

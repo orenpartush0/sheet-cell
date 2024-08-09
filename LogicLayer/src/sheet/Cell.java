@@ -3,9 +3,7 @@ import Interfaces.HasDataOnOtherCells;
 import Operation.Operation;
 import Operation.MathOperations;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Locale;
+import java.util.*;
 
 public class Cell implements Cloneable {
     private HasDataOnOtherCells hasDataOnOtherCells;
@@ -16,10 +14,38 @@ public class Cell implements Cloneable {
     ArrayList<String> cellsIdInfluencingThisCell = new ArrayList<>();
     ArrayList<Cell> cellVersions = new ArrayList<>();
 
-    Cell(String cellId,HasDataOnOtherCells sheet){
+    private Dictionary <Integer, versionInfo> versionHistory= new Hashtable<>();
+    int lastModify;
+
+
+
+    private class versionInfo{
+        int lastVersionModify;
+        String originalValue;
+
+        public versionInfo(){
+            lastVersionModify = -1;
+            originalValue = "";
+        }
+        public versionInfo(int lastVersionModify, String originalValue){
+            this.lastVersionModify = lastVersionModify;
+            this.originalValue = originalValue;
+        }
+
+        public int getLastVersionModify(){
+            return lastVersionModify;
+        }
+
+        public String getOriginalValue(){
+            return originalValue;
+        }
+    }
+    Cell(String cellId,HasDataOnOtherCells sheet, int currentSheetVersion){
         originalValue = effectiveValue = "";
         CELL_ID = cellId;
         this.hasDataOnOtherCells = sheet;
+        versionHistory.put(currentSheetVersion,new versionInfo());
+        lastModify = currentSheetVersion;
     }
 
     public String GetCellId() { return CELL_ID; }
@@ -47,13 +73,12 @@ public class Cell implements Cloneable {
             this.cellsIdInfluencingThisCell.add(cellId);
             done = true;
         }
-
         return done;
     }
 
     @Override
-    public Cell clone(){
-        Cell clonedCell = new Cell(CELL_ID,hasDataOnOtherCells);
+    public Cell clone(int currentSheetVersion){
+        Cell clonedCell = new Cell(CELL_ID,hasDataOnOtherCells,currentSheetVersion);
         clonedCell.originalValue = originalValue;
         clonedCell.effectiveValue = effectiveValue;
         clonedCell.setCellsInfluencedByThisCell(cellsIdInfluencedByThisCell);
@@ -91,9 +116,11 @@ public class Cell implements Cloneable {
 
     public String GetEffectiveValue() { return effectiveValue; }
 
-    public void UpdateCell(String newOriginalValue ){
+    public void UpdateCell(String newOriginalValue,int currentSheetVersion ){
         originalValue = newOriginalValue;
         effectiveValue = calcFunc(newOriginalValue);
+        versionHistory.put(currentSheetVersion,new versionInfo(lastModify,newOriginalValue));
+        lastModify = currentSheetVersion;
     }
 
     @Override
@@ -125,6 +152,21 @@ public class Cell implements Cloneable {
         }
 
         return false;
+    }
+
+    public String getCellOriginalValue(int version){
+        versionInfo info = versionHistory.get(version);
+        if(info == null){
+            return retriveDate(versionHistory.get(lastModify),version);
+        }
+        return info.originalValue;
+    }
+
+    private String retriveDate(versionInfo info, int version){
+        while (info.getLastVersionModify() > version){
+            info = versionHistory.get(info.getLastVersionModify());
+        }
+        return info.getOriginalValue();
     }
 
 
