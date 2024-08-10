@@ -3,9 +3,8 @@ import Interfaces.CellCoordinator;
 import Operation.Exceptions.OperationException;
 import Operation.Operation;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Locale;
+import java.util.*;
+
 import Operation.OperationImpl;
 import sheet.Exceptions.LoopConnectionException;
 
@@ -15,12 +14,14 @@ public class Cell implements Cloneable {
     private String originalValue;
     private String effectiveValue;
     ArrayList<Cell> cellVersions = new ArrayList<>();
+    private final Dictionary<Integer, Cell> cellByVersion= new Hashtable<>();
 
     Cell(String cellId, CellCoordinator sheet){
         originalValue = effectiveValue = "";
         CELL_ID = cellId;
         this.cellCoordinator = sheet;
     }
+
 
     public String GetCellId() { return CELL_ID; }
 
