@@ -15,19 +15,25 @@ public class Cell implements Cloneable {
     private String effectiveValue;
     ArrayList<Cell> cellVersions = new ArrayList<>();
     private final Dictionary<Integer, Cell> cellByVersion= new Hashtable<>();
+    private final int sheetVersion;
 
-    Cell(String cellId, CellCoordinator sheet){
+    Cell(String cellId, CellCoordinator sheet, int currentSheetVersion){
         originalValue = effectiveValue = "";
         CELL_ID = cellId;
         this.cellCoordinator = sheet;
+        cellByVersion.put(currentSheetVersion,null);
+        sheetVersion  = currentSheetVersion;
     }
 
+    public String GetOriginalValue() { return originalValue; }
+
+    public String GetEffectiveValue() { return effectiveValue; }
 
     public String GetCellId() { return CELL_ID; }
 
     @Override
     public Cell clone(){
-        Cell clonedCell = new Cell(CELL_ID, cellCoordinator);
+        Cell clonedCell = new Cell(CELL_ID, cellCoordinator,sheetVersion);
         clonedCell.originalValue = originalValue;
         clonedCell.effectiveValue = effectiveValue;
 
@@ -79,10 +85,6 @@ public class Cell implements Cloneable {
             return func;
         }
     }
-
-    public String GetOriginalValue() { return originalValue; }
-
-    public String GetEffectiveValue() { return effectiveValue; }
 
     public void UpdateCell(String newOriginalValue ) throws OperationException, LoopConnectionException {
         try{

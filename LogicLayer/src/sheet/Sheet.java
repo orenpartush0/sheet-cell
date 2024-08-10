@@ -21,7 +21,7 @@ public class Sheet implements CellCoordinator {
         for (int i = 0; i < numberOfRows; i++) {
             for (int j = 0; j < numberOfColumns; j++) {
                 String square = String.valueOf('A' + i) + String.valueOf(j + 1);
-                cells.put(square, new Cell(square,this));
+                cells.put(square, new Cell(square,this,INITIAL_VERSION));
                 connections.put(square,new CellConnection(square));
             }
         }
