@@ -1,63 +1,34 @@
 package sheet;
-import Interfaces.HasDataOnOtherCells;
+import Interfaces.CellCoordinator;
+import Operation.Exceptions.OperationException;
 import Operation.Operation;
-import Operation.MathOperations;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
+import Operation.OperationImpl;
+import sheet.Exceptions.LoopConnectionException;
 
 public class Cell implements Cloneable {
-    private HasDataOnOtherCells hasDataOnOtherCells;
+    private final CellCoordinator cellCoordinator;
     private final String CELL_ID;
     private String originalValue;
     private String effectiveValue;
-    ArrayList<String> cellsIdInfluencedByThisCell = new ArrayList<>();
-    ArrayList<String> cellsIdInfluencingThisCell = new ArrayList<>();
     ArrayList<Cell> cellVersions = new ArrayList<>();
 
-    Cell(String cellId,HasDataOnOtherCells sheet){
+    Cell(String cellId, CellCoordinator sheet){
         originalValue = effectiveValue = "";
         CELL_ID = cellId;
-        this.hasDataOnOtherCells = sheet;
+        this.cellCoordinator = sheet;
     }
 
     public String GetCellId() { return CELL_ID; }
 
-    public void setCellsInfluencingThisCell(Collection <String> cellsInfluencingThisCel){
-        this.cellsIdInfluencingThisCell.addAll(cellsInfluencingThisCel);
-    }
-
-    public void setCellsInfluencedByThisCell(Collection <String> cellsInfluencedByThisCel){
-        this.cellsIdInfluencedByThisCell.addAll(cellsInfluencedByThisCel);
-    }
-
-    public boolean addCellInfluencedByThisCell(String cellId){
-        boolean done = false;
-        if(!cellsIdInfluencedByThisCell.contains(cellId)){
-            this.cellsIdInfluencedByThisCell.add(cellId);
-            done = true;
-        }
-
-        return done;
-    }
-    public boolean addCellIdInfluencingThisCell(String cellId){
-        boolean done = false;
-        if(!cellsIdInfluencingThisCell.contains(cellId)){
-            this.cellsIdInfluencingThisCell.add(cellId);
-            done = true;
-        }
-
-        return done;
-    }
-
     @Override
     public Cell clone(){
-        Cell clonedCell = new Cell(CELL_ID,hasDataOnOtherCells);
+        Cell clonedCell = new Cell(CELL_ID, cellCoordinator);
         clonedCell.originalValue = originalValue;
         clonedCell.effectiveValue = effectiveValue;
-        clonedCell.setCellsInfluencedByThisCell(cellsIdInfluencedByThisCell);
-        clonedCell.setCellsInfluencingThisCell(cellsIdInfluencingThisCell);
 
         return clonedCell;
     }
@@ -66,21 +37,42 @@ public class Cell implements Cloneable {
         return NumberFormat.getNumberInstance(Locale.US).format(Double.parseDouble(number));
     }
 
+    private Collection<String> decipherFunc(String funcText){
+        Collection<String> funcNameAndArguments = new ArrayList<>();
+        int startIndex = 0; int endIndex = 0; int inFunction = 0;
+
+        do {
+            inFunction = funcText.charAt(endIndex) == '{' ? ++inFunction : inFunction;
+            inFunction = funcText.charAt(endIndex) == '}' ? --inFunction : inFunction;
+
+            if(inFunction == 1)
+            {
+                if(endIndex == funcText.length() - 2 || funcText.charAt(endIndex) == ','){
+                    funcNameAndArguments.add(funcText.substring(startIndex, endIndex));
+                    startIndex = endIndex + 1;
+                }
+            }
+
+            endIndex++;
+        }while(startIndex < funcText.length());
+        
+        return funcNameAndArguments;
+    }
+
     private boolean isFunc(String func){
         return func.charAt(0) =='{' && func.charAt(func.length()-1) == '}';
     }
 
-    private String calcFunc(String func){
+    private String calcFunc(String func) throws OperationException, LoopConnectionException {
         if(isFunc(func)){
-            int index = func.indexOf(",");
-            String subFunc = func.substring(1, index);
-            Operation operation = MathOperations.valueOf(func.substring(1, index));
-            String[] args = func.substring(1, index+1).split(",");
-            for(String arg : args){
+            Collection<String> funcAndArgs = decipherFunc(func).stream().toList();
+            Operation operation = new OperationImpl(cellCoordinator,CELL_ID);
+
+            for(String arg : funcAndArgs){
                 arg = calcFunc(arg);
             }
 
-            return operation.eval(args);
+            return operation.eval(funcAndArgs.toArray(new String[0]));
         }
         else{
             return func;
@@ -91,9 +83,13 @@ public class Cell implements Cloneable {
 
     public String GetEffectiveValue() { return effectiveValue; }
 
-    public void UpdateCell(String newOriginalValue ){
-        originalValue = newOriginalValue;
-        effectiveValue = calcFunc(newOriginalValue);
+    public void UpdateCell(String newOriginalValue ) throws OperationException, LoopConnectionException {
+        try{
+            originalValue = addThousandsSeparator(String.valueOf(newOriginalValue));
+        }
+        catch (NumberFormatException e){
+            effectiveValue = isFunc(newOriginalValue) ? calcFunc(newOriginalValue) : newOriginalValue;
+        }
     }
 
     @Override
@@ -104,16 +100,6 @@ public class Cell implements Cloneable {
         builder.append("Original Value: ").append(originalValue).append("\n");
         builder.append("Effective Value: ").append(effectiveValue).append("\n");
         builder.append("--------\n");
-        builder.append("Cells Influenced by This Cell:\n");
-        builder.append("------------------------------\n");
-        for (String cell : cellsIdInfluencedByThisCell) {
-            builder.append("cell at square = ").append(cell).append("\n");
-        }
-        builder.append("Cells Influencing This Cell:\n");
-        builder.append("------------------------------\n");
-        for (String cell : cellsIdInfluencingThisCell) {
-            builder.append("cell at square = ").append(cell).append("\n");
-        }
 
         return builder.toString();
     }
@@ -126,7 +112,5 @@ public class Cell implements Cloneable {
 
         return false;
     }
-
-
 }
 

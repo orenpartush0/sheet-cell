@@ -1,6 +1,9 @@
 package Operation;
 
+import Operation.Exceptions.OperationException;
+import sheet.Exceptions.LoopConnectionException;
+
 public interface Operation
 {
-    public abstract String eval(String... args);
+    String eval(String... args) throws OperationException, LoopConnectionException;
 }
