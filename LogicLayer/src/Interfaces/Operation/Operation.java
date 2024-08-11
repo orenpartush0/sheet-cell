@@ -1,6 +1,6 @@
-package Operation;
+package Interfaces.Operation;
 
-import Operation.Exceptions.OperationException;
+import Interfaces.Operation.Exceptions.OperationException;
 import sheet.Exceptions.LoopConnectionException;
 
 public interface Operation

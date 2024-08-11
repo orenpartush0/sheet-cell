@@ -1,4 +1,4 @@
-package Operation.Exceptions;
+package Interfaces.Operation.Exceptions;
 
 public class OperationException extends Exception{
 

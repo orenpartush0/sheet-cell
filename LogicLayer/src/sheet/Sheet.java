@@ -1,34 +1,36 @@
 package sheet;
 
 import Interfaces.CellCoordinator;
-import Operation.Exceptions.OperationException;
+import Interfaces.Operation.Exceptions.OperationException;
 import sheet.Exceptions.LoopConnectionException;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class Sheet implements CellCoordinator {
     private final int INITIAL_VERSION = 1;
-
     public String sheetName;
     private int version = INITIAL_VERSION;
     Map<String, Cell> cells = new HashMap<>();
-    HashMap<String,CellConnection> connections = new HashMap<>();
+    Map<Integer,HashMap<String,CellConnection>> connectionsVersions = new HashMap<>();
+    private final int numberOfRows;
+    private final int numberOfColumns;
 
-    public Sheet(String sheetTitle, int numberOfRows, int numberOfColumns) {
+    public Sheet(String sheetTitle, int _numberOfRows, int _numberOfColumns) {
         sheetName = sheetTitle;
-        int cellId = 0;
+        numberOfRows = _numberOfRows;
+        numberOfColumns = _numberOfColumns;
 
-        for (int i = 0; i < numberOfRows; i++) {
-            for (int j = 0; j < numberOfColumns; j++) {
-                String square = String.valueOf('A' + i) + String.valueOf(j + 1);
+        HashMap<String,CellConnection> connections =  new HashMap<>();
+        for (int i = 0; i < _numberOfRows; i++) {
+            for (int j = 0; j < _numberOfColumns; j++) {
+                String square = 'A' + i + String.valueOf(j + 1);
                 cells.put(square, new Cell(square,this,INITIAL_VERSION));
                 connections.put(square,new CellConnection(square));
             }
         }
-    }
 
-    public void UpdateVersion() {
-        version++;
+        connectionsVersions.put(INITIAL_VERSION,connections);
     }
 
     public int GetVersion() {
@@ -40,7 +42,8 @@ public class Sheet implements CellCoordinator {
     }
 
     public void UpdateCellByIndex(String square, String newValue) throws OperationException, LoopConnectionException {
-        cells.get(square).UpdateCell(newValue);
+        cells.get(square.toUpperCase()).UpdateCell(newValue,version);
+        version++;
     }
 
     @Override
@@ -49,8 +52,20 @@ public class Sheet implements CellCoordinator {
     }
 
     public void SetInfluenceBetweenTwoCells(String referrerCell, String referencedCell ) throws LoopConnectionException {
-        CellConnection.hasPath(connections.get(referencedCell),connections.get(referrerCell));
-        connections.get(referrerCell).addNeighbor(connections.get(referencedCell));
+        CellConnection.hasPath(connectionsVersions.get(version).get(referencedCell),connectionsVersions.get(version).get(referrerCell));
+        connectionsVersions.put(version + 1, (HashMap<String, sheet.CellConnection>) connectionsVersions.get(version).clone());
+        connectionsVersions.get(version + 1).get(referrerCell).addNeighbor(connectionsVersions.get(version + 1).get(referencedCell));
+    }
+
+    public int getColSize(int col){
+        int max = 5;
+        for(int i= 0 ; i < numberOfRows; i++){
+            char row = (char)('A' + i);
+            int cellLength = cells.get(row + String.valueOf(col)).GetEffectiveValue().length();
+            max = Math.max(max,cellLength);
+        }
+
+        return max;
     }
 
 }

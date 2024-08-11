@@ -1,15 +1,28 @@
 package sheet;
 
 import sheet.Exceptions.LoopConnectionException;
-import java.util.*;
 
-public class CellConnection {
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class CellConnection implements Cloneable {
     String cell;
     List<CellConnection> connections;
 
     public CellConnection(String val) {
         this.cell = val;
         this.connections = new ArrayList<>();
+    }
+
+    public CellConnection clone(){
+        CellConnection clonedCellConnection = new CellConnection(cell);
+        for(CellConnection c : this.connections){
+            clonedCellConnection.connections.add(c.clone());
+        }
+
+        return clonedCellConnection;
     }
 
     public void addNeighbor(CellConnection neighbor) {
@@ -19,11 +32,7 @@ public class CellConnection {
     public static void hasPath(CellConnection start, CellConnection end) throws LoopConnectionException {
         Set<CellConnection> visited = new HashSet<>();
         if(hasPathDFS(start, end, visited)){
-            String messageTemplate = "The cell {startCell} already has a reference to {endCell}";
-            String formattedMessage = messageTemplate
-                    .replace("{startCell}", start.cell)
-                    .replace("{endCell}", end.cell);
-            throw new LoopConnectionException(formattedMessage);
+            throw new LoopConnectionException("this function contain Ref that will cause a Loop!");
         }
     }
 

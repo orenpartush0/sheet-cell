@@ -1,27 +1,29 @@
 package sheet;
+
 import Interfaces.CellCoordinator;
-import Operation.Exceptions.OperationException;
-import Operation.Operation;
+import Interfaces.Operation.Exceptions.OperationException;
+import Interfaces.Operation.Operation;
+import Interfaces.Operation.OperationImpl;
+import sheet.Exceptions.LoopConnectionException;
+import sheet.Exceptions.VersionControlException;
+import sheet.Interfaces.HasCellData;
+
 import java.text.NumberFormat;
 import java.util.*;
 
-import Operation.OperationImpl;
-import sheet.Exceptions.LoopConnectionException;
-
-public class Cell implements Cloneable {
+public class Cell implements Cloneable, HasCellData {
     private final CellCoordinator cellCoordinator;
-    private final String CELL_ID;
+    private final String cellId;
     private String originalValue;
     private String effectiveValue;
-    ArrayList<Cell> cellVersions = new ArrayList<>();
-    private final Dictionary<Integer, Cell> cellByVersion= new Hashtable<>();
+    private final TreeMap<Integer, HasCellData> cellByVersion= new TreeMap<>();
     private final int sheetVersion;
 
     Cell(String cellId, CellCoordinator sheet, int currentSheetVersion){
         originalValue = effectiveValue = "";
-        CELL_ID = cellId;
+        this.cellId = cellId;
         this.cellCoordinator = sheet;
-        cellByVersion.put(currentSheetVersion,null);
+        cellByVersion.put(currentSheetVersion,this.clone());
         sheetVersion  = currentSheetVersion;
     }
 
@@ -29,15 +31,40 @@ public class Cell implements Cloneable {
 
     public String GetEffectiveValue() { return effectiveValue; }
 
-    public String GetCellId() { return CELL_ID; }
+    public String GetCellId() { return cellId; }
 
     @Override
     public Cell clone(){
-        Cell clonedCell = new Cell(CELL_ID, cellCoordinator,sheetVersion);
+        Cell clonedCell = new Cell(cellId, cellCoordinator,sheetVersion);
         clonedCell.originalValue = originalValue;
         clonedCell.effectiveValue = effectiveValue;
+        for(Map.Entry<Integer, HasCellData> entry: cellByVersion.entrySet()){
+            clonedCell.cellByVersion.put(entry.getKey(), entry.getValue().clone());
+        }
 
         return clonedCell;
+    }
+
+    public String GetCellOriginalValueBySheetVersion(int version) throws VersionControlException {
+        if (cellByVersion.get(version) != null) {
+            return cellByVersion.get(version).GetOriginalValue();
+        }
+        else{
+            return cellByVersion.get(cellByVersion.lastKey()).GetOriginalValue();
+        }
+    }
+
+    public boolean IsModifiedInThisVersion(int version){
+        return cellByVersion.containsKey(version);
+    }
+
+    public String GetCellEffectiveValueBySheetVersion(int version) throws VersionControlException {
+        if (cellByVersion.get(version).GetEffectiveValue() != null){
+            return cellByVersion.get(version).GetEffectiveValue();
+        }
+        else{
+            return cellByVersion.get(cellByVersion.lastKey()).GetEffectiveValue();
+        }
     }
 
     private String addThousandsSeparator(String number) throws NumberFormatException {
@@ -73,7 +100,7 @@ public class Cell implements Cloneable {
     private String calcFunc(String func) throws OperationException, LoopConnectionException {
         if(isFunc(func)){
             Collection<String> funcAndArgs = decipherFunc(func).stream().toList();
-            Operation operation = new OperationImpl(cellCoordinator,CELL_ID);
+            Operation operation = new OperationImpl(cellCoordinator, cellId);
 
             for(String arg : funcAndArgs){
                 arg = calcFunc(arg);
@@ -86,19 +113,19 @@ public class Cell implements Cloneable {
         }
     }
 
-    public void UpdateCell(String newOriginalValue ) throws OperationException, LoopConnectionException {
-        try{
-            originalValue = addThousandsSeparator(String.valueOf(newOriginalValue));
+    public void UpdateCell(String newOriginalValue,int sheetVersion) throws OperationException, LoopConnectionException {
+        try {
+            this.originalValue = addThousandsSeparator(String.valueOf(newOriginalValue));
+        } catch (NumberFormatException e) {
+            this.effectiveValue = isFunc(newOriginalValue) ? calcFunc(newOriginalValue) : newOriginalValue;
         }
-        catch (NumberFormatException e){
-            effectiveValue = isFunc(newOriginalValue) ? calcFunc(newOriginalValue) : newOriginalValue;
-        }
+        cellByVersion.put(sheetVersion + 1, this.clone());
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("Cell at square ").append(CELL_ID).append("\n");
+        builder.append("Cell at square ").append(cellId).append("\n");
         builder.append("-----\n");
         builder.append("Original Value: ").append(originalValue).append("\n");
         builder.append("Effective Value: ").append(effectiveValue).append("\n");
@@ -110,7 +137,7 @@ public class Cell implements Cloneable {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Cell) {
-            return CELL_ID.equals(((Cell)obj).GetCellId());
+            return cellId.equals(((Cell)obj).GetCellId());
         }
 
         return false;

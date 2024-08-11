@@ -1,7 +1,8 @@
-package Operation;
+package Interfaces.Operation;
+
 import Interfaces.CellCoordinator;
-import Operation.Enums.eOperation;
-import Operation.Exceptions.OperationException;
+import Interfaces.Operation.Exceptions.OperationException;
+import Interfaces.Operation.Enums.eOperation;
 import sheet.Exceptions.LoopConnectionException;
 
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ public class OperationImpl implements Operation {
     public String eval(String... funcAndArgs) throws OperationException, LoopConnectionException {
         ArrayList<String> args = new ArrayList<>(Arrays.stream(funcAndArgs).toList());
         String operationName = args.removeFirst();
-        eOperation operation = Operation.Enums.eOperation.valueOf(operationName);
+        eOperation operation = eOperation.valueOf(operationName);
 
         return switch (operation) {
             case eOperation.PLUS -> Plus(args);
