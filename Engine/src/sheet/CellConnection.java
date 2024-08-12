@@ -1,6 +1,6 @@
 package sheet;
 
-import sheet.Exceptions.LoopConnectionException;
+import sheet.Exception.LoopConnectionException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -34,6 +34,7 @@ public class CellConnection implements Cloneable {
                 .map(CellConnection::toString)
                 .collect(Collectors.toCollection(ArrayList::new));    }
 
+    @Override
     public CellConnection clone(){
         CellConnection clonedCellConnection = new CellConnection(cell);
         for(CellConnection c : referencesFromThisCell ){

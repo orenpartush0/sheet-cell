@@ -1,4 +1,4 @@
-package sheet.Interfaces;
+package sheet.Interface;
 
 public interface HasCellData {
     String GetOriginalValue();

@@ -1,6 +1,6 @@
-package Interfaces;
+package sheet.Interface;
 
-import sheet.Exceptions.LoopConnectionException;
+import sheet.Exception.LoopConnectionException;
 
 import java.util.ArrayList;
 

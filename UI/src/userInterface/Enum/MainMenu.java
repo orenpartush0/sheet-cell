@@ -1,4 +1,4 @@
-package Console.Enum;
+package userInterface.Enum;
 
 public enum MainMenu{
     READ_FILE("Read private system file"),

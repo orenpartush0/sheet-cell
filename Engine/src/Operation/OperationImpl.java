@@ -1,9 +1,9 @@
 package Operation;
-import Interfaces.CellCoordinator;
-import Interfaces.Operation;
+import sheet.Interface.CellCoordinator;
+import Operation.Interface.Operation;
 import Operation.Exceptions.OperationException;
-import Enums.eOperation;
-import sheet.Exceptions.LoopConnectionException;
+import Operation.Enums.eOperation;
+import sheet.Exception.LoopConnectionException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,7 +19,7 @@ public class OperationImpl implements Operation {
         String operationName = args.removeFirst();
         eOperation operation = eOperation.valueOf(operationName);
 
-        return switch (operation) {
+        String res = switch (operation) {
             case eOperation.PLUS -> Plus(args);
             case eOperation.MINUS -> Minus(args);
             case eOperation.DIVIDE -> Divide(args);
@@ -31,6 +31,8 @@ public class OperationImpl implements Operation {
             case eOperation.CONCAT -> Concat(args);
             case eOperation.REF -> ref(args);
         };
+
+        return res;
     }
 
     public OperationImpl(CellCoordinator _cellCoordinator,String _callerCell)

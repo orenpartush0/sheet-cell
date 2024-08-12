@@ -1,9 +1,9 @@
 package controller;
 
 import Operation.Exceptions.OperationException;
-import sheet.Exceptions.LoopConnectionException;
+import sheet.Exception.LoopConnectionException;
 import sheet.Sheet;
-import sheetCellDto.SheetDto;
+import dto.SheetDto;
 
 public class Controller {
     private final Sheet sheet;

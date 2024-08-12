@@ -1,12 +1,12 @@
 package sheet;
 
-import Interfaces.CellCoordinator;
+import sheet.Interface.CellCoordinator;
 import Operation.Exceptions.OperationException;
-import Interfaces.Operation;
+import Operation.Interface.Operation;
 import Operation.OperationImpl;
-import sheet.Exceptions.LoopConnectionException;
-import sheet.Exceptions.VersionControlException;
-import sheet.Interfaces.HasCellData;
+import sheet.Exception.LoopConnectionException;
+import sheet.Exception.VersionControlException;
+import sheet.Interface.HasCellData;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -36,6 +36,10 @@ public class Cell implements Cloneable, HasCellData {
 
     public int GetSheetVersion() { return sheetVersion; }
 
+    public String GetCellEffectiveValueBySheetVersion(int version) throws VersionControlException {
+        return cellByVersion.get(cellByVersion.floorKey(version)).GetEffectiveValue();
+    }
+
     @Override
     public Cell clone(){
         Cell clonedCell = new Cell();
@@ -58,37 +62,30 @@ public class Cell implements Cloneable, HasCellData {
         }
     }
 
-    public String GetCellEffectiveValueBySheetVersion(int version) throws VersionControlException {
-        if (cellByVersion.get(version).GetEffectiveValue() != null){
-            return cellByVersion.get(version).GetEffectiveValue();
-        }
-        else{
-            return cellByVersion.get(cellByVersion.lastKey()).GetEffectiveValue();
-        }
-    }
-
     private String addThousandsSeparator(String number) throws NumberFormatException {
         return NumberFormat.getNumberInstance(Locale.US).format(Double.parseDouble(number));
     }
 
     private Collection<String> decipherFunc(String funcText){
         Collection<String> funcNameAndArguments = new ArrayList<>();
-        int startIndex = 0; int endIndex = 0; int inFunction = 0;
+        int startIndex = 1; int endIndex = 0; int inFunction = 0;
 
-        do {
+        while(true){
             inFunction = funcText.charAt(endIndex) == '{' ? ++inFunction : inFunction;
             inFunction = funcText.charAt(endIndex) == '}' ? --inFunction : inFunction;
 
-            if(inFunction == 1)
-            {
-                if(endIndex == funcText.length() - 2 || funcText.charAt(endIndex) == ','){
-                    funcNameAndArguments.add(funcText.substring(startIndex, endIndex));
+            if (inFunction == 1) {
+                if (funcText.charAt(endIndex) == ',') {
+                    funcNameAndArguments.add(funcText.substring(startIndex, endIndex).replaceAll(" ", ""));
                     startIndex = endIndex + 1;
                 }
+            } else if (inFunction == 0) {
+                funcNameAndArguments.add(funcText.substring(startIndex, endIndex).replaceAll(" ", ""));
+                break;
             }
 
             endIndex++;
-        }while(startIndex < funcText.length());
+        }
         
         return funcNameAndArguments;
     }
@@ -99,11 +96,11 @@ public class Cell implements Cloneable, HasCellData {
 
     private String calcFunc(String func) throws OperationException, LoopConnectionException {
         if(isFunc(func)){
-            Collection<String> funcAndArgs = decipherFunc(func).stream().toList();
+            List<String> funcAndArgs = new ArrayList<>(decipherFunc(func).stream().toList());
             Operation operation = new OperationImpl(cellCoordinator, cellId);
 
-            for(String arg : funcAndArgs){
-                arg = calcFunc(arg);
+            for(int i = 0; i < funcAndArgs.size(); i++) {
+                funcAndArgs.set(i, calcFunc(funcAndArgs.get(i)));
             }
 
             return operation.eval(funcAndArgs.toArray(new String[0]));
@@ -113,13 +110,18 @@ public class Cell implements Cloneable, HasCellData {
         }
     }
 
-    public void UpdateCell(String newOriginalValue,int sheetVersion) throws OperationException, LoopConnectionException {
+    public void UpdateCell(String newOriginalValue, int sheetVersion) throws OperationException, LoopConnectionException {
+        originalValue = newOriginalValue;
+        effectiveValue = parseEffectiveValue(newOriginalValue);
+        cellByVersion.put(sheetVersion, this.clone());
+    }
+
+    private String parseEffectiveValue(String newOriginalValue) throws OperationException, LoopConnectionException {
         try {
-            this.originalValue = addThousandsSeparator(String.valueOf(newOriginalValue));
+            return addThousandsSeparator(String.valueOf(newOriginalValue));
         } catch (NumberFormatException e) {
-            this.effectiveValue = isFunc(newOriginalValue) ? calcFunc(newOriginalValue) : newOriginalValue;
+            return isFunc(newOriginalValue) ? calcFunc(newOriginalValue) : String.valueOf(newOriginalValue);
         }
-        cellByVersion.put(sheetVersion + 1, this.clone());
     }
 
     @Override

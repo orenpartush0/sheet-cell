@@ -1,9 +1,9 @@
 package sheet;
 
-import Interfaces.CellCoordinator;
+import sheet.Interface.CellCoordinator;
 import Operation.Exceptions.OperationException;
-import sheet.Exceptions.LoopConnectionException;
-import sheetCellDto.CellDto;
+import sheet.Exception.LoopConnectionException;
+import dto.CellDto;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,8 +61,7 @@ public class Sheet implements CellCoordinator {
 
 
     public void UpdateCellByIndex(String square, String newValue) throws OperationException, LoopConnectionException {
-        cells.get(square.toUpperCase()).UpdateCell(newValue,version);
-        version++;
+        cells.get(square.toUpperCase()).UpdateCell(newValue,++version);
     }
 
     @Override

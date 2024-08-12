@@ -1,7 +1,7 @@
-package Console;
-import Console.Enum.MainMenu;
+package userInterface;
+import userInterface.Enum.MainMenu;
 import controller.Controller;
-import sheetCellDto.SheetDto;
+import dto.SheetDto;
 
 import java.util.List;
 import java.util.Scanner;
