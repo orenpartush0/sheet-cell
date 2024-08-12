@@ -1,8 +1,8 @@
-package Interfaces.Operation;
-
+package Operation;
 import Interfaces.CellCoordinator;
-import Interfaces.Operation.Exceptions.OperationException;
-import Interfaces.Operation.Enums.eOperation;
+import Interfaces.Operation;
+import Operation.Exceptions.OperationException;
+import Enums.eOperation;
 import sheet.Exceptions.LoopConnectionException;
 
 import java.util.ArrayList;

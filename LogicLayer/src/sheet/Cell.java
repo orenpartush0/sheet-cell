@@ -1,25 +1,26 @@
 package sheet;
 
 import Interfaces.CellCoordinator;
-import Interfaces.Operation.Exceptions.OperationException;
-import Interfaces.Operation.Operation;
-import Interfaces.Operation.OperationImpl;
+import Operation.Exceptions.OperationException;
+import Interfaces.Operation;
+import Operation.OperationImpl;
 import sheet.Exceptions.LoopConnectionException;
 import sheet.Exceptions.VersionControlException;
 import sheet.Interfaces.HasCellData;
-
 import java.text.NumberFormat;
 import java.util.*;
 
 public class Cell implements Cloneable, HasCellData {
-    private final CellCoordinator cellCoordinator;
-    private final String cellId;
-    private String originalValue;
-    private String effectiveValue;
+    private CellCoordinator cellCoordinator;
+    private String cellId = "";
+    private String originalValue = "";
+    private String effectiveValue = "";
     private final TreeMap<Integer, HasCellData> cellByVersion= new TreeMap<>();
-    private final int sheetVersion;
+    private int sheetVersion;
 
-    Cell(String cellId, CellCoordinator sheet, int currentSheetVersion){
+    public Cell(){}
+
+    public Cell(String cellId, CellCoordinator sheet, int currentSheetVersion){
         originalValue = effectiveValue = "";
         this.cellId = cellId;
         this.cellCoordinator = sheet;
@@ -33,14 +34,17 @@ public class Cell implements Cloneable, HasCellData {
 
     public String GetCellId() { return cellId; }
 
+    public int GetSheetVersion() { return sheetVersion; }
+
     @Override
     public Cell clone(){
-        Cell clonedCell = new Cell(cellId, cellCoordinator,sheetVersion);
+        Cell clonedCell = new Cell();
+        clonedCell.cellId = cellId;
+        clonedCell.cellCoordinator = cellCoordinator;
+        clonedCell.sheetVersion = sheetVersion;
         clonedCell.originalValue = originalValue;
         clonedCell.effectiveValue = effectiveValue;
-        for(Map.Entry<Integer, HasCellData> entry: cellByVersion.entrySet()){
-            clonedCell.cellByVersion.put(entry.getKey(), entry.getValue().clone());
-        }
+        clonedCell.cellByVersion.putAll(cellByVersion);
 
         return clonedCell;
     }
@@ -52,10 +56,6 @@ public class Cell implements Cloneable, HasCellData {
         else{
             return cellByVersion.get(cellByVersion.lastKey()).GetOriginalValue();
         }
-    }
-
-    public boolean IsModifiedInThisVersion(int version){
-        return cellByVersion.containsKey(version);
     }
 
     public String GetCellEffectiveValueBySheetVersion(int version) throws VersionControlException {
@@ -129,7 +129,11 @@ public class Cell implements Cloneable, HasCellData {
         builder.append("-----\n");
         builder.append("Original Value: ").append(originalValue).append("\n");
         builder.append("Effective Value: ").append(effectiveValue).append("\n");
-        builder.append("--------\n");
+        builder.append("List of cells influence by this cell:\n");
+        builder.append(cellCoordinator.GetListOfReferencedCells(cellId));
+        builder.append("\nList of cells influence this cell:\n");
+        builder.append(cellCoordinator.GetListOfReferencerCells(cellId));
+        builder.append("\n--------\n");
 
         return builder.toString();
     }
