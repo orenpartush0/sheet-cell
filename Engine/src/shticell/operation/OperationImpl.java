@@ -1,12 +1,12 @@
-package operation;
+package shticell.operation;
 
-import operation.Exceptions.NumberOperationException;
-import operation.Exceptions.OperationException;
-import sheet.CellConnection;
-import operation.Interface.Operation;
-import operation.Enums.eOperation;
-import sheet.exception.LoopConnectionException;
-import sheet.Interface.CellCoordinator;
+import shticell.operation.Exceptions.NumberOperationException;
+import shticell.operation.Exceptions.OperationException;
+import shticell.cell.ties.CellConnection;
+import shticell.operation.Interface.Operation;
+import shticell.operation.Enums.eOperation;
+import shticell.exception.LoopConnectionException;
+import shticell.cell.sheet.api.CellCoordinator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +17,7 @@ public class OperationImpl implements Operation {
     CellCoordinator coordinator;
 
     @Override
-    public String eval(String... funcAndArgs) throws OperationException, LoopConnectionException, NumberFormatException, NumberOperationException{
+    public String eval(String... funcAndArgs) throws OperationException, LoopConnectionException, NumberFormatException, NumberOperationException {
         ArrayList<String> args = new ArrayList<>(Arrays.stream(funcAndArgs).toList());
         String operationName = args.removeFirst();
         eOperation operation;

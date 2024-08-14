@@ -1,12 +1,12 @@
-package function;
+package shticell.function;
 
-import operation.Exceptions.NumberOperationException;
-import operation.Exceptions.OperationException;
-import operation.Interface.Operation;
-import operation.OperationImpl;
-import sheet.CellConnection;
-import sheet.exception.LoopConnectionException;
-import sheet.Interface.CellCoordinator;
+import shticell.operation.Exceptions.NumberOperationException;
+import shticell.operation.Exceptions.OperationException;
+import shticell.operation.Interface.Operation;
+import shticell.operation.OperationImpl;
+import shticell.cell.ties.CellConnection;
+import shticell.exception.LoopConnectionException;
+import shticell.cell.sheet.api.CellCoordinator;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

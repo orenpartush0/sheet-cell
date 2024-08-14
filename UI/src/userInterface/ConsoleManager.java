@@ -5,7 +5,6 @@ import dto.SheetDto;
 
 import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class ConsoleManager {
@@ -93,7 +92,7 @@ public class ConsoleManager {
 
     private void printCellValue(){
         String cellId = selectCell();
-        System.out.println(manager.GetCellDataByID(cellId));
+        System.out.println(manager.GetCellByCoordinate(cellId));
     }
 
     private void insertData(){

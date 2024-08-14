@@ -1,4 +1,4 @@
-package operation.Exceptions;
+package shticell.operation.Exceptions;
 
 public class OperationException extends Exception {
     public OperationException(String message){

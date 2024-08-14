@@ -1,17 +1,18 @@
-package sheet;
+package shticell.cell.impl;
 
-import operation.Exceptions.NumberOperationException;
-import operation.Exceptions.OperationException;
-import sheet.Interface.CellCoordinator;
-import sheet.exception.LoopConnectionException;
-import sheet.Interface.HasCellData;
+import shticell.operation.Exceptions.NumberOperationException;
+import shticell.operation.Exceptions.OperationException;
+import shticell.cell.ties.CellConnection;
+import shticell.cell.sheet.api.CellCoordinator;
+import shticell.exception.LoopConnectionException;
+import shticell.cell.api.Cell;
 import java.text.NumberFormat;
 import java.util.*;
 
-import static function.functionIdentifier.calcFunc;
-import static function.functionIdentifier.isFunc;
+import static shticell.function.functionIdentifier.calcFunc;
+import static shticell.function.functionIdentifier.isFunc;
 
-public class Cell implements Cloneable, HasCellData {
+public class CellImpl implements Cloneable, Cell {
 
     private final String NAN = "NaN";
     private final String UNDEFINED = "!Undefined!";
@@ -20,25 +21,23 @@ public class Cell implements Cloneable, HasCellData {
     private String cellId = "";
     private String originalValue = "";
     private String effectiveValue = "";
-    private final TreeMap<Integer, HasCellData> cellByVersion= new TreeMap<>();
+    private final TreeMap<Integer, Cell> cellByVersion= new TreeMap<>();
     private int LatestSheetVersionUpdated;
     private CellConnection connections = new CellConnection(cellId);
 
-    public Cell(){}
-
-    public Cell(String cellId, CellCoordinator sheet, int currentSheetVersion){
+    public CellImpl(String cellId, CellCoordinator sheet, int currentSheetVersion){
         originalValue = effectiveValue = "";
-        this.cellId = cellId;
-        this.cellCoordinator = sheet;
+        cellId = cellId;
+        cellCoordinator = sheet;
         cellByVersion.put(currentSheetVersion,this.clone());
         LatestSheetVersionUpdated  = currentSheetVersion;
         connections = new CellConnection(cellId);
     }
 
-    public Cell(HasCellData hasCellData){
-        cellId = hasCellData.GetCellId();
-        originalValue = hasCellData.GetOriginalValue();
-        effectiveValue = hasCellData.GetEffectiveValue();
+    public CellImpl(Cell cell){
+        cellId = cell.GetCellId();
+        originalValue = cell.GetOriginalValue();
+        effectiveValue = cell.GetEffectiveValue();
     }
 
     public boolean IsChangedInThisVersion(int version) {return cellByVersion.get(version) != null; }
@@ -53,27 +52,24 @@ public class Cell implements Cloneable, HasCellData {
     public String GetCellId() { return cellId; }
 
     @Override
-    public int LatestSheetVersionUpdated() { return LatestSheetVersionUpdated; }
+    public int GetVersion() { return LatestSheetVersionUpdated; }
 
     public int GetSheetVersion() { return LatestSheetVersionUpdated; }
 
     public CellConnection GetConnections() { return connections; }
 
-    public HasCellData GetCellBySheetVersion(int version){
+    public Cell GetCellBySheetVersion(int version){
         return cellByVersion.get(cellByVersion.floorKey(version));
     }
 
     @Override
-    public Cell clone(){
-        Cell clonedCell = new Cell();
-        clonedCell.cellId = cellId;
-        clonedCell.cellCoordinator = cellCoordinator;
-        clonedCell.LatestSheetVersionUpdated = LatestSheetVersionUpdated;
-        clonedCell.originalValue = originalValue;
-        clonedCell.effectiveValue = effectiveValue;
-        clonedCell.cellByVersion.putAll(cellByVersion);
+    public CellImpl clone(){
+        CellImpl clonedCellImpl = new CellImpl(cellId,cellCoordinator,LatestSheetVersionUpdated);
+        clonedCellImpl.originalValue = originalValue;
+        clonedCellImpl.effectiveValue = effectiveValue;
+        clonedCellImpl.cellByVersion.putAll(cellByVersion);
 
-        return clonedCell;
+        return clonedCellImpl;
     }
 
     private String addThousandsSeparator(String number) throws NumberFormatException {
@@ -87,7 +83,7 @@ public class Cell implements Cloneable, HasCellData {
             effectiveValue = parseEffectiveValue(newOriginalValue);
             LatestSheetVersionUpdated = sheetVersion;
             originalValue = newOriginalValue;
-            cellCoordinator.UpdateDependentCells(connections.GetReferencesToThisCell());
+            cellCoordinator.UpdateDependentCells(connections.GetInfluenceOn());
             cellByVersion.put(sheetVersion, this.clone());
         }
         catch (NumberOperationException e){
@@ -101,7 +97,7 @@ public class Cell implements Cloneable, HasCellData {
             cellByVersion.put(sheetVersion, this.clone());
         }
         catch (OperationException | LoopConnectionException e) {
-            connections.AddReferencesToThisCell(removed);
+            connections.AddInfluenceToThisCell(removed);
             throw e;
         }
     }
@@ -115,8 +111,8 @@ public class Cell implements Cloneable, HasCellData {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Cell) {
-            return cellId.equals(((Cell)obj).GetCellId());
+        if (obj instanceof CellImpl) {
+            return cellId.equals(((CellImpl)obj).GetCellId());
         }
 
         return false;

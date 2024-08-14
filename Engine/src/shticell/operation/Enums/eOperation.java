@@ -1,4 +1,4 @@
-package operation.Enums;
+package shticell.operation.Enums;
 
 public enum eOperation
 {

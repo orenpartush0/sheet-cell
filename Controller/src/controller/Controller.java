@@ -1,39 +1,39 @@
 package controller;
 
-import operation.Exceptions.NumberOperationException;
-import operation.Exceptions.OperationException;
+import shticell.operation.Exceptions.NumberOperationException;
+import shticell.operation.Exceptions.OperationException;
 import dto.CellDto;
-import sheet.exception.LoopConnectionException;
-import sheet.Sheet;
+import shticell.exception.LoopConnectionException;
+import shticell.cell.sheet.sheetimpl.SheetImpl;
 import dto.SheetDto;
 
 import java.util.List;
 
 public class Controller {
-    private final Sheet sheet;
+    private final SheetImpl sheetImpl;
 
     public Controller(SheetDto sheetDto) {
-        sheet = new Sheet(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns());
+        sheetImpl = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns());
     }
 
-    public void UpdateCellByIndex(String square, String newValue) throws NumberFormatException, LoopConnectionException, OperationException, NumberOperationException {
-        sheet.UpdateCellByIndex(square, newValue);
+    public void UpdateCellByIndex(String coordinate, String newValue) throws NumberFormatException, LoopConnectionException, OperationException, NumberOperationException {
+        sheetImpl.UpdateCellByCoordinate(coordinate, newValue);
     }
 
      public SheetDto getSheet(){
-        return new SheetDto(sheet);
+        return new SheetDto(sheetImpl);
     }
 
-    public CellDto GetCellDataByID(String CellId){
-        return sheet.GetCellData(CellId);
+    public CellDto GetCellByCoordinate(String CellId){
+        return new CellDto(sheetImpl.GetCell(CellId));
     }
 
     public List<Integer> GetCountOfChangesPerVersion(){
-        return sheet.GetCountOfChangesPerVersion();
+        return sheetImpl.GetCountOfChangesPerVersion();
     }
 
     public SheetDto GetSheetByVersion(int version){
-        return new SheetDto(sheet.GetSheetByVersion(version));
+        return new SheetDto(sheetImpl.GetSheetByVersion(version));
     }
 
 }
