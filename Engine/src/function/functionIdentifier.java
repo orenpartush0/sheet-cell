@@ -18,8 +18,8 @@ public class functionIdentifier {
         int startIndex = 1; int endIndex = 0; int inFunction = 0;
 
         while(true){
-            inFunction = funcText.charAt(endIndex) == '{' ? ++inFunction : inFunction;
-            inFunction = funcText.charAt(endIndex) == '}' ? --inFunction : inFunction;
+            inFunction = funcText.charAt(endIndex) == '{' ? inFunction + 1: inFunction;
+            inFunction = funcText.charAt(endIndex) == '}' ? inFunction - 1 : inFunction;
 
             if (inFunction == 1) {
                 if (funcText.charAt(endIndex) == ',') {
