@@ -5,6 +5,7 @@ import dto.SheetDto;
 
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 
 public class ConsoleManager {
@@ -145,18 +146,26 @@ public class ConsoleManager {
     }
 
     public void Run(){
-        String choice;
+        boolean goOn = true;
+
         do {
             MainMenu.PrintMenu();
-            choice = scanner.nextLine();
+            String choice = scanner.nextLine();
             switch (choice) {
                 case "2" -> printSheetCell(manager.getSheet());
                 case "3" -> printCellValue();
                 case "4" -> insertData();
                 case "5" -> showVersions();
-                default -> System.out.println("Invalid choice. Please choose a number 1-6");
+                default -> {
+                    if (choice.equals("6")) {
+                        System.out.println("Bye Bye");
+                    } else {
+                        System.out.println("Invalid choice. Please choose a number 1-6");
+                    }
+                }
             }
-        }while(choice != "5");
+            goOn = !choice.equals("6");
+        }while(goOn);
     }
 
 
