@@ -1,25 +1,28 @@
-package Operation;
+package operation;
+
+import operation.Exceptions.NumberOperationException;
+import operation.Exceptions.OperationException;
+import sheet.CellConnection;
+import operation.Interface.Operation;
+import operation.Enums.eOperation;
+import sheet.exception.LoopConnectionException;
 import sheet.Interface.CellCoordinator;
-import Operation.Interface.Operation;
-import Operation.Exceptions.OperationException;
-import Operation.Enums.eOperation;
-import sheet.Exception.LoopConnectionException;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class OperationImpl implements Operation {
 
-    private final CellCoordinator cellCoordinator;
-    private final String callerCell;
+    private final CellConnection connections;
+    CellCoordinator coordinator;
 
     @Override
-    public String eval(String... funcAndArgs) throws OperationException, LoopConnectionException {
+    public String eval(String... funcAndArgs) throws OperationException, LoopConnectionException, NumberFormatException, NumberOperationException {
         ArrayList<String> args = new ArrayList<>(Arrays.stream(funcAndArgs).toList());
         String operationName = args.removeFirst();
         eOperation operation = eOperation.valueOf(operationName);
 
-        String res = switch (operation) {
+        return switch (operation) {
             case eOperation.PLUS -> Plus(args);
             case eOperation.MINUS -> Minus(args);
             case eOperation.DIVIDE -> Divide(args);
@@ -31,26 +34,26 @@ public class OperationImpl implements Operation {
             case eOperation.CONCAT -> Concat(args);
             case eOperation.REF -> ref(args);
         };
-
-        return res;
     }
 
-    public OperationImpl(CellCoordinator _cellCoordinator,String _callerCell)
+    public OperationImpl(CellConnection _connections , CellCoordinator _coordinator)
     {
-        cellCoordinator = _cellCoordinator;
-        callerCell = _callerCell;
+        connections = _connections;
+        coordinator = _coordinator;
     }
 
     private String ref(ArrayList<String> args) throws OperationException, LoopConnectionException {
         if(args.size() == 1){
-            cellCoordinator.SetInfluenceBetweenTwoCells(callerCell,args.getFirst());
-            return cellCoordinator.GetCellEffectiveValue(args.getFirst());
+            CellConnection.HasPath(coordinator.GetCellConnection(args.getFirst()),connections);
+            coordinator.GetCellConnection(args.getFirst()).AddReferenceToThisCell(connections);
+            connections.AddReferenceFromThisCell(coordinator.GetCellConnection(args.getFirst()));
+            return coordinator.GetCellEffectiveValue(args.getFirst());
         }
 
         throw new OperationException("Ref operation requires one argument");
     }
 
-    public String Concat(ArrayList<String> args) throws OperationException {
+    public String Sub(ArrayList<String> args) throws OperationException{
         if(args.size() == 3){
             int startIndex = Integer.parseInt(args.get(1));
             int endIndex = Integer.parseInt(args.get(2));
@@ -61,7 +64,7 @@ public class OperationImpl implements Operation {
         throw new OperationException("Sub operation requires three arguments");
     }
 
-    public String Sub(ArrayList<String> args) throws OperationException {
+    public String Concat(ArrayList<String> args) throws OperationException {
         if(args.size() == 2){
             return args.getFirst().concat(args.get(1));
         }
@@ -69,7 +72,7 @@ public class OperationImpl implements Operation {
         throw new OperationException("Concat operation requires two arguments");
     }
 
-    public String Pow(ArrayList<String> args) throws OperationException {
+    public String Pow(ArrayList<String> args) throws OperationException,NumberFormatException {
         if (args.size() == 2) {
             double num1 = Double.parseDouble(args.get(0));
             double num2 = Double.parseDouble(args.get(1));
@@ -80,13 +83,13 @@ public class OperationImpl implements Operation {
         throw new OperationException("Times operation requires two arguments");
     }
 
-    public String Mod(ArrayList<String> args) throws OperationException {
+    public String Mod(ArrayList<String> args) throws OperationException, NumberFormatException, NumberOperationException {
         if (args.size() == 2) {
             double num1 = Double.parseDouble(args.get(0));
             double num2 = Double.parseDouble(args.get(1));
 
             if (num2 == 0) {
-                throw new NumberFormatException("NaN");
+                throw new NumberOperationException("NaN");
             }
 
             return String.valueOf(num1 % num2);
@@ -95,7 +98,7 @@ public class OperationImpl implements Operation {
         throw new OperationException("Mod operation requires two arguments");
     }
 
-    public String Times(ArrayList<String> args) throws OperationException {
+    public String Times(ArrayList<String> args) throws OperationException, NumberFormatException {
         if (args.size() == 2) {
             double num1 = Double.parseDouble(args.get(0));
             double num2 = Double.parseDouble(args.get(1));
@@ -106,13 +109,13 @@ public class OperationImpl implements Operation {
         throw new OperationException("Times operation requires two arguments");
     }
 
-    public String Divide(ArrayList<String> args) throws OperationException {
+    public String Divide(ArrayList<String> args) throws OperationException, NumberOperationException {
         if (args.size() == 2) {
             double num1 = Double.parseDouble(args.get(0));
             double num2 = Double.parseDouble(args.get(1));
 
             if (num2 == 0) {
-                throw new NumberFormatException("NaN");
+                throw new NumberOperationException("NaN");
             }
 
             return String.valueOf(num1 / num2);
@@ -132,7 +135,7 @@ public class OperationImpl implements Operation {
         throw new OperationException("Minus operation requires two arguments");
     }
 
-    public String Plus(ArrayList<String> args) throws OperationException {
+    public String Plus(ArrayList<String> args) throws OperationException ,NumberFormatException{
         if (args.size() == 2) {
             double num1 = Double.parseDouble(args.get(0));
             double num2 = Double.parseDouble(args.get(1));

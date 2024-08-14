@@ -19,16 +19,16 @@ public class ConsoleManager {
         SheetDto sheetDto;
         System.out.println("Please enter the name of the Sheet: ");
         String sheetName = scanner.nextLine();
-        manager = new Controller(new SheetDto(sheetName,VERSION,NUM_OF_ROWS, NUM_OF_COLS,null));
+        manager = new Controller(new SheetDto(sheetName,VERSION,NUM_OF_ROWS, NUM_OF_COLS));
     }
 
     private void printColsNumbers(SheetDto sheetDto){
-        List<Integer> colsWidths = sheetDto.colWidth;
+        List<Integer> colsWidths = sheetDto.colWidth();
         String space = " ";
-        System.out.println("Sheet name: " + sheetDto.sheetName);
-        System.out.println("Version: " + sheetDto.version);
+        System.out.println("Sheet name: " + sheetDto.Name());
+        System.out.println("Version: " + sheetDto.version());
         System.out.print(space.repeat(5) + "|");
-        for(int col = 0; col < sheetDto.numberOfColumns; col++) {
+        for(int col = 0; col < sheetDto.numberOfColumns(); col++) {
             int colWidth = colsWidths.get(col) < 5 ? 5 : colsWidths.get(col);
             colWidth = colWidth  % 2 == 0 ? colWidth + 1 : colWidth;
             System.out.print(space.repeat(colWidth/2));
@@ -42,20 +42,20 @@ public class ConsoleManager {
 
     private void printSheetBody(SheetDto sheetDto){
         String space = " ";
-        List<Integer> colsWidths = sheetDto.colWidth;
+        List<Integer> colsWidths = sheetDto.colWidth();
 
-        for(int row = 0; row < sheetDto.numberOfRows; row++) {
+        for(int row = 0; row < sheetDto.numberOfRows(); row++) {
             System.out.print(space.repeat(2));
             System.out.print((char) ('A' + row));
             System.out.print(space.repeat(2));
             System.out.print("|");
-            for (int col = 0; col < sheetDto.numberOfColumns; col++) {
+            for (int col = 0; col < sheetDto.numberOfColumns(); col++) {
                 int colWidth = colsWidths.get(col) < 5 ? 5 : colsWidths.get(col);
                 colWidth = colWidth  % 2 == 0 ? colWidth + 1 : colWidth;
                 String square = String.valueOf((char) ('A' + row)) + String.valueOf(col + 1);
-                System.out.print(sheetDto.cells.get(square).effectiveValue);
+                System.out.print(sheetDto.cells().get(square).effectiveValue());
                 String SpaceColsBiggerThenTen = " ".repeat(col >= 9 ? 1 : 0);
-                System.out.print(space.repeat(colWidth - sheetDto.cells.get(square).effectiveValue.length()) + SpaceColsBiggerThenTen);
+                System.out.print(space.repeat(colWidth - sheetDto.cells().get(square).effectiveValue().length()) + SpaceColsBiggerThenTen);
                 System.out.print("|");
             }
 
@@ -63,8 +63,7 @@ public class ConsoleManager {
         }
     }
 
-    private void printSheetCell(){
-        SheetDto sheetDto = manager.getSheet();
+    private void printSheetCell(SheetDto sheetDto){
         printColsNumbers(sheetDto);
         printSheetBody(sheetDto);
     }
@@ -73,7 +72,7 @@ public class ConsoleManager {
         String pattern = "(?i)^[a-z][1-9][0-9]*$";
         if (input.matches(pattern)) {
             int numberPart = Integer.parseInt(input.substring(1));
-            return numberPart <= manager.getSheet().numberOfColumns + 1;
+            return numberPart <= manager.getSheet().numberOfColumns();
         }
 
         return false;
@@ -96,16 +95,53 @@ public class ConsoleManager {
         System.out.println(manager.GetCellDataByID(cellId));
     }
 
-    public void InsertData(){
+    private void insertData(){
+        String cellId = selectCell();
+        System.out.println("Enter the desired cell data");
         try {
-            String cellId = selectCell();
-            System.out.println("Enter the desired cell data");
             manager.UpdateCellByIndex(cellId, scanner.nextLine());
         }
-        catch (Exception ex){
-            System.out.println(ex.getMessage());
-            InsertData();
+        catch (Exception e){
+            System.out.println(e.getMessage());
         }
+    }
+
+    private void showCountOfChangesPerVersions(List<Integer> countsOfChangesPerVersion) {
+        System.out.println("Count of Changes Per Version:");
+        for (int i = 0; i < countsOfChangesPerVersion.size(); i++) {
+            System.out.printf("Version %d: %d changes%n", i + 1, countsOfChangesPerVersion.get(i));
+        }
+
+        System.out.println();
+
+    }
+    private static boolean isInteger(String str) {
+        return str.matches("-?\\d+");
+    }
+
+    private int showSheetVersionByUserChoice(List<Integer> countsOfChangesPerVersion){
+        String versionNumber;
+
+        while (true) {
+            System.out.print("Enter the version number (1 to " + countsOfChangesPerVersion.size() + "): ");
+                versionNumber = scanner.nextLine();
+                if(isInteger(versionNumber)){
+                    if (Integer.parseInt(versionNumber) >= 1 && Integer.parseInt(versionNumber) <= countsOfChangesPerVersion.size()) {
+                        break;
+                    }
+                }
+
+            System.out.println("Invalid input. Please enter a number between 1 and " + countsOfChangesPerVersion.size() + ".");
+        }
+
+        return Integer.parseInt(versionNumber);
+    }
+
+    private void showVersions(){
+        List<Integer> countsOfChangesPerVersion = manager.GetCountOfChangesPerVersion();
+        showCountOfChangesPerVersions(countsOfChangesPerVersion);
+        int selectedVersion = showSheetVersionByUserChoice(countsOfChangesPerVersion);
+        printSheetCell(manager.GetSheetByVersion(selectedVersion));
     }
 
     public void Run(){
@@ -114,11 +150,14 @@ public class ConsoleManager {
             MainMenu.PrintMenu();
             choice = scanner.nextLine();
             switch (choice) {
-                case "2" -> printSheetCell();
+                case "2" -> printSheetCell(manager.getSheet());
                 case "3" -> printCellValue();
-                case "4" -> InsertData();
+                case "4" -> insertData();
+                case "5" -> showVersions();
                 default -> System.out.println("Invalid choice. Please choose a number 1-6");
             }
         }while(choice != "5");
     }
+
+
 }

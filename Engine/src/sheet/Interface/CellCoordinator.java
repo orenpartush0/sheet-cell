@@ -1,12 +1,11 @@
 package sheet.Interface;
 
-import sheet.Exception.LoopConnectionException;
+import sheet.CellConnection;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface CellCoordinator {
     String GetCellEffectiveValue(String square);
-    void SetInfluenceBetweenTwoCells(String referrerCell, String referencedCell ) throws LoopConnectionException;
-    ArrayList<String> GetListOfReferencedCells(String referrerCell);
-    ArrayList<String> GetListOfReferencerCells(String referrerCell);
+    void UpdateDependentCells(List<String> cellsList);
+    CellConnection GetCellConnection(String cellId);
 }

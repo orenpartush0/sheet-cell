@@ -1,6 +1,6 @@
 package sheet;
 
-import sheet.Exception.LoopConnectionException;
+import sheet.exception.LoopConnectionException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -8,28 +8,32 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CellConnection implements Cloneable {
-    String cell;
-    List<CellConnection> referencesFromThisCell ;
-    List<CellConnection> referencesToThisCell;
+    private final String cell;
+    private final List<CellConnection> referencesFromThisCell ;
+    private final List<CellConnection> referencesToThisCell;
 
     public CellConnection(String val) {
         cell = val;
         referencesFromThisCell  = new ArrayList<>();
         referencesToThisCell = new ArrayList<>();
+        referencesToThisCell.add(this);
     }
+
+    public String GetCell() {return cell;}
 
     @Override
     public String toString(){
         return cell;
     }
 
-    public ArrayList<String> getReferencesFromThisCell() {
+
+    public ArrayList<String> GetReferencesFromThisCell() {
         return referencesFromThisCell.stream()
                 .map(CellConnection::toString)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public ArrayList<String> getReferencesToThisCell() {
+    public ArrayList<String> GetReferencesToThisCell() {
         return referencesToThisCell.stream()
                 .map(CellConnection::toString)
                 .collect(Collectors.toCollection(ArrayList::new));    }
@@ -44,17 +48,38 @@ public class CellConnection implements Cloneable {
         return clonedCellConnection;
     }
 
-    public void addReferenceFromThisCell(CellConnection neighbor) {
+    public void AddReferenceFromThisCell(CellConnection neighbor) {
         referencesFromThisCell.add(neighbor);
-        neighbor.referencesToThisCell.add(this);
     }
 
-    public static void hasPath(CellConnection start, CellConnection end) throws LoopConnectionException {
+    public void RemoveReferenceToThisCell(CellConnection neighbor) {
+        referencesToThisCell.remove(neighbor);
+    }
+
+    public void AddReferenceToThisCell(CellConnection neighbor) {
+        referencesToThisCell.add(neighbor);
+    }
+
+    public List<CellConnection> RemoveReferencesFromThisCell() {
+        List<CellConnection> toRemove = new ArrayList<>(referencesFromThisCell);
+        referencesFromThisCell.clear();
+        toRemove.forEach(cellConnection -> cellConnection.RemoveReferenceToThisCell(this));
+
+        return toRemove;
+    }
+
+    public void AddReferencesToThisCell(List<CellConnection> neighbors) {
+        referencesToThisCell.addAll(neighbors);
+        neighbors.forEach(cellConnection -> cellConnection.AddReferenceToThisCell(this));
+    }
+
+    public static void HasPath(CellConnection start, CellConnection end) throws LoopConnectionException {
         Set<CellConnection> visited = new HashSet<>();
         if(hasPathDFS(start, end, visited)){
             throw new LoopConnectionException("this function contain Ref that will cause a Loop!");
         }
     }
+
 
     private static boolean hasPathDFS(CellConnection current, CellConnection end, Set<CellConnection> visited) {
         if (current == end) {

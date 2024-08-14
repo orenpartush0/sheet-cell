@@ -16,6 +16,6 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="LogicLayer" />
+    <orderEntry type="module" module-name="Engine" />
   </component>
 </module>

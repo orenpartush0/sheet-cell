@@ -1,20 +1,20 @@
 package sheet;
 
+import operation.Exceptions.NumberOperationException;
+import operation.Exceptions.OperationException;
 import sheet.Interface.CellCoordinator;
-import Operation.Exceptions.OperationException;
-import sheet.Exception.LoopConnectionException;
+import sheet.exception.LoopConnectionException;
 import dto.CellDto;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import sheet.Interface.HasCellData;
+
+import java.util.*;
+import java.util.stream.IntStream;
 
 public class Sheet implements CellCoordinator {
     private final int INITIAL_VERSION = 1;
     private final String sheetName;
     private int version = INITIAL_VERSION;
-    Map<String, Cell> cells = new HashMap<>();
-    HashMap<String,CellConnection> connections = new HashMap<>();
+    Map<String, Cell> cells;
     private final int numberOfRows;
     private final int numberOfColumns;
 
@@ -22,25 +22,26 @@ public class Sheet implements CellCoordinator {
         sheetName = sheetTitle;
         numberOfRows = _numberOfRows;
         numberOfColumns = _numberOfColumns;
+        cells = new HashMap<>();
 
         for (int i = 0; i < _numberOfRows; i++) {
             for (int j = 0; j < _numberOfColumns; j++) {
                 String square = String.valueOf((char)('A' + i)) + String.valueOf(j+ 1);
                 cells.put(square, new Cell(square,this,INITIAL_VERSION));
-                connections.put(square,new CellConnection(square));
             }
         }
-
-
     }
 
-    public int GetVersion() {
-        return version;
+    public Sheet(String sheetTitle, int _numberOfRows, int _numberOfColumns,Map<String, Cell> _cells)
+    {
+        this(sheetTitle,_numberOfRows,_numberOfColumns);
+        cells = _cells;
     }
 
-    public String GetSheetName() {
-        return sheetName;
-    }
+
+    public int GetVersion() {return version;}
+
+    public String GetSheetName() {return sheetName;}
 
     public int GetNumberOfRows() {return numberOfRows;}
 
@@ -55,13 +56,32 @@ public class Sheet implements CellCoordinator {
         return cellDto;
     }
 
-    public String GetCellData(String cellId) {
-        return cells.get(cellId).toString();
+    public CellDto GetCellData(String cellId) {
+        return new CellDto(cells.get(cellId));
     }
 
+    @Override
+    public CellConnection GetCellConnection(String cellId){return cells.get(cellId).GetConnection();}
 
-    public void UpdateCellByIndex(String square, String newValue) throws OperationException, LoopConnectionException {
-        cells.get(square.toUpperCase()).UpdateCell(newValue,++version);
+    public void UpdateCellByIndex(String square, String newValue) throws LoopConnectionException, OperationException, NumberOperationException {
+        try{cells.get(square.toUpperCase()).UpdateCell(newValue,++version);}
+        catch (LoopConnectionException | OperationException e){version--; throw e;};
+    }
+
+    public List<Integer> GetCountOfChangesPerVersion(){
+        List<Integer> changes = new ArrayList<>(Collections.nCopies(version,0));
+        final int from = 2;
+        final int to = version + 1;
+
+        for (Map.Entry<String, Cell> entry : cells.entrySet()) {
+            IntStream.range(from,to).forEach(i -> {
+                if (entry.getValue().IsChangedInThisVersion(i)) {
+                    changes.set(i - 1, changes.get(i - 1) + 1);
+                }
+            });
+        }
+
+        return changes;
     }
 
     @Override
@@ -69,24 +89,19 @@ public class Sheet implements CellCoordinator {
         return cells.get(square).GetEffectiveValue();
     }
 
-    public void SetInfluenceBetweenTwoCells(String referrerCell, String referencedCell ) throws LoopConnectionException {
-        CellConnection.hasPath(connections.get(referencedCell), connections.get(referrerCell));
-        connections.get(referrerCell).addReferenceFromThisCell(connections.get(referencedCell));
+    public void UpdateDependentCells(List<String> dependentCells) {
+        dependentCells.stream().skip(1).forEach(cellId -> {
+            try {
+                Cell cellNeedToBeUpdated = cells.get(cellId);
+                cellNeedToBeUpdated.UpdateCell(cellNeedToBeUpdated.GetOriginalValue(), version);
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
-
-    @Override
-    public ArrayList<String> GetListOfReferencedCells(String referrerCell) {
-        return connections.get(referrerCell).getReferencesFromThisCell();
-    }
-
-
-    @Override
-    public ArrayList<String> GetListOfReferencerCells(String referredCell) {
-        return connections.get(referredCell).getReferencesToThisCell();
-    }
-
-    public List<Integer> getColSize() {
+    public List<Integer> getColsSize() {
         List<Integer> columnSizes = new ArrayList<>();
 
         for (int col = 0; col < numberOfColumns; col++) {
@@ -112,5 +127,16 @@ public class Sheet implements CellCoordinator {
         return columnSizes;
     }
 
+    public Sheet GetSheetByVersion(int version){
+
+        Map<String,Cell> cellsInRequiredVersion = new HashMap<>();
+
+        for(Map.Entry<String, Cell> entry : cells.entrySet()){
+            HasCellData cellData = entry.getValue().GetCellBySheetVersion(version);
+            cellsInRequiredVersion.put(entry.getKey(),new Cell(cellData));
+        }
+
+        return new Sheet(sheetName,numberOfRows,numberOfColumns,cellsInRequiredVersion);
+    }
 
 }

@@ -1,22 +1,28 @@
 package sheet;
 
+import operation.Exceptions.NumberOperationException;
+import operation.Exceptions.OperationException;
 import sheet.Interface.CellCoordinator;
-import Operation.Exceptions.OperationException;
-import Operation.Interface.Operation;
-import Operation.OperationImpl;
-import sheet.Exception.LoopConnectionException;
-import sheet.Exception.VersionControlException;
+import sheet.exception.LoopConnectionException;
 import sheet.Interface.HasCellData;
 import java.text.NumberFormat;
 import java.util.*;
 
+import static function.functionIdentifier.calcFunc;
+import static function.functionIdentifier.isFunc;
+
 public class Cell implements Cloneable, HasCellData {
+
+    private final String NAN = "NaN";
+    private final String UNDEFINED = "!Undefined!";
+
     private CellCoordinator cellCoordinator;
     private String cellId = "";
     private String originalValue = "";
     private String effectiveValue = "";
     private final TreeMap<Integer, HasCellData> cellByVersion= new TreeMap<>();
-    private int sheetVersion;
+    private int LatestSheetVersionUpdated;
+    private CellConnection connections = new CellConnection(cellId);
 
     public Cell(){}
 
@@ -25,19 +31,36 @@ public class Cell implements Cloneable, HasCellData {
         this.cellId = cellId;
         this.cellCoordinator = sheet;
         cellByVersion.put(currentSheetVersion,this.clone());
-        sheetVersion  = currentSheetVersion;
+        LatestSheetVersionUpdated  = currentSheetVersion;
+        connections = new CellConnection(cellId);
     }
 
+    public Cell(HasCellData hasCellData){
+        cellId = hasCellData.GetCellId();
+        originalValue = hasCellData.GetOriginalValue();
+        effectiveValue = hasCellData.GetEffectiveValue();
+    }
+
+    public boolean IsChangedInThisVersion(int version) {return cellByVersion.get(version) != null; }
+
+    @Override
     public String GetOriginalValue() { return originalValue; }
 
+    @Override
     public String GetEffectiveValue() { return effectiveValue; }
 
+    @Override
     public String GetCellId() { return cellId; }
 
-    public int GetSheetVersion() { return sheetVersion; }
+    @Override
+    public int LatestSheetVersionUpdated() { return LatestSheetVersionUpdated; }
 
-    public String GetCellEffectiveValueBySheetVersion(int version) throws VersionControlException {
-        return cellByVersion.get(cellByVersion.floorKey(version)).GetEffectiveValue();
+    public int GetSheetVersion() { return LatestSheetVersionUpdated; }
+
+    public CellConnection GetConnection() { return connections; }
+
+    public HasCellData GetCellBySheetVersion(int version){
+        return cellByVersion.get(cellByVersion.floorKey(version));
     }
 
     @Override
@@ -45,7 +68,7 @@ public class Cell implements Cloneable, HasCellData {
         Cell clonedCell = new Cell();
         clonedCell.cellId = cellId;
         clonedCell.cellCoordinator = cellCoordinator;
-        clonedCell.sheetVersion = sheetVersion;
+        clonedCell.LatestSheetVersionUpdated = LatestSheetVersionUpdated;
         clonedCell.originalValue = originalValue;
         clonedCell.effectiveValue = effectiveValue;
         clonedCell.cellByVersion.putAll(cellByVersion);
@@ -53,91 +76,39 @@ public class Cell implements Cloneable, HasCellData {
         return clonedCell;
     }
 
-    public String GetCellOriginalValueBySheetVersion(int version) throws VersionControlException {
-        if (cellByVersion.get(version) != null) {
-            return cellByVersion.get(version).GetOriginalValue();
-        }
-        else{
-            return cellByVersion.get(cellByVersion.lastKey()).GetOriginalValue();
-        }
-    }
-
     private String addThousandsSeparator(String number) throws NumberFormatException {
         return NumberFormat.getNumberInstance(Locale.US).format(Double.parseDouble(number));
     }
 
-    private Collection<String> decipherFunc(String funcText){
-        Collection<String> funcNameAndArguments = new ArrayList<>();
-        int startIndex = 1; int endIndex = 0; int inFunction = 0;
 
-        while(true){
-            inFunction = funcText.charAt(endIndex) == '{' ? ++inFunction : inFunction;
-            inFunction = funcText.charAt(endIndex) == '}' ? --inFunction : inFunction;
-
-            if (inFunction == 1) {
-                if (funcText.charAt(endIndex) == ',') {
-                    funcNameAndArguments.add(funcText.substring(startIndex, endIndex).replaceAll(" ", ""));
-                    startIndex = endIndex + 1;
-                }
-            } else if (inFunction == 0) {
-                funcNameAndArguments.add(funcText.substring(startIndex, endIndex).replaceAll(" ", ""));
-                break;
-            }
-
-            endIndex++;
+    public void UpdateCell(String newOriginalValue, int sheetVersion) throws  LoopConnectionException,OperationException{
+            List<CellConnection> removed = new ArrayList<>(connections.RemoveReferencesFromThisCell());
+        try{
+            LatestSheetVersionUpdated = sheetVersion;
+            effectiveValue = parseEffectiveValue(newOriginalValue);
+            originalValue = newOriginalValue;
+            cellCoordinator.UpdateDependentCells(connections.GetReferencesToThisCell());
+            cellByVersion.put(sheetVersion, this.clone());
         }
-        
-        return funcNameAndArguments;
-    }
-
-    private boolean isFunc(String func){
-        return func.charAt(0) =='{' && func.charAt(func.length()-1) == '}';
-    }
-
-    private String calcFunc(String func) throws OperationException, LoopConnectionException {
-        if(isFunc(func)){
-            List<String> funcAndArgs = new ArrayList<>(decipherFunc(func).stream().toList());
-            Operation operation = new OperationImpl(cellCoordinator, cellId);
-
-            for(int i = 0; i < funcAndArgs.size(); i++) {
-                funcAndArgs.set(i, calcFunc(funcAndArgs.get(i)));
-            }
-
-            return operation.eval(funcAndArgs.toArray(new String[0]));
+        catch (NumberOperationException e){
+            effectiveValue = NAN;
+            cellByVersion.put(sheetVersion, this.clone());
         }
-        else{
-            return func;
+        catch(IndexOutOfBoundsException e){
+            effectiveValue = UNDEFINED;
+            cellByVersion.put(sheetVersion, this.clone());
+        }
+        catch (OperationException | LoopConnectionException e) {
+            connections.AddReferencesToThisCell(removed);
+            throw e;
         }
     }
 
-    public void UpdateCell(String newOriginalValue, int sheetVersion) throws OperationException, LoopConnectionException {
-        originalValue = newOriginalValue;
-        effectiveValue = parseEffectiveValue(newOriginalValue);
-        cellByVersion.put(sheetVersion, this.clone());
-    }
-
-    private String parseEffectiveValue(String newOriginalValue) throws OperationException, LoopConnectionException {
-        try {
-            return addThousandsSeparator(String.valueOf(newOriginalValue));
-        } catch (NumberFormatException e) {
-            return isFunc(newOriginalValue) ? calcFunc(newOriginalValue) : String.valueOf(newOriginalValue);
-        }
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Cell at square ").append(cellId).append("\n");
-        builder.append("-----\n");
-        builder.append("Original Value: ").append(originalValue).append("\n");
-        builder.append("Effective Value: ").append(effectiveValue).append("\n");
-        builder.append("List of cells influence by this cell:\n");
-        builder.append(cellCoordinator.GetListOfReferencedCells(cellId));
-        builder.append("\nList of cells influence this cell:\n");
-        builder.append(cellCoordinator.GetListOfReferencerCells(cellId));
-        builder.append("\n--------\n");
-
-        return builder.toString();
+    private String parseEffectiveValue(String newOriginalValue) throws NumberFormatException, LoopConnectionException, OperationException, NumberOperationException {
+            String effectiveValue = isFunc(newOriginalValue) ? calcFunc(newOriginalValue,connections,cellCoordinator) : String.valueOf(newOriginalValue);
+            return !effectiveValue.isEmpty() && effectiveValue.chars().allMatch(Character::isDigit)
+                    ? addThousandsSeparator(String.valueOf(effectiveValue))
+                    : effectiveValue;
     }
 
     @Override

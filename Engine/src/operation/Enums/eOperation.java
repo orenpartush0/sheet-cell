@@ -1,4 +1,4 @@
-package Operation.Enums;
+package operation.Enums;
 
 public enum eOperation
 {
