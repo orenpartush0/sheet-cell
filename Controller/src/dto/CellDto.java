@@ -11,7 +11,7 @@ public record CellDto(String cellId,int LatestSheetVersionUpdated,String origina
     public CellDto(Cell cell)
     {
         this(cell.GetCellId(),cell.GetSheetVersion(),cell.GetOriginalValue(),cell.GetEffectiveValue()
-                ,cell.GetConnection().GetReferencesFromThisCell(), cell.GetConnection().GetReferencesToThisCell());
+                ,cell.GetConnections().GetReferencesFromThisCell(), cell.GetConnections().GetReferencesToThisCell());
     }
 
     @Override

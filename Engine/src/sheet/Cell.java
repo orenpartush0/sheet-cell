@@ -57,7 +57,7 @@ public class Cell implements Cloneable, HasCellData {
 
     public int GetSheetVersion() { return LatestSheetVersionUpdated; }
 
-    public CellConnection GetConnection() { return connections; }
+    public CellConnection GetConnections() { return connections; }
 
     public HasCellData GetCellBySheetVersion(int version){
         return cellByVersion.get(cellByVersion.floorKey(version));
@@ -84,17 +84,19 @@ public class Cell implements Cloneable, HasCellData {
     public void UpdateCell(String newOriginalValue, int sheetVersion) throws  LoopConnectionException,OperationException{
             List<CellConnection> removed = new ArrayList<>(connections.RemoveReferencesFromThisCell());
         try{
-            LatestSheetVersionUpdated = sheetVersion;
             effectiveValue = parseEffectiveValue(newOriginalValue);
+            LatestSheetVersionUpdated = sheetVersion;
             originalValue = newOriginalValue;
             cellCoordinator.UpdateDependentCells(connections.GetReferencesToThisCell());
             cellByVersion.put(sheetVersion, this.clone());
         }
         catch (NumberOperationException e){
+            LatestSheetVersionUpdated = sheetVersion;
             effectiveValue = NAN;
             cellByVersion.put(sheetVersion, this.clone());
         }
         catch(IndexOutOfBoundsException e){
+            LatestSheetVersionUpdated = sheetVersion;
             effectiveValue = UNDEFINED;
             cellByVersion.put(sheetVersion, this.clone());
         }

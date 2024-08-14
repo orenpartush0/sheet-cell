@@ -17,10 +17,13 @@ public class OperationImpl implements Operation {
     CellCoordinator coordinator;
 
     @Override
-    public String eval(String... funcAndArgs) throws OperationException, LoopConnectionException, NumberFormatException, NumberOperationException {
+    public String eval(String... funcAndArgs) throws OperationException, LoopConnectionException, NumberFormatException, NumberOperationException{
         ArrayList<String> args = new ArrayList<>(Arrays.stream(funcAndArgs).toList());
         String operationName = args.removeFirst();
-        eOperation operation = eOperation.valueOf(operationName);
+        eOperation operation;
+        try {operation = eOperation.valueOf(operationName);} catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid Operation named: " + operationName);
+        }
 
         return switch (operation) {
             case eOperation.PLUS -> Plus(args);
@@ -44,9 +47,9 @@ public class OperationImpl implements Operation {
 
     private String ref(ArrayList<String> args) throws OperationException, LoopConnectionException {
         if(args.size() == 1){
-            CellConnection.HasPath(coordinator.GetCellConnection(args.getFirst()),connections);
-            coordinator.GetCellConnection(args.getFirst()).AddReferenceToThisCell(connections);
-            connections.AddReferenceFromThisCell(coordinator.GetCellConnection(args.getFirst()));
+            CellConnection.HasPath(coordinator.GetCellConnections(args.getFirst()),connections);
+            coordinator.GetCellConnections(args.getFirst()).AddReferenceToThisCell(connections);
+            connections.AddReferenceFromThisCell(coordinator.GetCellConnections(args.getFirst()));
             return coordinator.GetCellEffectiveValue(args.getFirst());
         }
 
@@ -74,10 +77,16 @@ public class OperationImpl implements Operation {
 
     public String Pow(ArrayList<String> args) throws OperationException,NumberFormatException {
         if (args.size() == 2) {
-            double num1 = Double.parseDouble(args.get(0));
-            double num2 = Double.parseDouble(args.get(1));
+            try {
+                double num1 = Double.parseDouble(args.get(0));
+                double num2 = Double.parseDouble(args.get(1));
+                return String.valueOf(Math.pow(num1, num2));
+            }
+            catch (NumberFormatException e) {
+                throw new OperationException("Invalid argument for Pow operation");
+            }
 
-            return String.valueOf(Math.pow(num1, num2));
+
         }
 
         throw new OperationException("Times operation requires two arguments");
@@ -85,14 +94,20 @@ public class OperationImpl implements Operation {
 
     public String Mod(ArrayList<String> args) throws OperationException, NumberFormatException, NumberOperationException {
         if (args.size() == 2) {
-            double num1 = Double.parseDouble(args.get(0));
-            double num2 = Double.parseDouble(args.get(1));
 
-            if (num2 == 0) {
-                throw new NumberOperationException("NaN");
+            try {
+                double num1 = Double.parseDouble(args.get(0));
+                double num2 = Double.parseDouble(args.get(1));
+
+                if (num2 == 0) {
+                    throw new NumberOperationException("NaN");
+                }
+
+                return String.valueOf(num1 % num2);
             }
-
-            return String.valueOf(num1 % num2);
+            catch (NumberFormatException e) {
+                throw new OperationException("Invalid argument for Mod operation");
+            }
         }
 
         throw new OperationException("Mod operation requires two arguments");
@@ -100,10 +115,15 @@ public class OperationImpl implements Operation {
 
     public String Times(ArrayList<String> args) throws OperationException, NumberFormatException {
         if (args.size() == 2) {
-            double num1 = Double.parseDouble(args.get(0));
-            double num2 = Double.parseDouble(args.get(1));
+            try {
+                double num1 = Double.parseDouble(args.get(0));
+                double num2 = Double.parseDouble(args.get(1));
 
-            return String.valueOf(num1 * num2);
+                return String.valueOf(num1 * num2);
+            }
+            catch (NumberFormatException e) {
+                throw new OperationException("Invalid argument for Times operation");
+            }
         }
 
         throw new OperationException("Times operation requires two arguments");
@@ -111,14 +131,19 @@ public class OperationImpl implements Operation {
 
     public String Divide(ArrayList<String> args) throws OperationException, NumberOperationException {
         if (args.size() == 2) {
-            double num1 = Double.parseDouble(args.get(0));
-            double num2 = Double.parseDouble(args.get(1));
+            try {
+                double num1 = Double.parseDouble(args.get(0));
+                double num2 = Double.parseDouble(args.get(1));
 
-            if (num2 == 0) {
-                throw new NumberOperationException("NaN");
+                if (num2 == 0) {
+                    throw new NumberOperationException("NaN");
+                }
+
+                return String.valueOf(num1 / num2);
             }
-
-            return String.valueOf(num1 / num2);
+            catch(NumberFormatException e) {
+                throw new OperationException("Invalid argument for Divide operation");
+            }
         }
 
         throw new OperationException("Divide operation requires two arguments");
@@ -126,10 +151,16 @@ public class OperationImpl implements Operation {
 
     public String Minus(ArrayList<String> args) throws OperationException {
         if (args.size() == 2) {
-            double num1 = Double.parseDouble(args.get(0));
-            double num2 = Double.parseDouble(args.get(1));
 
-            return String.valueOf(num1 - num2);
+            try {
+                double num1 = Double.parseDouble(args.get(0));
+                double num2 = Double.parseDouble(args.get(1));
+
+                return String.valueOf(num1 - num2);
+            }
+            catch(NumberFormatException e) {
+                throw new OperationException("Invalid argument for Minus operation");
+            }
         }
 
         throw new OperationException("Minus operation requires two arguments");
@@ -137,10 +168,15 @@ public class OperationImpl implements Operation {
 
     public String Plus(ArrayList<String> args) throws OperationException ,NumberFormatException{
         if (args.size() == 2) {
-            double num1 = Double.parseDouble(args.get(0));
-            double num2 = Double.parseDouble(args.get(1));
+            try {
+                double num1 = Double.parseDouble(args.get(0));
+                double num2 = Double.parseDouble(args.get(1));
 
-            return String.valueOf(num1 + num2);
+                return String.valueOf(num1 + num2);
+            }
+            catch (NumberFormatException e) {
+                throw new OperationException("Invalid argument for Plus operation");
+            }
         }
 
         throw new OperationException("Plus operation requires two arguments");
@@ -148,7 +184,12 @@ public class OperationImpl implements Operation {
 
     public String Abs(ArrayList<String> args) throws OperationException {
         if (args.size() == 1) {
-            return String.valueOf(Math.abs(Double.parseDouble(args.getFirst())));
+            try {
+                return String.valueOf(Math.abs(Double.parseDouble(args.getFirst())));
+            }
+            catch (NumberFormatException e) {
+                throw new OperationException("Invalid argument for Abs operation");
+            }
         }
 
         throw new OperationException("Abs operation requires one argument");

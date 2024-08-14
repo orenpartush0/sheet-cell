@@ -61,11 +61,11 @@ public class Sheet implements CellCoordinator {
     }
 
     @Override
-    public CellConnection GetCellConnection(String cellId){return cells.get(cellId).GetConnection();}
+    public CellConnection GetCellConnections(String cellId){return cells.get(cellId).GetConnections();}
 
     public void UpdateCellByIndex(String square, String newValue) throws LoopConnectionException, OperationException, NumberOperationException {
         try{cells.get(square.toUpperCase()).UpdateCell(newValue,++version);}
-        catch (LoopConnectionException | OperationException e){version--; throw e;};
+        catch (LoopConnectionException | OperationException | RuntimeException e){version--; throw e;};
     }
 
     public List<Integer> GetCountOfChangesPerVersion(){
