@@ -5,6 +5,8 @@ import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.operation.Exceptions.OperationException;
 
+import java.util.ArrayList;
+
 public interface Cell {
     String GetOriginalValue();
     String GetEffectiveValue();
@@ -14,4 +16,6 @@ public interface Cell {
     CellConnection GetConnections();
     boolean IsChangedInThisVersion(int version);
     Cell GetCellBySheetVersion(int version);
+    ArrayList<String> GetDependsOnListOfStrings();
+    ArrayList<String> GetInfluenceOnListOfStrings();
 }

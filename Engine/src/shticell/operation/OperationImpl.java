@@ -45,11 +45,10 @@ public class OperationImpl implements Operation {
         coordinator = _coordinator;
     }
 
-    private String ref(ArrayList<String> args) throws OperationException, LoopConnectionException {
+    private String ref(ArrayList<String> args) throws OperationException {
         if(args.size() == 1){
-            coordinator.GetCellConnections(CoordinateFactory.getCoordinate(args.getFirst())).HasPath(connections);
-            coordinator.GetCellConnections(CoordinateFactory.getCoordinate(args.getFirst())).AddReferenceToThisCell(connections);
-            connections.AddReferenceFromThisCell(coordinator.GetCellConnections(CoordinateFactory.getCoordinate(args.getFirst())));
+            coordinator.GetCellConnections(CoordinateFactory.getCoordinate(args.getFirst())).AddToInfluenceOn(connections);
+            connections.AddToDependsOn(coordinator.GetCellConnections(CoordinateFactory.getCoordinate(args.getFirst())));
             return coordinator.GetCellEffectiveValue(CoordinateFactory.getCoordinate(args.getFirst()));
         }
 

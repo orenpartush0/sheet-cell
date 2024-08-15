@@ -13,7 +13,7 @@ public record CellDto(Coordinate coordinate, int LatestSheetVersionUpdated, Stri
     public CellDto(Cell cellImpl)
     {
         this(cellImpl.GetCellCoordinate(), cellImpl.GetVersion(), cellImpl.GetOriginalValue(), cellImpl.GetEffectiveValue()
-                , cellImpl.GetConnections().GetDependsOnListOfStrings(), cellImpl.GetConnections().GetInfluenceOnListOfStrings());
+                , cellImpl.GetDependsOnListOfStrings(), cellImpl.GetInfluenceOnListOfStrings());
     }
 
     @Override

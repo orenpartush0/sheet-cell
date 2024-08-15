@@ -12,17 +12,17 @@ public interface CellConnection{
 
     List<CellConnection> GetInfluenceOn();
 
-    void AddReferenceFromThisCell(CellConnection neighbor);
+    List<CellConnection> GetSortedInfluenceOn() throws LoopConnectionException;
 
-    void RemoveReferenceToThisCell(CellConnection neighbor);
+    void AddToDependsOn(CellConnection neighbor);
 
-    void AddReferenceToThisCell(CellConnection neighbor);
+    void AddToInfluenceOn(CellConnection neighbor);
 
-    List<CellConnection> RemoveReferencesFromThisCell();
+    void RemoveFromInfluenceOn(CellConnection neighbor);
 
-    void AddInfluenceToThisCell(List<CellConnection> neighbors);
+    List<CellConnection> ClearDependsOn();
 
-    void HasPath(CellConnection end) throws LoopConnectionException;
+    void AddListToInfluenceOn(List<CellConnection> neighbors);
 
     ArrayList<String> GetDependsOnListOfStrings();
 

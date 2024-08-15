@@ -91,10 +91,10 @@ public class SheetImpl implements CellCoordinator, Sheet {
     }
 
     @Override
-    public void UpdateDependentCells(List<CellConnection> dependentCells) {
-        dependentCells.stream().skip(1).forEach(dependentCell -> {
+    public void UpdateDependentCells(List<Coordinate> coordinates) {
+        coordinates.forEach(cellCoordinate -> {
             try {
-                Cell cellImplNeedToBeUpdated = cells.get(dependentCell.GetCellCoordinate());
+                Cell cellImplNeedToBeUpdated = cells.get(cellCoordinate);
                 cellImplNeedToBeUpdated.UpdateCell(cellImplNeedToBeUpdated.GetOriginalValue(), version);
             }
             catch (Exception e) {

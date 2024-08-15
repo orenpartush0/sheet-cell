@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface CellCoordinator {
     String GetCellEffectiveValue(Coordinate coordinate);
-    void UpdateDependentCells(List<CellConnection> cellsList);
+    void UpdateDependentCells(List<Coordinate> cellsList);
     CellConnection GetCellConnections(Coordinate coordinate);
 }

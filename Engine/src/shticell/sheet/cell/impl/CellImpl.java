@@ -8,7 +8,6 @@ import shticell.sheet.api.CellCoordinator;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.cell.api.Cell;
-
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -19,7 +18,7 @@ public class CellImpl implements Cloneable, Cell {
 
     private final String NAN = "NaN";
     private final String UNDEFINED = "!Undefined!";
-    private CellCoordinator cellCoordinator;
+    private CellCoordinator sheet;
     private Coordinate coordinate;
     private String originalValue = "";
     private String effectiveValue = "";
@@ -32,7 +31,7 @@ public class CellImpl implements Cloneable, Cell {
     public CellImpl(Coordinate _coordinate, CellCoordinator sheet, int currentSheetVersion){
         originalValue = effectiveValue = "";
         coordinate = _coordinate;
-        cellCoordinator = sheet;
+        this.sheet = sheet;
         cellByVersion.put(currentSheetVersion,this.clone());
         LatestSheetVersionUpdated  = currentSheetVersion;
         connections = new CellConnectionImpl(coordinate);
@@ -68,12 +67,22 @@ public class CellImpl implements Cloneable, Cell {
     }
 
     @Override
+    public ArrayList<String> GetDependsOnListOfStrings() {
+        return connections.GetDependsOnListOfStrings();
+    }
+
+    @Override
+    public ArrayList<String> GetInfluenceOnListOfStrings() {
+        return connections.GetInfluenceOnListOfStrings();
+    }
+
+    @Override
     public CellImpl clone(){
         CellImpl clonedCellImpl = new CellImpl();
         clonedCellImpl.originalValue = originalValue;
         clonedCellImpl.effectiveValue = effectiveValue;
         clonedCellImpl.coordinate = coordinate;
-        clonedCellImpl.cellCoordinator = cellCoordinator;
+        clonedCellImpl.sheet = sheet;
 
         return clonedCellImpl;
     }
@@ -85,32 +94,33 @@ public class CellImpl implements Cloneable, Cell {
 
     @Override
     public void UpdateCell(String newOriginalValue, int sheetVersion) throws  LoopConnectionException,OperationException{
-            List<CellConnection> removed = new ArrayList<>(connections.RemoveReferencesFromThisCell());
+            List<CellConnection> removed = new ArrayList<>(connections.ClearDependsOn());
         try{
-            effectiveValue = parseEffectiveValue(newOriginalValue);
+            cellByVersion.put(sheetVersion, this.clone());
             LatestSheetVersionUpdated = sheetVersion;
             originalValue = newOriginalValue;
-            cellCoordinator.UpdateDependentCells(connections.GetInfluenceOn());
-            cellByVersion.put(sheetVersion, this.clone());
+            effectiveValue = parseEffectiveValue(newOriginalValue);
+            sheet.UpdateDependentCells(connections.GetSortedInfluenceOn().stream().map(CellConnection::GetCellCoordinate).toList());
         }
         catch (NumberOperationException e){
-            LatestSheetVersionUpdated = sheetVersion;
             effectiveValue = NAN;
-            cellByVersion.put(sheetVersion, this.clone());
         }
         catch(IndexOutOfBoundsException e){
-            LatestSheetVersionUpdated = sheetVersion;
             effectiveValue = UNDEFINED;
-            cellByVersion.put(sheetVersion, this.clone());
         }
         catch (OperationException | LoopConnectionException e) {
-            connections.AddInfluenceToThisCell(removed);
+            connections.AddListToInfluenceOn(removed);
+            Cell backUp = cellByVersion.lastEntry().getValue();
+            effectiveValue = backUp.GetEffectiveValue();
+            LatestSheetVersionUpdated = backUp.GetVersion();
+            originalValue = backUp.GetOriginalValue();
+            cellByVersion.remove(cellByVersion.lastEntry().getKey());
             throw e;
         }
     }
 
     private String parseEffectiveValue(String newOriginalValue) throws NumberFormatException, LoopConnectionException, OperationException, NumberOperationException {
-            String effectiveValue = isFunc(newOriginalValue) ? calcFunc(newOriginalValue,connections,cellCoordinator) : String.valueOf(newOriginalValue);
+            String effectiveValue = isFunc(newOriginalValue) ? calcFunc(newOriginalValue,connections, sheet) : String.valueOf(newOriginalValue);
             return !effectiveValue.isEmpty() && effectiveValue.chars().allMatch(Character::isDigit)
                     ? addThousandsSeparator(String.valueOf(effectiveValue))
                     : effectiveValue;
@@ -124,5 +134,6 @@ public class CellImpl implements Cloneable, Cell {
 
         return false;
     }
+
 }
 
