@@ -1,7 +1,6 @@
 package shticell.sheet.api;
 
-import shticell.cell.ties.api.CellConnection;
-import shticell.cell.ties.impl.CellConnectionImpl;
+import shticell.sheet.cell.connection.CellConnection;
 
 import java.util.List;
 

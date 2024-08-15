@@ -1,12 +1,13 @@
-package shticell.cell.impl;
+package shticell.sheet.cell.impl;
 
-import shticell.cell.ties.api.CellConnection;
+import shticell.sheet.cell.connection.CellConnection;
 import shticell.operation.Exceptions.NumberOperationException;
 import shticell.operation.Exceptions.OperationException;
-import shticell.cell.ties.impl.CellConnectionImpl;
+import shticell.sheet.cell.connection.CellConnectionImpl;
 import shticell.sheet.api.CellCoordinator;
-import shticell.exception.LoopConnectionException;
-import shticell.cell.api.Cell;
+import shticell.sheet.exception.LoopConnectionException;
+import shticell.sheet.cell.api.Cell;
+
 import java.text.NumberFormat;
 import java.util.*;
 

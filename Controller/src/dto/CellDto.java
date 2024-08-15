@@ -1,7 +1,7 @@
 package dto;
 
-import shticell.cell.api.Cell;
-import shticell.cell.impl.CellImpl;
+import shticell.sheet.cell.api.Cell;
+
 import java.util.ArrayList;
 
 

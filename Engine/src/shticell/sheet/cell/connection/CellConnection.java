@@ -1,6 +1,6 @@
-package shticell.cell.ties.api;
+package shticell.sheet.cell.connection;
 
-import shticell.exception.LoopConnectionException;
+import shticell.sheet.exception.LoopConnectionException;
 
 import java.util.*;
 

@@ -1,7 +1,7 @@
 package shticell.sheet.api;
 
-import shticell.cell.api.Cell;
-import shticell.exception.LoopConnectionException;
+import shticell.sheet.cell.api.Cell;
+import shticell.sheet.exception.LoopConnectionException;
 import shticell.operation.Exceptions.NumberOperationException;
 import shticell.operation.Exceptions.OperationException;
 import shticell.sheet.impl.SheetImpl;

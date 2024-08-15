@@ -1,11 +1,11 @@
 package shticell.function.api;
 
-import shticell.cell.ties.api.CellConnection;
+import shticell.sheet.cell.connection.CellConnection;
 import shticell.operation.Exceptions.NumberOperationException;
 import shticell.operation.Exceptions.OperationException;
 import shticell.operation.Operation;
 import shticell.operation.OperationImpl;
-import shticell.exception.LoopConnectionException;
+import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.api.CellCoordinator;
 import java.util.ArrayList;
 import java.util.Collection;

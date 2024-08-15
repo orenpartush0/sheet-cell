@@ -1,7 +1,7 @@
-package shticell.cell.api;
+package shticell.sheet.cell.api;
 
-import shticell.cell.ties.api.CellConnection;
-import shticell.exception.LoopConnectionException;
+import shticell.sheet.cell.connection.CellConnection;
+import shticell.sheet.exception.LoopConnectionException;
 import shticell.operation.Exceptions.OperationException;
 
 public interface Cell {
