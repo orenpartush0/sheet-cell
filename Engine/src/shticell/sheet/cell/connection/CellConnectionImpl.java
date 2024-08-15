@@ -1,5 +1,6 @@
 package shticell.sheet.cell.connection;
 
+import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 
 import java.util.ArrayList;
@@ -9,22 +10,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CellConnectionImpl implements Cloneable, CellConnection {
-    private final String cellId;
+    private final Coordinate coordinate;
     private final List<CellConnection> dependsOn = new ArrayList<>();
     private final List<CellConnection> influenceOn = new ArrayList<>();
 
-    public CellConnectionImpl(String val) {
-        cellId = val;
+    public CellConnectionImpl(Coordinate _coordinate) {
+        coordinate = _coordinate;
         influenceOn.add(this);
     }
 
-    public String GetCellID() {return cellId;}
-
-    @Override
-    public String toString(){
-        return cellId;
-    }
-
+    public Coordinate GetCellCoordinate() {return coordinate;}
 
     public ArrayList<String> GetDependsOnListOfStrings() {
         return dependsOn.stream()
@@ -40,12 +35,13 @@ public class CellConnectionImpl implements Cloneable, CellConnection {
 
     public ArrayList<String> GetInfluenceOnListOfStrings() {
         return influenceOn.stream()
-                .map(CellConnection::toString)
+                .map(cellConnection -> coordinate)
+                .map(Coordinate::toString)
                 .collect(Collectors.toCollection(ArrayList::new));    }
 
     @Override
     public CellConnectionImpl clone(){
-        CellConnectionImpl clonedCellConnectionImpl = new CellConnectionImpl(cellId);
+        CellConnectionImpl clonedCellConnectionImpl = new CellConnectionImpl(coordinate);
         clonedCellConnectionImpl.dependsOn.addAll(dependsOn);
 
         return clonedCellConnectionImpl;
@@ -95,5 +91,4 @@ public class CellConnectionImpl implements Cloneable, CellConnection {
                 .filter(neighbor -> !visited.contains(neighbor))
                 .anyMatch(neighbor -> hasPathDFS(neighbor, end, visited));
     }
-
 }

@@ -4,6 +4,7 @@ import shticell.sheet.cell.connection.CellConnection;
 import shticell.operation.Exceptions.NumberOperationException;
 import shticell.operation.Exceptions.OperationException;
 import shticell.operation.Enums.eOperation;
+import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.api.CellCoordinator;
 
@@ -46,10 +47,10 @@ public class OperationImpl implements Operation {
 
     private String ref(ArrayList<String> args) throws OperationException, LoopConnectionException {
         if(args.size() == 1){
-            coordinator.GetCellConnections(args.getFirst()).HasPath(connections);
-            coordinator.GetCellConnections(args.getFirst()).AddReferenceToThisCell(connections);
-            connections.AddReferenceFromThisCell(coordinator.GetCellConnections(args.getFirst()));
-            return coordinator.GetCellEffectiveValue(args.getFirst());
+            coordinator.GetCellConnections(CoordinateFactory.getCoordinate(args.getFirst())).HasPath(connections);
+            coordinator.GetCellConnections(CoordinateFactory.getCoordinate(args.getFirst())).AddReferenceToThisCell(connections);
+            connections.AddReferenceFromThisCell(coordinator.GetCellConnections(CoordinateFactory.getCoordinate(args.getFirst())));
+            return coordinator.GetCellEffectiveValue(CoordinateFactory.getCoordinate(args.getFirst()));
         }
 
         throw new OperationException("Ref operation requires one argument");

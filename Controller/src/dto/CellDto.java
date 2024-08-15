@@ -1,23 +1,24 @@
 package dto;
 
 import shticell.sheet.cell.api.Cell;
+import shticell.sheet.coordinate.Coordinate;
 
 import java.util.ArrayList;
 
 
-public record CellDto(String cellId,int LatestSheetVersionUpdated,String originalValue,
-                      String effectiveValue,ArrayList<String> referencesFromThisCell,
+public record CellDto(Coordinate coordinate, int LatestSheetVersionUpdated, String originalValue,
+                      String effectiveValue, ArrayList<String> referencesFromThisCell,
                       ArrayList<String> referencesToThisCell)
 {
     public CellDto(Cell cellImpl)
     {
-        this(cellImpl.GetCellId(), cellImpl.GetVersion(), cellImpl.GetOriginalValue(), cellImpl.GetEffectiveValue()
+        this(cellImpl.GetCellCoordinate(), cellImpl.GetVersion(), cellImpl.GetOriginalValue(), cellImpl.GetEffectiveValue()
                 , cellImpl.GetConnections().GetDependsOnListOfStrings(), cellImpl.GetConnections().GetInfluenceOnListOfStrings());
     }
 
     @Override
     public String toString() {
-        return  "cellId= " + cellId + "\n"
+        return  "Cell Coordinate= " + coordinate + "\n"
                 + "Latest Sheet Version Updated = " + LatestSheetVersionUpdated + "\n"
                 + "Original Value = " + originalValue + "\n"
                 + "Effective Value = " + effectiveValue + "\n"

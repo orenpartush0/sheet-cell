@@ -1,4 +1,5 @@
 package userInterface;
+import shticell.sheet.coordinate.CoordinateFactory;
 import userInterface.Enum.MainMenu;
 import controller.Controller;
 import dto.SheetDto;
@@ -52,10 +53,9 @@ public class ConsoleManager {
             for (int col = 0; col < sheetDto.numberOfColumns(); col++) {
                 int colWidth = colsWidths.get(col) < 5 ? 5 : colsWidths.get(col);
                 colWidth = colWidth  % 2 == 0 ? colWidth + 1 : colWidth;
-                String square = String.valueOf((char) ('A' + row)) + String.valueOf(col + 1);
-                System.out.print(sheetDto.cells().get(square).effectiveValue());
+                System.out.print(sheetDto.cells().get(CoordinateFactory.getCoordinate(row,col + 1)).effectiveValue());
                 String SpaceColsBiggerThenTen = " ".repeat(col >= 9 ? 1 : 0);
-                System.out.print(space.repeat(colWidth - sheetDto.cells().get(square).effectiveValue().length()) + SpaceColsBiggerThenTen);
+                System.out.print(space.repeat(colWidth - sheetDto.cells().get(CoordinateFactory.getCoordinate(row,col + 1)).effectiveValue().length()) + SpaceColsBiggerThenTen);
                 System.out.print("|");
             }
 
@@ -91,15 +91,15 @@ public class ConsoleManager {
     }
 
     private void printCellValue(){
-        String cellId = selectCell();
-        System.out.println(manager.GetCellByCoordinate(cellId));
+        String cell = selectCell();
+        System.out.println(manager.GetCellByCoordinate(cell));
     }
 
     private void insertData(){
-        String cellId = selectCell();
+        String cell = selectCell();
         System.out.println("Enter the desired cell data");
         try {
-            manager.UpdateCellByIndex(cellId, scanner.nextLine());
+            manager.UpdateCellByIndex(cell, scanner.nextLine());
         }
         catch (Exception e){
             System.out.println(e.getMessage());

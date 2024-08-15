@@ -5,6 +5,7 @@ import shticell.operation.Exceptions.NumberOperationException;
 import shticell.operation.Exceptions.OperationException;
 import shticell.sheet.cell.connection.CellConnectionImpl;
 import shticell.sheet.api.CellCoordinator;
+import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.cell.api.Cell;
 
@@ -19,26 +20,26 @@ public class CellImpl implements Cloneable, Cell {
     private final String NAN = "NaN";
     private final String UNDEFINED = "!Undefined!";
     private CellCoordinator cellCoordinator;
-    private String cellId = "";
+    private Coordinate coordinate;
     private String originalValue = "";
     private String effectiveValue = "";
     private final TreeMap<Integer, Cell> cellByVersion= new TreeMap<>();
     private int LatestSheetVersionUpdated;
-    private CellConnection connections = new CellConnectionImpl(cellId);
+    private CellConnection connections = new CellConnectionImpl(coordinate);
 
     public CellImpl(){};
 
-    public CellImpl(String cellId, CellCoordinator sheet, int currentSheetVersion){
+    public CellImpl(Coordinate _coordinate, CellCoordinator sheet, int currentSheetVersion){
         originalValue = effectiveValue = "";
-        cellId = cellId;
+        coordinate = _coordinate;
         cellCoordinator = sheet;
         cellByVersion.put(currentSheetVersion,this.clone());
         LatestSheetVersionUpdated  = currentSheetVersion;
-        connections = new CellConnectionImpl(cellId);
+        connections = new CellConnectionImpl(coordinate);
     }
 
     public CellImpl(Cell cell){
-        cellId = cell.GetCellId();
+        coordinate = cell.GetCellCoordinate();
         originalValue = cell.GetOriginalValue();
         effectiveValue = cell.GetEffectiveValue();
     }
@@ -53,7 +54,7 @@ public class CellImpl implements Cloneable, Cell {
     public String GetEffectiveValue() { return effectiveValue; }
 
     @Override
-    public String GetCellId() { return cellId; }
+    public Coordinate GetCellCoordinate() { return coordinate; }
 
     @Override
     public int GetVersion() { return LatestSheetVersionUpdated; }
@@ -71,7 +72,7 @@ public class CellImpl implements Cloneable, Cell {
         CellImpl clonedCellImpl = new CellImpl();
         clonedCellImpl.originalValue = originalValue;
         clonedCellImpl.effectiveValue = effectiveValue;
-        clonedCellImpl.cellId = cellId;
+        clonedCellImpl.coordinate = coordinate;
         clonedCellImpl.cellCoordinator = cellCoordinator;
 
         return clonedCellImpl;
@@ -118,7 +119,7 @@ public class CellImpl implements Cloneable, Cell {
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof CellImpl) {
-            return cellId.equals(((CellImpl)obj).GetCellId());
+            return coordinate.equals(((CellImpl)obj).GetCellCoordinate());
         }
 
         return false;

@@ -1,13 +1,12 @@
 package shticell.sheet.cell.connection;
 
+import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 
 import java.util.*;
 
 public interface CellConnection{
-    String GetCellID();
-
-    String toString();
+    Coordinate GetCellCoordinate();
 
     List<CellConnection> GetDependsOn();
 

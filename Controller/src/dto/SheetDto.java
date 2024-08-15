@@ -1,6 +1,7 @@
 package dto;
 
 import shticell.sheet.api.Sheet;
+import shticell.sheet.coordinate.Coordinate;
 
 import java.util.List;
 import java.util.Map;
@@ -8,7 +9,7 @@ import java.util.stream.Collectors;
 
 
 public record SheetDto(String Name, int version, int numberOfRows, int numberOfColumns,
-                       Map<String, CellDto> cells, List<Integer> colWidth)
+                       Map<Coordinate, CellDto> cells, List<Integer> colWidth)
 {
     public SheetDto(Sheet sheet)
     {
