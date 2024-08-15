@@ -1,4 +1,4 @@
-package shticell.operation.Interface;
+package shticell.operation;
 
 import shticell.operation.Exceptions.NumberOperationException;
 import shticell.operation.Exceptions.OperationException;

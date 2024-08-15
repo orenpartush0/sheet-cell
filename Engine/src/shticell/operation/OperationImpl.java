@@ -1,12 +1,11 @@
 package shticell.operation;
 
+import shticell.cell.ties.api.CellConnection;
 import shticell.operation.Exceptions.NumberOperationException;
 import shticell.operation.Exceptions.OperationException;
-import shticell.cell.ties.CellConnection;
-import shticell.operation.Interface.Operation;
 import shticell.operation.Enums.eOperation;
 import shticell.exception.LoopConnectionException;
-import shticell.cell.sheet.api.CellCoordinator;
+import shticell.sheet.api.CellCoordinator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +46,7 @@ public class OperationImpl implements Operation {
 
     private String ref(ArrayList<String> args) throws OperationException, LoopConnectionException {
         if(args.size() == 1){
-            CellConnection.HasPath(coordinator.GetCellConnections(args.getFirst()),connections);
+            coordinator.GetCellConnections(args.getFirst()).HasPath(connections);
             coordinator.GetCellConnections(args.getFirst()).AddReferenceToThisCell(connections);
             connections.AddReferenceFromThisCell(coordinator.GetCellConnections(args.getFirst()));
             return coordinator.GetCellEffectiveValue(args.getFirst());

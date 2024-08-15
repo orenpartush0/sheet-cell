@@ -1,5 +1,6 @@
-package shticell.cell.ties;
+package shticell.cell.ties.impl;
 
+import shticell.cell.ties.api.CellConnection;
 import shticell.exception.LoopConnectionException;
 
 import java.util.ArrayList;
@@ -8,17 +9,17 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class CellConnection implements Cloneable {
+public class CellConnectionImpl implements Cloneable, CellConnection {
     private final String cellId;
     private final List<CellConnection> dependsOn = new ArrayList<>();
     private final List<CellConnection> influenceOn = new ArrayList<>();
 
-    public CellConnection(String val) {
+    public CellConnectionImpl(String val) {
         cellId = val;
         influenceOn.add(this);
     }
 
-    public String GetCell() {return cellId;}
+    public String GetCellID() {return cellId;}
 
     @Override
     public String toString(){
@@ -26,36 +27,43 @@ public class CellConnection implements Cloneable {
     }
 
 
-    public ArrayList<String> GetDependsOn() {
+    public ArrayList<String> GetDependsOnListOfStrings() {
         return dependsOn.stream()
                 .map(CellConnection::toString)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    public ArrayList<String> GetInfluenceOn() {
+    @Override
+    public List<CellConnection> GetDependsOn() {return dependsOn;}
+
+    @Override
+    public List<CellConnection> GetInfluenceOn() { return influenceOn; }
+
+    public ArrayList<String> GetInfluenceOnListOfStrings() {
         return influenceOn.stream()
                 .map(CellConnection::toString)
                 .collect(Collectors.toCollection(ArrayList::new));    }
 
     @Override
-    public CellConnection clone(){
-        CellConnection clonedCellConnection = new CellConnection(cellId);
-        clonedCellConnection.dependsOn.addAll(dependsOn);
+    public CellConnectionImpl clone(){
+        CellConnectionImpl clonedCellConnectionImpl = new CellConnectionImpl(cellId);
+        clonedCellConnectionImpl.dependsOn.addAll(dependsOn);
 
-        return clonedCellConnection;
+        return clonedCellConnectionImpl;
     }
 
+    @Override
     public void AddReferenceFromThisCell(CellConnection neighbor) {
         dependsOn.add(neighbor);
     }
 
+    @Override
     public void RemoveReferenceToThisCell(CellConnection neighbor) {
         influenceOn.remove(neighbor);
     }
 
-    public void AddReferenceToThisCell(CellConnection neighbor) {
-        influenceOn.add(neighbor);
-    }
+    @Override
+    public void AddReferenceToThisCell(CellConnection neighbor) { influenceOn.add(neighbor);}
 
     public List<CellConnection> RemoveReferencesFromThisCell() {
         List<CellConnection> toRemove = new ArrayList<>(dependsOn);
@@ -70,23 +78,23 @@ public class CellConnection implements Cloneable {
         neighbors.forEach(cellConnection -> cellConnection.AddReferenceToThisCell(this));
     }
 
-    public static void HasPath(CellConnection start, CellConnection end) throws LoopConnectionException {
+    public void HasPath(CellConnection end) throws LoopConnectionException {
         Set<CellConnection> visited = new HashSet<>();
-        if(hasPathDFS(start, end, visited)){
+        if(hasPathDFS(this, end, visited)){
             throw new LoopConnectionException("this function contain Ref that will cause a Loop!");
         }
     }
 
-
-    private static boolean hasPathDFS(CellConnection current, CellConnection end, Set<CellConnection> visited) {
-        if (current == end) {
+    private boolean hasPathDFS(CellConnection current, CellConnection end, Set<CellConnection> visited) {
+        if (current.equals(end)) {
             return true;
         }
 
         visited.add(current);
 
-        return current.dependsOn.stream()
+        return current.GetDependsOn().stream()
                 .filter(neighbor -> !visited.contains(neighbor))
                 .anyMatch(neighbor -> hasPathDFS(neighbor, end, visited));
     }
+
 }

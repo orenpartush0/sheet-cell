@@ -1,29 +1,31 @@
 package shticell.cell.impl;
 
+import shticell.cell.ties.api.CellConnection;
 import shticell.operation.Exceptions.NumberOperationException;
 import shticell.operation.Exceptions.OperationException;
-import shticell.cell.ties.CellConnection;
-import shticell.cell.sheet.api.CellCoordinator;
+import shticell.cell.ties.impl.CellConnectionImpl;
+import shticell.sheet.api.CellCoordinator;
 import shticell.exception.LoopConnectionException;
 import shticell.cell.api.Cell;
 import java.text.NumberFormat;
 import java.util.*;
 
-import static shticell.function.functionIdentifier.calcFunc;
-import static shticell.function.functionIdentifier.isFunc;
+import static shticell.function.api.functionIdentifier.calcFunc;
+import static shticell.function.api.functionIdentifier.isFunc;
 
 public class CellImpl implements Cloneable, Cell {
 
     private final String NAN = "NaN";
     private final String UNDEFINED = "!Undefined!";
-
     private CellCoordinator cellCoordinator;
     private String cellId = "";
     private String originalValue = "";
     private String effectiveValue = "";
     private final TreeMap<Integer, Cell> cellByVersion= new TreeMap<>();
     private int LatestSheetVersionUpdated;
-    private CellConnection connections = new CellConnection(cellId);
+    private CellConnection connections = new CellConnectionImpl(cellId);
+
+    public CellImpl(){};
 
     public CellImpl(String cellId, CellCoordinator sheet, int currentSheetVersion){
         originalValue = effectiveValue = "";
@@ -31,7 +33,7 @@ public class CellImpl implements Cloneable, Cell {
         cellCoordinator = sheet;
         cellByVersion.put(currentSheetVersion,this.clone());
         LatestSheetVersionUpdated  = currentSheetVersion;
-        connections = new CellConnection(cellId);
+        connections = new CellConnectionImpl(cellId);
     }
 
     public CellImpl(Cell cell){
@@ -40,6 +42,7 @@ public class CellImpl implements Cloneable, Cell {
         effectiveValue = cell.GetEffectiveValue();
     }
 
+    @Override
     public boolean IsChangedInThisVersion(int version) {return cellByVersion.get(version) != null; }
 
     @Override
@@ -54,20 +57,21 @@ public class CellImpl implements Cloneable, Cell {
     @Override
     public int GetVersion() { return LatestSheetVersionUpdated; }
 
-    public int GetSheetVersion() { return LatestSheetVersionUpdated; }
-
+    @Override
     public CellConnection GetConnections() { return connections; }
 
+    @Override
     public Cell GetCellBySheetVersion(int version){
         return cellByVersion.get(cellByVersion.floorKey(version));
     }
 
     @Override
     public CellImpl clone(){
-        CellImpl clonedCellImpl = new CellImpl(cellId,cellCoordinator,LatestSheetVersionUpdated);
+        CellImpl clonedCellImpl = new CellImpl();
         clonedCellImpl.originalValue = originalValue;
         clonedCellImpl.effectiveValue = effectiveValue;
-        clonedCellImpl.cellByVersion.putAll(cellByVersion);
+        clonedCellImpl.cellId = cellId;
+        clonedCellImpl.cellCoordinator = cellCoordinator;
 
         return clonedCellImpl;
     }
@@ -77,6 +81,7 @@ public class CellImpl implements Cloneable, Cell {
     }
 
 
+    @Override
     public void UpdateCell(String newOriginalValue, int sheetVersion) throws  LoopConnectionException,OperationException{
             List<CellConnection> removed = new ArrayList<>(connections.RemoveReferencesFromThisCell());
         try{

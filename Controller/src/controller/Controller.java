@@ -4,36 +4,37 @@ import shticell.operation.Exceptions.NumberOperationException;
 import shticell.operation.Exceptions.OperationException;
 import dto.CellDto;
 import shticell.exception.LoopConnectionException;
-import shticell.cell.sheet.sheetimpl.SheetImpl;
+import shticell.sheet.api.Sheet;
+import shticell.sheet.impl.SheetImpl;
 import dto.SheetDto;
 
 import java.util.List;
 
 public class Controller {
-    private final SheetImpl sheetImpl;
+    private final Sheet sheet;
 
     public Controller(SheetDto sheetDto) {
-        sheetImpl = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns());
+        sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns());
     }
 
     public void UpdateCellByIndex(String coordinate, String newValue) throws NumberFormatException, LoopConnectionException, OperationException, NumberOperationException {
-        sheetImpl.UpdateCellByCoordinate(coordinate, newValue);
+        sheet.UpdateCellByCoordinate(coordinate, newValue);
     }
 
      public SheetDto getSheet(){
-        return new SheetDto(sheetImpl);
+        return new SheetDto(sheet);
     }
 
     public CellDto GetCellByCoordinate(String CellId){
-        return new CellDto(sheetImpl.GetCell(CellId));
+        return new CellDto(sheet.GetCell(CellId));
     }
 
     public List<Integer> GetCountOfChangesPerVersion(){
-        return sheetImpl.GetCountOfChangesPerVersion();
+        return sheet.GetCountOfChangesPerVersion();
     }
 
     public SheetDto GetSheetByVersion(int version){
-        return new SheetDto(sheetImpl.GetSheetByVersion(version));
+        return new SheetDto(sheet.GetSheetByVersion(version));
     }
 
 }

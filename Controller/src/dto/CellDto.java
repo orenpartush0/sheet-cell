@@ -1,5 +1,6 @@
 package dto;
 
+import shticell.cell.api.Cell;
 import shticell.cell.impl.CellImpl;
 import java.util.ArrayList;
 
@@ -8,10 +9,10 @@ public record CellDto(String cellId,int LatestSheetVersionUpdated,String origina
                       String effectiveValue,ArrayList<String> referencesFromThisCell,
                       ArrayList<String> referencesToThisCell)
 {
-    public CellDto(CellImpl cellImpl)
+    public CellDto(Cell cellImpl)
     {
-        this(cellImpl.GetCellId(), cellImpl.GetSheetVersion(), cellImpl.GetOriginalValue(), cellImpl.GetEffectiveValue()
-                , cellImpl.GetConnections().GetDependsOn(), cellImpl.GetConnections().GetInfluenceOn());
+        this(cellImpl.GetCellId(), cellImpl.GetVersion(), cellImpl.GetOriginalValue(), cellImpl.GetEffectiveValue()
+                , cellImpl.GetConnections().GetDependsOnListOfStrings(), cellImpl.GetConnections().GetInfluenceOnListOfStrings());
     }
 
     @Override

@@ -1,10 +1,10 @@
-package shticell.cell.sheet.sheetimpl;
+package shticell.sheet.impl;
 
-import shticell.cell.sheet.api.Sheet;
+import shticell.cell.ties.api.CellConnection;
+import shticell.sheet.api.Sheet;
 import shticell.operation.Exceptions.NumberOperationException;
 import shticell.operation.Exceptions.OperationException;
-import shticell.cell.sheet.api.CellCoordinator;
-import shticell.cell.ties.CellConnection;
+import shticell.sheet.api.CellCoordinator;
 import shticell.exception.LoopConnectionException;
 import shticell.cell.api.Cell;
 import shticell.cell.impl.CellImpl;
@@ -17,7 +17,7 @@ public class SheetImpl implements CellCoordinator, Sheet {
     private final int INITIAL_VERSION = 1;
     private final String sheetName;
     private int version = INITIAL_VERSION;
-    Map<String, CellImpl> cells;
+    Map<String, Cell> cells;
     private final int numberOfRows;
     private final int numberOfColumns;
 
@@ -27,21 +27,19 @@ public class SheetImpl implements CellCoordinator, Sheet {
         numberOfColumns = _numberOfColumns;
         cells = new HashMap<>();
 
-        IntStream.range(0,_numberOfRows).forEach(i -> {
-                    IntStream.range(0,_numberOfColumns).forEach(j -> {
-                        String square = String.valueOf((char)('A' + i)) + String.valueOf(j+ 1);
-                        cells.put(square, new CellImpl(square,this,INITIAL_VERSION));
-                    });
-                }
-                );
+        for(int i =0; i<numberOfRows; i++) {
+            for(int j =0; j<numberOfColumns; j++) {
+                String square = String.valueOf((char)('A' + i)) + String.valueOf(j+ 1);
+                cells.put(square, new CellImpl(square,this,INITIAL_VERSION));
+            }
+        }
     }
 
-    public SheetImpl(String sheetTitle, int _numberOfRows, int _numberOfColumns, Map<String, CellImpl> _cells)
+    public SheetImpl(String sheetTitle, int _numberOfRows, int _numberOfColumns, Map<String, Cell> _cells)
     {
         this(sheetTitle,_numberOfRows,_numberOfColumns);
         cells = _cells;
     }
-
 
     @Override
     public int GetVersion() {return version;}
@@ -56,25 +54,31 @@ public class SheetImpl implements CellCoordinator, Sheet {
     public int GetNumberOfColumns() {return numberOfColumns;}
 
     @Override
-    public Map<String, CellImpl> GetCells() { return cells; }
+    public Map<String, Cell> GetCells() { return cells; }
 
     @Override
-    public CellImpl GetCell(String cellId) { return cells.get(cellId);}
+    public Cell GetCell(String cellId) { return cells.get(cellId);}
 
     @Override
     public CellConnection GetCellConnections(String cellId){return cells.get(cellId).GetConnections();}
+
+    @Override
+    public String GetCellEffectiveValue(String coordinate) {
+        return cells.get(coordinate).GetEffectiveValue();
+    }
 
     public void UpdateCellByCoordinate(String coordinate, String newValue) throws LoopConnectionException, OperationException, NumberOperationException {
         try{cells.get(coordinate.toUpperCase()).UpdateCell(newValue,++version);}
         catch (LoopConnectionException | OperationException | RuntimeException e){version--; throw e;};
     }
 
+    @Override
     public List<Integer> GetCountOfChangesPerVersion(){
         List<Integer> changes = new ArrayList<>(Collections.nCopies(version,0));
         final int from = 2;
         final int to = version + 1;
 
-        for (Map.Entry<String, CellImpl> entry : cells.entrySet()) {
+        for (Map.Entry<String, Cell> entry : cells.entrySet()) {
             IntStream.range(from,to).forEach(i -> {
                 if (entry.getValue().IsChangedInThisVersion(i)) {
                     changes.set(i - 1, changes.get(i - 1) + 1);
@@ -86,14 +90,10 @@ public class SheetImpl implements CellCoordinator, Sheet {
     }
 
     @Override
-    public String GetCellEffectiveValue(String square) {
-        return cells.get(square).GetEffectiveValue();
-    }
-
-    public void UpdateDependentCells(List<String> dependentCells) {
-        dependentCells.stream().skip(1).forEach(cellId -> {
+    public void UpdateDependentCells(List<CellConnection> dependentCells) {
+        dependentCells.stream().skip(1).forEach(dependentCell -> {
             try {
-                CellImpl cellImplNeedToBeUpdated = cells.get(cellId);
+                Cell cellImplNeedToBeUpdated = cells.get(dependentCell.GetCellID());
                 cellImplNeedToBeUpdated.UpdateCell(cellImplNeedToBeUpdated.GetOriginalValue(), version);
             }
             catch (Exception e) {
@@ -102,13 +102,14 @@ public class SheetImpl implements CellCoordinator, Sheet {
         });
     }
 
+    @Override
     public List<Integer> getColsSize() {
         return IntStream.range(0, numberOfColumns)
                 .mapToObj(col -> IntStream.range(0, numberOfRows)
                         .map(row -> {
                             char rowLabel = (char) ('A' + row);
                             String cellKey = rowLabel + String.valueOf(col + 1);
-                            CellImpl cellImpl = cells.get(cellKey);
+                            Cell cellImpl = cells.get(cellKey);
                             String effectiveValue = cellImpl.GetEffectiveValue();
                             return effectiveValue.length();
                         })
@@ -117,9 +118,10 @@ public class SheetImpl implements CellCoordinator, Sheet {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public SheetImpl GetSheetByVersion(int version){
 
-        Map<String, CellImpl> cellsInRequiredVersion = new HashMap<>();
+        Map<String, Cell> cellsInRequiredVersion = new HashMap<>();
 
         cells.forEach((key, value) -> {
             Cell cellData = value.GetCellBySheetVersion(version);
