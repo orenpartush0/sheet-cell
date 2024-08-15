@@ -5,7 +5,7 @@
 //
 
 
-package shticell.jaxb;
+package shticell.jaxb.schema;
 
 import java.util.ArrayList;
 import java.util.List;
