@@ -1,6 +1,9 @@
 package controller;
 
+import shticell.operation.Exceptions.NumberOperationException;
+import shticell.operation.Exceptions.OperationException;
 import dto.CellDto;
+import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.api.Sheet;
