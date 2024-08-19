@@ -1,11 +1,13 @@
 package shticell.sheet.cell.impl;
 
 import shticell.sheet.cell.connection.CellConnection;
-import shticell.operation.Exceptions.NumberOperationException;
-import shticell.operation.Exceptions.OperationException;
 import shticell.sheet.cell.connection.CellConnectionImpl;
-import shticell.sheet.api.CellCoordinator;
+import shticell.sheet.api.HasSheetData;
+import shticell.sheet.cell.value.EffectiveValue;
+import shticell.sheet.cell.value.EffectiveValueImpl;
+import shticell.sheet.cell.value.ValueType;
 import shticell.sheet.coordinate.Coordinate;
+import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.cell.api.Cell;
 import java.text.NumberFormat;
@@ -18,23 +20,24 @@ public class CellImpl implements Cloneable, Cell {
 
     private final String NAN = "NaN";
     private final String UNDEFINED = "!Undefined!";
-    private CellCoordinator sheet;
+    private HasSheetData sheet;
     private Coordinate coordinate;
     private String originalValue = "";
-    private String effectiveValue = "";
+    private EffectiveValue effectiveValue;
     private final TreeMap<Integer, Cell> cellByVersion= new TreeMap<>();
     private int LatestSheetVersionUpdated;
     private CellConnection connections = new CellConnectionImpl(coordinate);
 
     public CellImpl(){};
 
-    public CellImpl(Coordinate _coordinate, CellCoordinator sheet, int currentSheetVersion){
-        originalValue = effectiveValue = "";
+    public CellImpl(Coordinate _coordinate, HasSheetData sheet, int currentSheetVersion){
+        originalValue = "";
+        effectiveValue = new EffectiveValueImpl("",ValueType.STRING);
         coordinate = _coordinate;
         this.sheet = sheet;
-        cellByVersion.put(currentSheetVersion,this.clone());
         LatestSheetVersionUpdated  = currentSheetVersion;
         connections = new CellConnectionImpl(coordinate);
+        cellByVersion.put(currentSheetVersion,this.clone());
     }
 
     public CellImpl(Cell cell){
@@ -50,7 +53,7 @@ public class CellImpl implements Cloneable, Cell {
     public String GetOriginalValue() { return originalValue; }
 
     @Override
-    public String GetEffectiveValue() { return effectiveValue; }
+    public EffectiveValue GetEffectiveValue() { return effectiveValue; }
 
     @Override
     public Coordinate GetCellCoordinate() { return coordinate; }
@@ -63,6 +66,7 @@ public class CellImpl implements Cloneable, Cell {
 
     @Override
     public Cell GetCellBySheetVersion(int version){
+        Cell tmp;
         return cellByVersion.get(cellByVersion.floorKey(version));
     }
 
@@ -77,12 +81,13 @@ public class CellImpl implements Cloneable, Cell {
     }
 
     @Override
-    public CellImpl clone(){
+    public Cell clone(){
         CellImpl clonedCellImpl = new CellImpl();
         clonedCellImpl.originalValue = originalValue;
         clonedCellImpl.effectiveValue = effectiveValue;
         clonedCellImpl.coordinate = coordinate;
         clonedCellImpl.sheet = sheet;
+        clonedCellImpl.effectiveValue = effectiveValue.Clone();
 
         return clonedCellImpl;
     }
@@ -93,37 +98,49 @@ public class CellImpl implements Cloneable, Cell {
 
 
     @Override
-    public void UpdateCell(String newOriginalValue, int sheetVersion) throws  LoopConnectionException,OperationException{
+    public void UpdateCell(String newOriginalValue, int sheetVersion) throws  LoopConnectionException{
             List<CellConnection> removed = new ArrayList<>(connections.ClearDependsOn());
+            Cell backUp = this.clone();
         try{
-            cellByVersion.put(sheetVersion, this.clone());
             LatestSheetVersionUpdated = sheetVersion;
             originalValue = newOriginalValue;
             effectiveValue = parseEffectiveValue(newOriginalValue);
             sheet.UpdateDependentCells(connections.GetSortedInfluenceOn().stream().map(CellConnection::GetCellCoordinate).toList());
+            cellByVersion.put(sheetVersion, this.clone());
         }
-        catch (NumberOperationException e){
-            effectiveValue = NAN;
+        catch (ArithmeticException e){
+            effectiveValue = new EffectiveValueImpl(NAN, ValueType.STRING);
+            cellByVersion.put(sheetVersion, this.clone());
         }
         catch(IndexOutOfBoundsException e){
-            effectiveValue = UNDEFINED;
+            effectiveValue = new EffectiveValueImpl(UNDEFINED, ValueType.STRING);
+            cellByVersion.put(sheetVersion, this.clone());
         }
-        catch (OperationException | LoopConnectionException e) {
+        catch (Exception e) {
             connections.AddListToInfluenceOn(removed);
-            Cell backUp = cellByVersion.lastEntry().getValue();
             effectiveValue = backUp.GetEffectiveValue();
             LatestSheetVersionUpdated = backUp.GetVersion();
             originalValue = backUp.GetOriginalValue();
-            cellByVersion.remove(cellByVersion.lastEntry().getKey());
             throw e;
         }
     }
 
-    private String parseEffectiveValue(String newOriginalValue) throws NumberFormatException, LoopConnectionException, OperationException, NumberOperationException {
-            String effectiveValue = isFunc(newOriginalValue) ? calcFunc(newOriginalValue,connections, sheet) : String.valueOf(newOriginalValue);
-            return !effectiveValue.isEmpty() && effectiveValue.chars().allMatch(Character::isDigit)
-                    ? addThousandsSeparator(String.valueOf(effectiveValue))
-                    : effectiveValue;
+    private EffectiveValue parseEffectiveValue(String newOriginalValue) throws NumberFormatException, LoopConnectionException {
+        return isFunc(newOriginalValue)
+                    ? calcFunc(new EffectiveValueImpl(newOriginalValue,ValueType.STRING),connections, sheet)
+                    : getEffectiveValue(newOriginalValue);
+
+    }
+
+    private EffectiveValue getEffectiveValue(String originalValue){
+        if(originalValue.matches("-?(0|[1-9][0-9]*)\\.?[0-9]*")){
+            return new EffectiveValueImpl(Double.parseDouble(originalValue), ValueType.NUMERIC);
+        }
+        if(originalValue.equals("True") || originalValue.equals("False")){
+            return new EffectiveValueImpl(Boolean.parseBoolean(originalValue),ValueType.BOOLEAN);
+        }
+        else
+            return new EffectiveValueImpl(originalValue,ValueType.STRING);
     }
 
     @Override

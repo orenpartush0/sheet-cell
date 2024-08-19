@@ -53,9 +53,10 @@ public class ConsoleManager {
             for (int col = 0; col < sheetDto.numberOfColumns(); col++) {
                 int colWidth = colsWidths.get(col) < 5 ? 5 : colsWidths.get(col);
                 colWidth = colWidth  % 2 == 0 ? colWidth + 1 : colWidth;
-                System.out.print(sheetDto.cells().get(CoordinateFactory.getCoordinate(row,col + 1)).effectiveValue());
+                System.out.print(sheetDto.cells().get(CoordinateFactory.getCoordinate(row,col + 1)).effectiveValue().value().toString());
                 String SpaceColsBiggerThenTen = " ".repeat(col >= 9 ? 1 : 0);
-                System.out.print(space.repeat(colWidth - sheetDto.cells().get(CoordinateFactory.getCoordinate(row,col + 1)).effectiveValue().length()) + SpaceColsBiggerThenTen);
+                int count = colWidth - sheetDto.cells().get(CoordinateFactory.getCoordinate(row,col + 1)).effectiveValue().toString().length();
+                System.out.print(space.repeat(count) + SpaceColsBiggerThenTen);
                 System.out.print("|");
             }
 
@@ -144,27 +145,31 @@ public class ConsoleManager {
         printSheetCell(manager.GetSheetByVersion(selectedVersion));
     }
 
-    public void Run(){
+    public void Run() {
         boolean goOn = true;
-
-        do {
-            MainMenu.PrintMenu();
-            String choice = scanner.nextLine();
-            switch (choice) {
-                case "2" -> printSheetCell(manager.getSheet());
-                case "3" -> printCellValue();
-                case "4" -> insertData();
-                case "5" -> showVersions();
-                default -> {
-                    if (choice.equals("6")) {
-                        System.out.println("Bye Bye");
-                    } else {
-                        System.out.println("Invalid choice. Please choose a number 1-6");
+        try {
+            do {
+                MainMenu.PrintMenu();
+                String choice = scanner.nextLine();
+                switch (choice) {
+                    case "2" -> printSheetCell(manager.getSheet());
+                    case "3" -> printCellValue();
+                    case "4" -> insertData();
+                    case "5" -> showVersions();
+                    default -> {
+                        if (choice.equals("6")) {
+                            System.out.println("Bye Bye");
+                        } else {
+                            System.out.println("Invalid choice. Please choose a number 1-6");
+                        }
                     }
                 }
-            }
-            goOn = !choice.equals("6");
-        }while(goOn);
+                goOn = !choice.equals("6");
+            } while (goOn);
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        }
     }
 
 

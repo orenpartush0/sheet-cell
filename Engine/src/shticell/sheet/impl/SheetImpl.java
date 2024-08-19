@@ -1,10 +1,10 @@
 package shticell.sheet.impl;
 
-import shticell.sheet.cell.connection.CellConnection;
 import shticell.sheet.api.Sheet;
-import shticell.operation.Exceptions.NumberOperationException;
-import shticell.operation.Exceptions.OperationException;
-import shticell.sheet.api.CellCoordinator;
+import shticell.sheet.api.HasSheetData;
+import shticell.sheet.cell.connection.CellConnection;
+import shticell.sheet.cell.value.EffectiveValue;
+import shticell.sheet.cell.value.ValueType;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
@@ -14,7 +14,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class SheetImpl implements CellCoordinator, Sheet {
+public class SheetImpl implements HasSheetData, Sheet {
     private final int INITIAL_VERSION = 1;
     private final String sheetName;
     private int version = INITIAL_VERSION;
@@ -61,16 +61,13 @@ public class SheetImpl implements CellCoordinator, Sheet {
     public Cell GetCell(Coordinate coordinate) { return cells.get(coordinate);}
 
     @Override
-    public CellConnection GetCellConnections(Coordinate coordinate){return cells.get(coordinate).GetConnections();}
-
-    @Override
-    public String GetCellEffectiveValue(Coordinate coordinate) {
+    public EffectiveValue GetCellEffectiveValue(Coordinate coordinate) {
         return cells.get(coordinate).GetEffectiveValue();
     }
 
-    public void UpdateCellByCoordinate(Coordinate coordinate, String newValue) throws LoopConnectionException, OperationException, NumberOperationException {
+    public void UpdateCellByCoordinate(Coordinate coordinate, String newValue) throws LoopConnectionException {
         try{cells.get(coordinate).UpdateCell(newValue,++version);}
-        catch (LoopConnectionException | OperationException | RuntimeException e){version--; throw e;};
+        catch (LoopConnectionException | RuntimeException e){version--; throw e;};
     }
 
     @Override
@@ -104,19 +101,37 @@ public class SheetImpl implements CellCoordinator, Sheet {
     }
 
     @Override
+    public CellConnection GetCellConnections(Coordinate coordinate) {
+        return cells.get(coordinate).GetConnections();
+    }
+
+    @Override
+    public boolean IsCoordinateInSheet(Coordinate coordinate) {
+        return cells.containsKey(coordinate);
+    }
+
+    @Override
     public List<Integer> getColsSize() {
         return IntStream.range(1, numberOfColumns + 1)
                 .mapToObj(col -> IntStream.range(0, numberOfRows)
                         .map(row -> {
                             Cell cellImpl = cells.get(CoordinateFactory.getCoordinate(row,col));
-                            String effectiveValue = cellImpl.GetEffectiveValue();
-                            return effectiveValue.length();
+                            EffectiveValue effectiveValue = cellImpl.GetEffectiveValue();
+                            int numOfThousandsSeparator = getNumOfThousandsSeparator(effectiveValue);
+                            return Math.max(effectiveValue.getValue().toString().length() + numOfThousandsSeparator,5);
                         })
                         .max()
                         .orElse(5))
                 .collect(Collectors.toList());
     }
 
+   public int getNumOfThousandsSeparator(EffectiveValue effectiveValue){
+        if(effectiveValue.getValueType() == ValueType.NUMERIC){
+            return (effectiveValue.getValueWithExpectation(Double.class).toString().length() / 3 );
+        }
+
+        return 0;
+   }
     @Override
     public SheetImpl GetSheetByVersion(int version){
 
