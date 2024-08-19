@@ -22,13 +22,13 @@ public class SchemBaseJaxb {
         
     }
 
-    private static Sheet convertToSheet(STLSheet sheet) {
-        SheetImpl res = new SheetImpl(sheet.getName(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
-        for( STLCell cell : sheet.getSTLCells().getSTLCell()) {
-
-        }
-
-    }
+//    private static Sheet convertToSheet(STLSheet sheet) {
+//        SheetImpl res = new SheetImpl(sheet.getName(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
+//        for( STLCell cell : sheet.getSTLCells().getSTLCell()) {
+//
+//        }
+//
+//    }
 
 
     //public SheetImpl(String _sheetName, int _numberOfRows, int _numberOfColumns)
