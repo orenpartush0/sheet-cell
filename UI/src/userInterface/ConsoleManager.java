@@ -4,7 +4,9 @@ import userInterface.Enum.MainMenu;
 import controller.Controller;
 import dto.SheetDto;
 
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 
 
@@ -53,7 +55,12 @@ public class ConsoleManager {
             for (int col = 0; col < sheetDto.numberOfColumns(); col++) {
                 int colWidth = colsWidths.get(col) < 5 ? 5 : colsWidths.get(col);
                 colWidth = colWidth  % 2 == 0 ? colWidth + 1 : colWidth;
-                System.out.print(sheetDto.cells().get(CoordinateFactory.getCoordinate(row,col + 1)).effectiveValue().value().toString());
+
+                System.out.print(addThousandsSeparator(
+                        sheetDto.cells().get(
+                                CoordinateFactory.getCoordinate(row,col + 1))
+                                .effectiveValue().value().toString()));
+
                 String SpaceColsBiggerThenTen = " ".repeat(col >= 9 ? 1 : 0);
                 int count = colWidth - sheetDto.cells().get(CoordinateFactory.getCoordinate(row,col + 1)).effectiveValue().toString().length();
                 System.out.print(space.repeat(count) + SpaceColsBiggerThenTen);
@@ -61,6 +68,15 @@ public class ConsoleManager {
             }
 
             System.out.println();
+        }
+    }
+
+    private String addThousandsSeparator(String number) throws NumberFormatException {
+        try {
+            return NumberFormat.getNumberInstance(Locale.US).format(Double.parseDouble(number));
+        }
+        catch (NumberFormatException e) {
+            return number;
         }
     }
 

@@ -92,11 +92,6 @@ public class CellImpl implements Cloneable, Cell {
         return clonedCellImpl;
     }
 
-    private String addThousandsSeparator(String number) throws NumberFormatException {
-        return NumberFormat.getNumberInstance(Locale.US).format(Double.parseDouble(number));
-    }
-
-
     @Override
     public void UpdateCell(String newOriginalValue, int sheetVersion) throws  LoopConnectionException{
             List<CellConnection> removed = new ArrayList<>(connections.ClearDependsOn());

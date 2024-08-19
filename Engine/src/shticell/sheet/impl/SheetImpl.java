@@ -10,6 +10,8 @@ import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.cell.api.Cell;
 import shticell.sheet.cell.impl.CellImpl;
+
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -117,8 +119,7 @@ public class SheetImpl implements HasSheetData, Sheet {
                         .map(row -> {
                             Cell cellImpl = cells.get(CoordinateFactory.getCoordinate(row,col));
                             EffectiveValue effectiveValue = cellImpl.GetEffectiveValue();
-                            int numOfThousandsSeparator = getNumOfThousandsSeparator(effectiveValue);
-                            return Math.max(effectiveValue.getValue().toString().length() + numOfThousandsSeparator,5);
+                            return getNumOfThousandsSeparator(effectiveValue);
                         })
                         .max()
                         .orElse(5))
@@ -127,10 +128,21 @@ public class SheetImpl implements HasSheetData, Sheet {
 
    public int getNumOfThousandsSeparator(EffectiveValue effectiveValue){
         if(effectiveValue.getValueType() == ValueType.NUMERIC){
-            return (effectiveValue.getValueWithExpectation(Double.class).toString().length() / 3 );
+            String numberStr = effectiveValue.getValueWithExpectation(Double.class).toString();
+            BigDecimal number = new BigDecimal(numberStr);
+            String numStr = number.toPlainString();
+
+            if (numStr.contains(".")) {
+                numStr = numStr.substring(0, numStr.indexOf('.'));
+            }
+
+            int length = numStr.length();
+            int commaCount = (length > 3) ? (length - 1) / 3 : 0;
+
+            return length + commaCount;
         }
 
-        return 0;
+        return Math.max(effectiveValue.getValue().toString().length(),5);
    }
     @Override
     public SheetImpl GetSheetByVersion(int version){
