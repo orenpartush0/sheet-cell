@@ -19,6 +19,7 @@ public class Controller {
         sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns());
     }
 
+
     public void UpdateCellByIndex(String square, String newValue) throws NumberFormatException, LoopConnectionException, OperationException, NumberOperationException {
         sheet.UpdateCellByCoordinate(CoordinateFactory.getCoordinate(square), newValue);
     }
