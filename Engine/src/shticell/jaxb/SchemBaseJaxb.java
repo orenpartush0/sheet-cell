@@ -1,5 +1,6 @@
 package shticell.jaxb;
 
+import com.sun.codemodel.JForEach;
 import controller.Controller;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
@@ -13,15 +14,27 @@ import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.CellOutOfSheetException;
 import shticell.sheet.exception.InvalidCellsSel;
+import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.impl.SheetImpl;
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SchemBaseJaxb {
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "Engine.shticell.jaxb.schema;";
 
-    public static STLSheet deserializeFrom(InputStream in) throws JAXBException{
+    public static Sheet CreateSheetFromXML(InputStream in){
+        STLSheet stlSheet = null;
+        try {
+            stlSheet = deserializeFrom (in);
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+        return convertToSheet(stlSheet);
+    }
+
+    private static STLSheet deserializeFrom(InputStream in) throws JAXBException{
         JAXBContext jc = JAXBContext.newInstance(JAXB_XML_GAME_PACKAGE_NAME);
         Unmarshaller u = jc.createUnmarshaller();
         STLSheet unmarshal = (STLSheet) u.unmarshal(in);
@@ -31,35 +44,84 @@ public class SchemBaseJaxb {
 
     private static Sheet convertToSheet(STLSheet sheet) {
         SheetImpl res = new SheetImpl(sheet.getName(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
-        for( STLCell cell : sheet.getSTLCells().getSTLCell()) {
-
+        try {
+            List<STLCell> creationOrder = getCreationCellsList(sheet.getSTLCells().getSTLCell(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
+            creationOrder.forEach(c-> {
+                try {
+                    res.UpdateCellByCoordinate(CoordinateFactory.getCoordinate(c.getRow(),Integer.parseInt(c.getColumn())),c.getSTLOriginalValue());
+                } catch (LoopConnectionException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         }
-    }
-    private static List<CellConnection> getCellConnectionList(List<STLCell> cellsList,int rows, int columns) throws CellOutOfSheetException, InvalidCellsSel {
-        List<CellConnection> res = new ArrayList<CellConnection>();
-        Map<Coordinate,CellConnection> map = new HashMap<Coordinate,CellConnection>();
-        Coordinate coordinate;
-        CellConnection cellConnection1;
-        CellConnection cellConnection2;
-        for( STLCell cell : cellsList) {
-            coordinate = CoordinateFactory.getCoordinate(cell.getRow(),Integer.parseInt(cell.getColumn()));
-            cellConnection1 = Optional.ofNullable(map.get(coordinate)).orElse(new CellConnectionImpl(coordinate));
-            List<Coordinate> pointTo = getRefList(cell,rows,columns);
-            for(Coordinate cord : pointTo) {
-                cellConnection2 = Optional.ofNullable(map.get(coordinate)).orElse(new CellConnectionImpl(cord));
-                cellConnection1.AddToDependsOn(cellConnection2);
-                cellConnection2.AddToInfluenceOn(cellConnection1);
-                map.put(coordinate,cellConnection2);
-            }
-            map.put(coordinate,cellConnection1);
-            res.add(cellConnection1);
-        }
-        if (map.keySet().size() != res.size()) {
-            throw new InvalidCellsSel();
+        catch (Exception e) {
+            System.out.println(e.getMessage());
         }
         return res;
+
     }
 
+    private static List<STLCell> getCreationCellsList(List<STLCell> cellsList,int rows, int columns) throws LoopConnectionException {
+        List<CellConnection> connectionList = getCellConnectionList(cellsList,rows,columns);
+        List<CellConnection> topoligicalConnectionList = new ArrayList<>();
+        Map<CellConnection, STLCell> connectionCellMap = new HashMap<>();
+        for (int i = 0; i < cellsList.size(); i++) {
+            connectionCellMap.put(connectionList.get(i), cellsList.get(i));
+        }
+
+        connectionList.forEach(c -> {
+            try {
+                if(!topoligicalConnectionList.contains(c)){
+                    topoligicalConnectionList.addAll(c.GetSortedInfluenceOn());
+                }
+            } catch (LoopConnectionException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        topoligicalConnectionList.retainAll(connectionList);
+
+        List<STLCell> topoligicalCellsList = new ArrayList<>();
+        topoligicalConnectionList.forEach(c -> topoligicalCellsList.add(connectionCellMap.get(c)) );
+        return topoligicalCellsList;
+    }
+
+    private static List<CellConnection> getCellConnectionList(List<STLCell> cellsList,int rows, int columns) throws RuntimeException {
+        List<CellConnection> res = new ArrayList<CellConnection>();
+        Map<Coordinate,CellConnection> map = new HashMap<Coordinate,CellConnection>();
+        res.addAll(
+                cellsList.stream()
+                        .peek(cell -> {
+                            try {
+                                checkCoordinateInSheet(rows, columns, cell.getRow(), Integer.parseInt(cell.getColumn()));
+                            } catch (CellOutOfSheetException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .map(cell -> {
+                            Coordinate coordinate = CoordinateFactory.getCoordinate(cell.getRow(), Integer.parseInt(cell.getColumn()));
+                            CellConnectionImpl cellConnection1 = (CellConnectionImpl) map.computeIfAbsent(coordinate, k -> new CellConnectionImpl(coordinate));
+
+                            List<Coordinate> pointTo = null;
+                            try {
+                                pointTo = getRefList(cell, rows, columns);
+                            } catch (CellOutOfSheetException e) {
+                                throw new RuntimeException(e);
+                            }
+
+                            pointTo.forEach(cord -> {
+                                CellConnectionImpl cellConnection2 = (CellConnectionImpl) map.computeIfAbsent(cord, k -> new CellConnectionImpl(cord));
+                                cellConnection1.AddToDependsOn(cellConnection2);
+                                cellConnection2.AddToInfluenceOn(cellConnection1);
+                                map.put(coordinate, cellConnection2);
+                            });
+
+                            map.put(coordinate, cellConnection1);
+                            return cellConnection1;
+                        })
+                        .toList());
+
+        return res;
+    }
 
     private static void checkCoordinateInSheet(int rows, int columns, int row, int column)throws CellOutOfSheetException {
         if(row < 0 || column < 0 || row >= rows || column >= columns) {
@@ -68,20 +130,22 @@ public class SchemBaseJaxb {
     }
 
     private static List<Coordinate> getRefList(STLCell cell,int rows, int columns) throws CellOutOfSheetException {
-        String orgVal = cell.getSTLOriginalValue();
+        String orgVal = cell.getSTLOriginalValue().replace(" ","");
         List<Coordinate> res = new ArrayList<>();
-        int index = orgVal.indexOf("REF");
+        int index = orgVal.indexOf("REF,");
         String cord;
         Coordinate coordinate;
         while(index!= -1 && !orgVal.isEmpty()) {
-            cord = orgVal.substring(index+3);
+            cord = orgVal.substring(index+4);
             coordinate = coordinateFromString(cord,rows,columns);
             res.add(coordinate);
-            int add = 3+coordinate.toString().length();
-            orgVal = orgVal.substring(0+add);
+            int add = 4+coordinate.toString().length();
+            orgVal = orgVal.substring(4+add);
+            index = orgVal.indexOf("REF,");
         }
         return res;
     }
+
     private static Coordinate coordinateFromString (String orgVal, int rows, int columns) throws CellOutOfSheetException {
         int row = Integer.parseInt(String.valueOf(orgVal.charAt(0)-'A'));
         String tempCol="";
