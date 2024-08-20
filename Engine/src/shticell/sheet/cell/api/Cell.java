@@ -7,7 +7,7 @@ import shticell.sheet.exception.LoopConnectionException;
 
 import java.util.ArrayList;
 
-public interface Cell {
+public interface Cell extends CellToXML {
     String GetOriginalValue();
     EffectiveValue GetEffectiveValue();
     Coordinate GetCellCoordinate();

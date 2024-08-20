@@ -1,5 +1,6 @@
 package shticell.sheet.cell.impl;
 
+import shticell.sheet.cell.api.CellToXML;
 import shticell.sheet.cell.connection.CellConnection;
 import shticell.sheet.cell.connection.CellConnectionImpl;
 import shticell.sheet.api.HasSheetData;
@@ -16,7 +17,7 @@ import java.util.*;
 import static shticell.function.api.functionIdentifier.calcFunc;
 import static shticell.function.api.functionIdentifier.isFunc;
 
-public class CellImpl implements Cloneable, Cell {
+public class CellImpl implements Cloneable, Cell, CellToXML {
 
     private final String NAN = "NaN";
     private final String UNDEFINED = "!Undefined!";
@@ -90,6 +91,22 @@ public class CellImpl implements Cloneable, Cell {
         clonedCellImpl.effectiveValue = effectiveValue.Clone();
 
         return clonedCellImpl;
+    }
+    @Override
+    public void UpdateCellWithOutVersion(String newOriginalValue) throws LoopConnectionException {
+        List<CellConnection> removed = new ArrayList<>(connections.ClearDependsOn());
+        Cell backUp = this.clone();
+        try{
+            originalValue = newOriginalValue;
+            effectiveValue = parseEffectiveValue(newOriginalValue);
+            sheet.UpdateDependentCells(connections.GetSortedInfluenceOn().stream().map(CellConnection::GetCellCoordinate).toList());
+        }
+        catch (ArithmeticException e){
+            effectiveValue = new EffectiveValueImpl(NAN, ValueType.STRING);
+        }
+        catch(IndexOutOfBoundsException e){
+            effectiveValue = new EffectiveValueImpl(UNDEFINED, ValueType.STRING);
+        }
     }
 
     @Override

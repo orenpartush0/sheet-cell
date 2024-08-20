@@ -2,6 +2,8 @@ package shticell.sheet.impl;
 
 import shticell.sheet.api.Sheet;
 import shticell.sheet.api.HasSheetData;
+import shticell.sheet.api.SheetToXML;
+import shticell.sheet.cell.api.CellToXML;
 import shticell.sheet.cell.connection.CellConnection;
 import shticell.sheet.cell.value.EffectiveValue;
 import shticell.sheet.cell.value.ValueType;
@@ -16,7 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class SheetImpl implements HasSheetData, Sheet {
+public class SheetImpl implements HasSheetData, Sheet, SheetToXML {
     private final int INITIAL_VERSION = 1;
     private final String sheetName;
     private int version = INITIAL_VERSION;
@@ -67,6 +69,10 @@ public class SheetImpl implements HasSheetData, Sheet {
         return cells.get(coordinate).GetEffectiveValue();
     }
 
+    @Override
+    public void UpdateCellByCoordinateWithOutVersions(Coordinate coordinate, String newValue){
+
+    }
     public void UpdateCellByCoordinate(Coordinate coordinate, String newValue) throws LoopConnectionException {
         try{cells.get(coordinate).UpdateCell(newValue,++version);}
         catch (LoopConnectionException | RuntimeException e){version--; throw e;};
@@ -88,7 +94,18 @@ public class SheetImpl implements HasSheetData, Sheet {
 
         return changes;
     }
-
+    @Override
+    public void UpdateDependentCellsForXML(List<Coordinate> coordinates){
+        coordinates.forEach(cellCoordinate -> {
+            try {
+                Cell cellImplNeedToBeUpdated = cells.get(cellCoordinate);
+                cellImplNeedToBeUpdated.UpdateCellWithOutVersion(cellImplNeedToBeUpdated.GetOriginalValue());
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
     @Override
     public void UpdateDependentCells(List<Coordinate> coordinates) {
         coordinates.forEach(cellCoordinate -> {
