@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class SchemBaseJaxb {
-    private final static String JAXB_XML_GAME_PACKAGE_NAME = "Engine.shticell.jaxb.schema;";
+    private final static String JAXB_XML_GAME_PACKAGE_NAME = "shticell/jaxb/schema";
 
     public static Sheet CreateSheetFromXML(InputStream in) throws Exception {
         STLSheet stlSheet = null;
@@ -37,7 +37,7 @@ public class SchemBaseJaxb {
     }
 
     private static STLSheet deserializeFrom(InputStream in) throws JAXBException{
-        JAXBContext jc = JAXBContext.newInstance(JAXB_XML_GAME_PACKAGE_NAME);
+        JAXBContext jc = JAXBContext.newInstance(STLSheet.class);
         Unmarshaller u = jc.createUnmarshaller();
         STLSheet unmarshal = (STLSheet) u.unmarshal(in);
         return unmarshal;
@@ -50,7 +50,7 @@ public class SchemBaseJaxb {
             List<STLCell> creationOrder = getCreationCellsList(sheet.getSTLCells().getSTLCell(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
             creationOrder.forEach(c-> {
                 try {
-                    res.UpdateCellByCoordinate(CoordinateFactory.getCoordinate(c.getRow(),Integer.parseInt(c.getColumn())),c.getSTLOriginalValue());
+                    res.UpdateCellByCoordinateWithOutVersions(CoordinateFactory.getCoordinate(c.getRow(),(int)c.getColumn().charAt(0)-(int)'A'), c.getSTLOriginalValue());
                 } catch (LoopConnectionException e) {
                     throw new RuntimeException(e);
                 }
@@ -74,6 +74,7 @@ public class SchemBaseJaxb {
         connectionList.forEach(c -> {
             try {
                 if(!topoligicalConnectionList.contains(c)){
+                    topoligicalConnectionList.add(c);
                     topoligicalConnectionList.addAll(c.GetSortedInfluenceOn());
                 }
             } catch (LoopConnectionException e) {
@@ -94,13 +95,13 @@ public class SchemBaseJaxb {
                 cellsList.stream()
                         .peek(cell -> {
                             try {
-                                checkCoordinateInSheet(rows, columns, cell.getRow(), Integer.parseInt(cell.getColumn()));
+                                checkCoordinateInSheet(rows, columns, cell.getRow(), (int)cell.getColumn().charAt(0)-(int)'A');
                             } catch (CellOutOfSheetException e) {
                                 throw new RuntimeException(e);
                             }
                         })
                         .map(cell -> {
-                            Coordinate coordinate = CoordinateFactory.getCoordinate(cell.getRow(), Integer.parseInt(cell.getColumn()));
+                            Coordinate coordinate = CoordinateFactory.getCoordinate(cell.getRow(), (int)cell.getColumn().charAt(0)-(int)'A');
                             CellConnectionImpl cellConnection1 = (CellConnectionImpl) map.computeIfAbsent(coordinate, k -> new CellConnectionImpl(coordinate));
 
                             List<Coordinate> pointTo = null;
@@ -142,7 +143,7 @@ public class SchemBaseJaxb {
             coordinate = coordinateFromString(cord,rows,columns);
             res.add(coordinate);
             int add = 4+coordinate.toString().length();
-            orgVal = orgVal.substring(4+add);
+            orgVal = orgVal.substring(index+4+add);
             index = orgVal.indexOf("REF,");
         }
         return res;

@@ -70,7 +70,9 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML {
     }
 
     @Override
-    public void UpdateCellByCoordinateWithOutVersions(Coordinate coordinate, String newValue){
+    public void UpdateCellByCoordinateWithOutVersions(Coordinate coordinate, String newValue) throws LoopConnectionException {
+        try{cells.get(coordinate).UpdateCellWithOutVersion(newValue);}
+        catch (LoopConnectionException | RuntimeException e){throw e;};
 
     }
     public void UpdateCellByCoordinate(Coordinate coordinate, String newValue) throws LoopConnectionException {

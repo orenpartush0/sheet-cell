@@ -24,7 +24,8 @@ public class Controller {
 
     public void createSheetFromFile(String fileName) throws Exception {
         try{
-            InputStream inputStream = new FileInputStream(new File(fileName));
+            File file = new File(fileName);
+            InputStream inputStream = new FileInputStream(file);
             sheet = SchemBaseJaxb.CreateSheetFromXML(inputStream);
         } catch (FileNotFoundException e) {
             throw new FileNotFoundException();
