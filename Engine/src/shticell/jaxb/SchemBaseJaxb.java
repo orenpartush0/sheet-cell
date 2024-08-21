@@ -24,14 +24,16 @@ import java.util.stream.Collectors;
 public class SchemBaseJaxb {
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "Engine.shticell.jaxb.schema;";
 
-    public static Sheet CreateSheetFromXML(InputStream in){
+    public static Sheet CreateSheetFromXML(InputStream in) throws Exception {
         STLSheet stlSheet = null;
         try {
             stlSheet = deserializeFrom (in);
+            return convertToSheet(stlSheet);
         } catch (JAXBException e) {
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new Exception(e);
         }
-        return convertToSheet(stlSheet);
     }
 
     private static STLSheet deserializeFrom(InputStream in) throws JAXBException{
@@ -42,7 +44,7 @@ public class SchemBaseJaxb {
         
     }
 
-    private static Sheet convertToSheet(STLSheet sheet) {
+    private static Sheet convertToSheet(STLSheet sheet) throws Exception {
         SheetImpl res = new SheetImpl(sheet.getName(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
         try {
             List<STLCell> creationOrder = getCreationCellsList(sheet.getSTLCells().getSTLCell(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
@@ -55,7 +57,7 @@ public class SchemBaseJaxb {
             });
         }
         catch (Exception e) {
-            System.out.println(e.getMessage());
+            throw new Exception(e);
         }
         return res;
 

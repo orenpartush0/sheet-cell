@@ -1,6 +1,7 @@
 package controller;
 
 import dto.CellDto;
+import shticell.jaxb.SchemBaseJaxb;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
@@ -8,14 +9,31 @@ import shticell.sheet.api.Sheet;
 import shticell.sheet.impl.SheetImpl;
 import dto.SheetDto;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.List;
 
 public class Controller {
-    private final Sheet sheet;
+    private Sheet sheet; // I removed the finle beacse when load a file the sheet changes
 
     public Controller(SheetDto sheetDto) {
         sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns());
     }
+
+    public void createSheetFromFile(String fileName) throws Exception {
+        try{
+            InputStream inputStream = new FileInputStream(new File(fileName));
+            sheet = SchemBaseJaxb.CreateSheetFromXML(inputStream);
+        } catch (FileNotFoundException e) {
+            throw new FileNotFoundException();
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
+
+    }
+
 
     public void UpdateCellByIndex(String square, String newValue) throws NumberFormatException, LoopConnectionException{
         sheet.UpdateCellByCoordinate(CoordinateFactory.getCoordinate(square), newValue);

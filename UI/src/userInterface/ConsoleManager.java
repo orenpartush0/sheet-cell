@@ -160,6 +160,15 @@ public class ConsoleManager {
         int selectedVersion = showSheetVersionByUserChoice(countsOfChangesPerVersion);
         printSheetCell(manager.GetSheetByVersion(selectedVersion));
     }
+    private void sheetFromFile(){
+        System.out.println("Enter File Path");
+        String fileDirectory = scanner.nextLine();
+        try {
+            manager.createSheetFromFile(fileDirectory);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
     public void Run() {
         boolean goOn = true;
@@ -168,6 +177,7 @@ public class ConsoleManager {
                 MainMenu.PrintMenu();
                 String choice = scanner.nextLine();
                 switch (choice) {
+                    case "1" -> sheetFromFile();
                     case "2" -> printSheetCell(manager.getSheet());
                     case "3" -> printCellValue();
                     case "4" -> insertData();
