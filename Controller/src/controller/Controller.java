@@ -22,6 +22,18 @@ public class Controller {
         sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns());
     }
 
+    public Controller(String fileName) throws Exception {
+        try{
+            File file = new File(fileName);
+            InputStream inputStream = new FileInputStream(file);
+            sheet = SchemBaseJaxb.CreateSheetFromXML(inputStream);
+        } catch (FileNotFoundException e) {
+            throw new FileNotFoundException();
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
+    }
+
     public void createSheetFromFile(String fileName) throws Exception {
         try{
             File file = new File(fileName);

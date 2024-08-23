@@ -1,18 +1,19 @@
 package userInterface;
+import com.sun.xml.xsom.impl.scd.Iterators;
+import dto.CellDto;
+import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 import userInterface.Enum.MainMenu;
 import controller.Controller;
 import dto.SheetDto;
 
 import java.text.NumberFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class ConsoleManager {
 
-    private final Controller manager;
+    private  Controller manager;
     private final Scanner scanner = new Scanner(System.in);
     private final int VERSION = 1;
     private final int NUM_OF_COLS = 26;
@@ -20,9 +21,7 @@ public class ConsoleManager {
 
     ConsoleManager(){
         SheetDto sheetDto;
-        System.out.println("Please enter the name of the Sheet: ");
-        String sheetName = scanner.nextLine();
-        manager = new Controller(new SheetDto(sheetName,VERSION,NUM_OF_ROWS, NUM_OF_COLS));
+        manager =null;
     }
 
     private void printColsNumbers(SheetDto sheetDto){
@@ -170,8 +169,47 @@ public class ConsoleManager {
         }
     }
 
+    private void createMangerFromFile(){
+        System.out.println("Enter File Path");
+        String fileDirectory = scanner.nextLine();
+        try {
+            manager = new Controller(fileDirectory);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+     private void FirstMenu(){
+        System.out.println("Press 1 to create a new sheet or press 2 to upload sheet from file");
+        String choice = scanner.nextLine();
+        boolean doIt = true;
+        do{
+            switch (choice){
+                case "1" -> {
+                    createManger();
+                    doIt = false;
+                    break;
+                }
+                case "2" -> {
+                    createMangerFromFile();
+                    doIt = false;
+                    break;
+                }
+            }
+        }while (doIt);
+     }
+
+     private void createManger(){
+        System.out.println("Enter Sheet Name");
+        String sheetName = scanner.nextLine();
+        Map<Coordinate, CellDto> cells = new HashMap<>();
+        List<Integer> colWidths = new ArrayList<>();
+        manager = new Controller(new SheetDto(sheetName,VERSION,NUM_OF_ROWS,NUM_OF_COLS,cells,colWidths));
+     }
+
     public void Run() {
         boolean goOn = true;
+        FirstMenu();
         try {
             do {
                 MainMenu.PrintMenu();

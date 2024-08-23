@@ -8,5 +8,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Controller" exported="" />
+    <orderEntry type="library" name="jaxb-xjc" level="project" />
   </component>
 </module>
