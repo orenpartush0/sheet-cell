@@ -18,8 +18,8 @@ public interface CoordinateFactory {
     }
 
     static Coordinate getCoordinate(String square) {
-        int row = square.substring(0,2).toUpperCase().charAt(0) - 'A';
-        int col = Integer.parseInt(square.substring(1));
+        int col = square.substring(0,2).toUpperCase().charAt(0) - 'A';
+        int row = Integer.parseInt(square.substring(1));
         return getCoordinate(row,col);
     }
 }

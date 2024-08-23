@@ -32,8 +32,8 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML {
         numberOfColumns = _numberOfColumns;
         cells = new HashMap<>();
 
-        for(int i =0; i<numberOfRows; i++) {
-            for(int j =1; j<= numberOfColumns; j++) {
+        for(int i =1; i <= numberOfRows; i++) {
+            for(int j =0; j< numberOfColumns; j++) {
                 Coordinate coordinate = CoordinateFactory.getCoordinate(i,j);
                 cells.put(coordinate,new CellImpl(coordinate,this,INITIAL_VERSION));
             }
@@ -133,8 +133,8 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML {
 
     @Override
     public List<Integer> getColsSize() {
-        return IntStream.range(1, numberOfColumns + 1)
-                .mapToObj(col -> IntStream.range(0, numberOfRows)
+        return IntStream.range(0, numberOfColumns)
+                .mapToObj(col -> IntStream.range(1, numberOfRows + 1)
                         .map(row -> {
                             Cell cellImpl = cells.get(CoordinateFactory.getCoordinate(row,col));
                             EffectiveValue effectiveValue = cellImpl.GetEffectiveValue();

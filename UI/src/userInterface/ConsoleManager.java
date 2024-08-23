@@ -1,5 +1,4 @@
 package userInterface;
-import com.sun.xml.xsom.impl.scd.Iterators;
 import dto.CellDto;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
@@ -24,17 +23,17 @@ public class ConsoleManager {
         manager =null;
     }
 
-    private void printColsNumbers(SheetDto sheetDto){
+    private void printColsLetters(SheetDto sheetDto){
         List<Integer> colsWidths = sheetDto.colWidth();
         String space = " ";
         System.out.println("Sheet name: " + sheetDto.Name());
         System.out.println("Version: " + sheetDto.version());
-        System.out.print(space.repeat(5) + "|");
+        System.out.print(space.repeat(6) + "|");
         for(int col = 0; col < sheetDto.numberOfColumns(); col++) {
             int colWidth = colsWidths.get(col) < 5 ? 5 : colsWidths.get(col);
             colWidth = colWidth  % 2 == 0 ? colWidth + 1 : colWidth;
             System.out.print(space.repeat(colWidth/2));
-            System.out.print(col + 1);
+            System.out.print((char)(col + 'A'));
             System.out.print(space.repeat(colWidth/2));
             System.out.print("|");
         }
@@ -46,10 +45,11 @@ public class ConsoleManager {
         String space = " ";
         List<Integer> colsWidths = sheetDto.colWidth();
 
-        for(int row = 0; row < sheetDto.numberOfRows(); row++) {
+        for(int row = 1; row <= sheetDto.numberOfRows(); row++) {
             System.out.print(space.repeat(2));
-            System.out.print((char) ('A' + row));
+            System.out.print((row));
             System.out.print(space.repeat(2));
+            System.out.print(row < 10 ? " " : "");
             System.out.print("|");
             for (int col = 0; col < sheetDto.numberOfColumns(); col++) {
                 int colWidth = colsWidths.get(col) < 5 ? 5 : colsWidths.get(col);
@@ -57,12 +57,11 @@ public class ConsoleManager {
 
                 System.out.print(addThousandsSeparator(
                         sheetDto.cells().get(
-                                CoordinateFactory.getCoordinate(row,col + 1))
+                                CoordinateFactory.getCoordinate(row,col))
                                 .effectiveValue().value().toString()));
 
-                String SpaceColsBiggerThenTen = " ".repeat(col >= 9 ? 1 : 0);
-                int count = colWidth - sheetDto.cells().get(CoordinateFactory.getCoordinate(row,col + 1)).effectiveValue().toString().length();
-                System.out.print(space.repeat(count) + SpaceColsBiggerThenTen);
+                int count = colWidth - sheetDto.cells().get(CoordinateFactory.getCoordinate(row,col)).effectiveValue().toString().length();
+                System.out.print(space.repeat(count));
                 System.out.print("|");
             }
 
@@ -80,7 +79,7 @@ public class ConsoleManager {
     }
 
     private void printSheetCell(SheetDto sheetDto){
-        printColsNumbers(sheetDto);
+        printColsLetters(sheetDto);
         printSheetBody(sheetDto);
     }
 
