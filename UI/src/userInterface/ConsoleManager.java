@@ -60,7 +60,10 @@ public class ConsoleManager {
                                 CoordinateFactory.getCoordinate(row,col))
                                 .effectiveValue().value().toString()));
 
-                int count = colWidth - sheetDto.cells().get(CoordinateFactory.getCoordinate(row,col)).effectiveValue().toString().length();
+                int count = colWidth - addThousandsSeparator(
+                        sheetDto.cells().get(
+                                        CoordinateFactory.getCoordinate(row,col))
+                                .effectiveValue().value().toString()).length();
                 System.out.print(space.repeat(count));
                 System.out.print("|");
             }
@@ -83,7 +86,7 @@ public class ConsoleManager {
         printSheetBody(sheetDto);
     }
 
-    public boolean isValidCellIDFormat(String input) {
+    public boolean isValidCoordinate(String input) {
         String pattern = "(?i)^[a-z][1-9][0-9]*$";
         if (input.matches(pattern)) {
             int numberPart = Integer.parseInt(input.substring(1));
@@ -95,14 +98,16 @@ public class ConsoleManager {
 
     private String selectCell(){
         System.out.println("Enter the desired cell identity");
-        String cellId = scanner.nextLine().toUpperCase();
-        while(!isValidCellIDFormat(cellId)){
-            System.out.println("Cell " + cellId + " does not exists");
+        String coordinate = scanner.nextLine();
+        while(!CoordinateFactory.isValidCoordinate(coordinate)
+                || Integer.parseInt(coordinate.substring(1)) > manager.getSheet().numberOfColumns()){
+
+            System.out.println("Cell " + coordinate + " does not exists");
             System.out.println("Enter the desired cell identity");
-            cellId = scanner.nextLine();
+            coordinate = scanner.nextLine();
         }
 
-        return cellId;
+        return coordinate;
     }
 
     private void printCellValue(){

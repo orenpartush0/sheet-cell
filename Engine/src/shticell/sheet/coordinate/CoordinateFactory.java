@@ -22,4 +22,9 @@ public interface CoordinateFactory {
         int row = Integer.parseInt(square.substring(1));
         return getCoordinate(row,col);
     }
+
+    static boolean isValidCoordinate(String coordinate) {
+        String pattern = "^[a-zA-Z]\\d+$";
+        return coordinate.matches(pattern);
+    }
 }
