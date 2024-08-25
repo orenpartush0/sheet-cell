@@ -1,7 +1,5 @@
 package shticell.jaxb;
 
-import com.sun.codemodel.JForEach;
-import controller.Controller;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
@@ -13,13 +11,11 @@ import shticell.sheet.cell.connection.CellConnectionImpl;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.CellOutOfSheetException;
-import shticell.sheet.exception.InvalidCellsSel;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.impl.SheetImpl;
 
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SchemBaseJaxb {
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "shticell/jaxb/schema";
@@ -28,14 +24,9 @@ public class SchemBaseJaxb {
 
     public static Sheet CreateSheetFromXML(InputStream in) throws Exception {
         STLSheet stlSheet = null;
-        try {
-            stlSheet = deserializeFrom (in);
-            return convertToSheet(stlSheet);
-        } catch (JAXBException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            throw new Exception(e);
-        }
+        stlSheet = deserializeFrom (in);
+
+        return convertToSheet(stlSheet);
     }
 
     private static STLSheet deserializeFrom(InputStream in) throws JAXBException{
@@ -60,7 +51,7 @@ public class SchemBaseJaxb {
             List<STLCell> creationOrder = getCreationCellsList(sheet.getSTLCells().getSTLCell(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
             creationOrder.forEach(c-> {
                 try {
-                    res.UpdateCellByCoordinateWithOutVersions(CoordinateFactory.getCoordinate(c.getRow(),(int)c.getColumn().charAt(0)-(int)'A'), c.getSTLOriginalValue());
+                    res.UpdateCellByCoordinateWithOutVersionUpdate(CoordinateFactory.getCoordinate(c.getRow(),(int)c.getColumn().charAt(0)-(int)'A'), c.getSTLOriginalValue());
                 } catch (LoopConnectionException e) {
                     throw new RuntimeException(e);
                 }
@@ -156,6 +147,7 @@ public class SchemBaseJaxb {
             orgVal = orgVal.substring(index+4+add);
             index = orgVal.indexOf("REF,");
         }
+
         return res;
     }
 
@@ -173,15 +165,7 @@ public class SchemBaseJaxb {
         }
         int col = Integer.parseInt(tempCol);
         checkCoordinateInSheet(rows,columns,row,col);
+
         return CoordinateFactory.getCoordinate(row,col);
     }
-
-
-
-
-
-    //public SheetImpl(String _sheetName, int _numberOfRows, int _numberOfColumns)
-
-
-
 }

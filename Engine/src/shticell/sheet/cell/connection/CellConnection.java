@@ -22,7 +22,7 @@ public interface CellConnection{
 
     List<CellConnection> ClearDependsOn();
 
-    void AddListToInfluenceOn(List<CellConnection> neighbors);
+    void recoverDependsOn(List<CellConnection> neighbors);
 
     ArrayList<String> GetDependsOnListOfStrings();
 

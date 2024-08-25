@@ -25,7 +25,7 @@ public class RefExpression implements Expression {
 
         String coordinate = expressions[0].eval().getValueWithExpectation(String.class);
         if(!hasSheetData.IsCoordinateInSheet(CoordinateFactory.getCoordinate(coordinate))){
-            throw new IllegalArgumentException("Coordinate: " + coordinate + " is not in sheet");
+            throw new RuntimeException("Coordinate: " + coordinate + " is not in sheet");
         }
         hasSheetData.GetCellConnections(
                 CoordinateFactory.getCoordinate(coordinate))

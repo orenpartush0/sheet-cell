@@ -1,10 +1,11 @@
-package shticell.function.api;
+package shticell.function;
 
 import shticell.expression.Enum.Operation;
 import shticell.expression.api.Expression;
 import shticell.expression.api.OperationsExpressionFactory;
 import shticell.expression.api.TypeExpressionFactory;
 import shticell.sheet.cell.connection.CellConnection;
+import shticell.sheet.cell.value.EfectiveValueFactory;
 import shticell.sheet.cell.value.EffectiveValue;
 import shticell.sheet.cell.value.EffectiveValueImpl;
 import shticell.sheet.cell.value.ValueType;
@@ -35,12 +36,17 @@ public interface functionIdentifier {
             endIndex++;
         }
 
-        String funcName = Arguments.removeFirst().getValueWithExpectation(String.class);
-        return new OperationAndArguments(Operation.valueOf(funcName), Arguments);
+        try {
+            String funcName = Arguments.removeFirst().getValueWithExpectation(String.class);
+            return new OperationAndArguments(Operation.valueOf(funcName.toUpperCase()), Arguments);
+        }
+        catch (Exception e){
+            throw new RuntimeException("Unknown function!");
+        }
     }
 
     static boolean isFunc(String func){
-        return func.charAt(0) =='{' && func.charAt(func.length()-1) == '}';
+        return !func.isEmpty() && func.charAt(0) =='{' && func.charAt(func.length()-1) == '}';
     }
 
     static EffectiveValue calcFunc(EffectiveValue func, CellConnection connections, HasSheetData hasSheetData) throws NumberFormatException {
@@ -58,7 +64,7 @@ public interface functionIdentifier {
             return expression.eval(arguments.toArray(new Expression[0]));
         }
         else{
-            return func;
+            return EfectiveValueFactory.getEffectiveValue(func.getValueWithExpectation(String.class));
         }
     }
 }

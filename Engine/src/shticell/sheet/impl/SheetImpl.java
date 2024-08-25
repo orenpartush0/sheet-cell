@@ -3,7 +3,6 @@ package shticell.sheet.impl;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.api.HasSheetData;
 import shticell.sheet.api.SheetToXML;
-import shticell.sheet.cell.api.CellToXML;
 import shticell.sheet.cell.connection.CellConnection;
 import shticell.sheet.cell.value.EffectiveValue;
 import shticell.sheet.cell.value.ValueType;
@@ -12,7 +11,6 @@ import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.cell.api.Cell;
 import shticell.sheet.cell.impl.CellImpl;
-
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -70,11 +68,11 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML {
     }
 
     @Override
-    public void UpdateCellByCoordinateWithOutVersions(Coordinate coordinate, String newValue) throws LoopConnectionException {
-        try{cells.get(coordinate).UpdateCellWithOutVersion(newValue);}
+    public void UpdateCellByCoordinateWithOutVersionUpdate(Coordinate coordinate, String newValue) throws LoopConnectionException {
+        try{cells.get(coordinate).UpdateCell(newValue,version);}
         catch (LoopConnectionException | RuntimeException e){throw e;};
-
     }
+
     public void UpdateCellByCoordinate(Coordinate coordinate, String newValue) throws LoopConnectionException {
         try{cells.get(coordinate).UpdateCell(newValue,++version);}
         catch (LoopConnectionException | RuntimeException e){version--; throw e;};
@@ -96,18 +94,7 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML {
 
         return changes;
     }
-    @Override
-    public void UpdateDependentCellsForXML(List<Coordinate> coordinates){
-        coordinates.forEach(cellCoordinate -> {
-            try {
-                Cell cellImplNeedToBeUpdated = cells.get(cellCoordinate);
-                cellImplNeedToBeUpdated.UpdateCellWithOutVersion(cellImplNeedToBeUpdated.GetOriginalValue());
-            }
-            catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
+
     @Override
     public void UpdateDependentCells(List<Coordinate> coordinates) {
         coordinates.forEach(cellCoordinate -> {

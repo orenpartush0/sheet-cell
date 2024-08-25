@@ -38,7 +38,7 @@ public class EffectiveValueImpl implements EffectiveValue {
 
     @Override
     public String toString() {
-        return valueType.toString();
+        return value.toString();
     }
 
     @Override

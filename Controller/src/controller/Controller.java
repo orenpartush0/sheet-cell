@@ -23,28 +23,15 @@ public class Controller {
     }
 
     public Controller(String fileName) throws Exception {
-        try{
-            File file = new File(fileName);
-            InputStream inputStream = new FileInputStream(file);
-            sheet = SchemBaseJaxb.CreateSheetFromXML(inputStream);
-        } catch (FileNotFoundException e) {
-            throw new FileNotFoundException();
-        } catch (Exception e) {
-            throw new Exception(e);
-        }
+        File file = new File(fileName);
+        InputStream inputStream = new FileInputStream(file);
+        sheet = SchemBaseJaxb.CreateSheetFromXML(inputStream);
     }
 
     public void createSheetFromFile(String fileName) throws Exception {
-        try{
-            File file = new File(fileName);
-            InputStream inputStream = new FileInputStream(file);
-            sheet = SchemBaseJaxb.CreateSheetFromXML(inputStream);
-        } catch (FileNotFoundException e) {
-            throw new FileNotFoundException();
-        } catch (Exception e) {
-            throw new Exception(e);
-        }
-
+        File file = new File(fileName);
+        InputStream inputStream = new FileInputStream(file);
+        sheet = SchemBaseJaxb.CreateSheetFromXML(inputStream);
     }
 
 

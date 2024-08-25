@@ -68,9 +68,9 @@ public class CellConnectionImpl implements Cloneable, CellConnection {
         return toRemove;
     }
 
-    public void AddListToInfluenceOn(List<CellConnection> neighbors) {
-        influenceOn.addAll(neighbors);
-        neighbors.forEach(cellConnection -> cellConnection.AddToInfluenceOn(this));
+    public void recoverDependsOn(List<CellConnection> backup) {
+        dependsOn.addAll(backup);
+        backup.forEach(cellConnection -> cellConnection.AddToInfluenceOn(this));
     }
 
     private boolean topologicalSortUtil(CellConnection cell, Set<CellConnection> visited,
