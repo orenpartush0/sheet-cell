@@ -10,7 +10,7 @@ public interface CoordinateFactory {
     static Map<String,Coordinate> coordinateCache = new HashMap<>();
 
     static Coordinate getCoordinate(int row, int col) {
-        String key = row + ":" + col;
+        String key = col + ":" + row;
         return Optional.ofNullable(coordinateCache.get(key)).orElseGet(() ->{
             coordinateCache.put(key,new Coordinate(row,col));
             return coordinateCache.get(key);

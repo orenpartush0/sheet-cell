@@ -20,6 +20,6 @@ public record Coordinate(int row, int col) {
 
     @Override
     public String toString() {
-        return Character.toString(('A' + row )) + Integer.toString(col);
+        return Character.toString(('A' + col )) + Integer.toString(row);
     }
 }
