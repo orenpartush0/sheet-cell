@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 
 public class SchemBaseJaxb {
     private final static String JAXB_XML_GAME_PACKAGE_NAME = "shticell/jaxb/schema";
+    private static final int MAXROWS = 50;
+    private static final int MAXCOLS = 20;
 
     public static Sheet CreateSheetFromXML(InputStream in) throws Exception {
         STLSheet stlSheet = null;
@@ -44,9 +46,17 @@ public class SchemBaseJaxb {
         
     }
 
+    private static void checkRowsAndCols(int rows, int cols) {
+        if (rows > MAXROWS || cols > MAXCOLS) {
+            throw new RuntimeException("rows must be smaller than " + MAXROWS + " and cols " + MAXCOLS);
+        }
+    }
+
     private static Sheet convertToSheet(STLSheet sheet) throws Exception {
-        SheetImpl res = new SheetImpl(sheet.getName(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
+        SheetImpl res;
         try {
+            checkRowsAndCols(sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
+            res = new SheetImpl(sheet.getName(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
             List<STLCell> creationOrder = getCreationCellsList(sheet.getSTLCells().getSTLCell(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
             creationOrder.forEach(c-> {
                 try {
