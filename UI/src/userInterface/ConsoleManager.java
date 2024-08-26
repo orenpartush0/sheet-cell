@@ -41,7 +41,7 @@ public class ConsoleManager {
 
     private void printSheetBody(SheetDto sheetDto){
         String space = " ";
-
+//
         for(int row = 1; row <= sheetDto.numberOfRows(); row++) {
             System.out.print(space.repeat(2));
             System.out.print((row));
