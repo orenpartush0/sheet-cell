@@ -171,31 +171,31 @@ public class ConsoleManager {
         }
     }
 
-    private void createMangerFromFile(){
+    private void createMangerFromFile() throws Exception {
         System.out.println("Enter File Path");
         String fileDirectory = scanner.nextLine();
-        try {
-            manager = new Controller(fileDirectory);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
+        manager = new Controller(fileDirectory);
+
         }
-    }
 
      private void FirstMenu(){
-        System.out.println("Press 1 to create a new sheet or press 2 to upload sheet from file");
-        String choice = scanner.nextLine();
         boolean doIt = true;
         do{
+            System.out.println("Press 1 to create a new sheet or press 2 to upload sheet from file");
+            String choice = scanner.nextLine();
             switch (choice){
                 case "1" -> {
                     createManger();
                     doIt = false;
-                    break;
                 }
                 case "2" -> {
-                    createMangerFromFile();
-                    doIt = false;
-                    break;
+                    try {
+                        createMangerFromFile();
+                        doIt = false;
+                    }
+                    catch (Exception e){
+                        System.out.println(e.getMessage());
+                    }
                 }
             }
         }while (doIt);

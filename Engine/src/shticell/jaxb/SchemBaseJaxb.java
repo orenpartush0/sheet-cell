@@ -130,7 +130,7 @@ public class SchemBaseJaxb {
     }
 
     private static void checkCoordinateInSheet(int rows, int columns, int row, int column)throws CellOutOfSheetException {
-        if(row < 0 || column < 0 || row >= rows || column >= columns) {
+        if(row < 0 || column < 0 || row > rows || column > columns) {
             throw new CellOutOfSheetException(row,column);
         }
     }
@@ -145,8 +145,8 @@ public class SchemBaseJaxb {
             cord = orgVal.substring(index+4);
             coordinate = coordinateFromString(cord,rows,columns);
             res.add(coordinate);
-            int add = 4+coordinate.toString().length();
-            orgVal = orgVal.substring(index+4+add);
+            int add = 5+coordinate.toString().length();
+            orgVal = orgVal.substring(index+add);
             index = orgVal.indexOf("REF,");
         }
 
@@ -154,7 +154,7 @@ public class SchemBaseJaxb {
     }
 
     private static Coordinate coordinateFromString (String orgVal, int rows, int columns) throws CellOutOfSheetException {
-        int row = Integer.parseInt(String.valueOf(orgVal.charAt(0)-'A'));
+        int col = Integer.parseInt(String.valueOf(orgVal.charAt(0)-'A'));
         String tempCol="";
         for( int i = 1; i< orgVal.length(); i++) {
             char c = orgVal.charAt(i);
@@ -165,7 +165,7 @@ public class SchemBaseJaxb {
                 break;
             }
         }
-        int col = Integer.parseInt(tempCol);
+        int row = Integer.parseInt(tempCol);
         checkCoordinateInSheet(rows,columns,row,col);
 
         return CoordinateFactory.getCoordinate(row,col);
