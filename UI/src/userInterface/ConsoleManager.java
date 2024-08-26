@@ -17,20 +17,18 @@ public class ConsoleManager {
     private final int VERSION = 1;
     private final int NUM_OF_COLS = 26;
     private final int NUM_OF_ROWS = 26;
+    private final int ROWS_HEIGHT = 1;
+    private final int COLS_WIDTH = 5;
 
-    ConsoleManager(){
-        SheetDto sheetDto;
-        manager =null;
-    }
+    ConsoleManager(){}
 
     private void printColsLetters(SheetDto sheetDto){
-        List<Integer> colsWidths = sheetDto.colWidth();
         String space = " ";
         System.out.println("Sheet name: " + sheetDto.Name());
         System.out.println("Version: " + sheetDto.version());
         System.out.print(space.repeat(6) + "|");
         for(int col = 0; col < sheetDto.numberOfColumns(); col++) {
-            int colWidth = colsWidths.get(col) < 5 ? 5 : colsWidths.get(col);
+            int colWidth = sheetDto.colsWidth();
             colWidth = colWidth  % 2 == 0 ? colWidth + 1 : colWidth;
             System.out.print(space.repeat(colWidth/2));
             System.out.print((char)(col + 'A'));
@@ -43,7 +41,6 @@ public class ConsoleManager {
 
     private void printSheetBody(SheetDto sheetDto){
         String space = " ";
-        List<Integer> colsWidths = sheetDto.colWidth();
 
         for(int row = 1; row <= sheetDto.numberOfRows(); row++) {
             System.out.print(space.repeat(2));
@@ -52,7 +49,7 @@ public class ConsoleManager {
             System.out.print(row < 10 ? " " : "");
             System.out.print("|");
             for (int col = 0; col < sheetDto.numberOfColumns(); col++) {
-                int colWidth = colsWidths.get(col) < 5 ? 5 : colsWidths.get(col);
+                int colWidth = sheetDto.colsWidth();
                 colWidth = colWidth  % 2 == 0 ? colWidth + 1 : colWidth;
 
                 System.out.print(addThousandsSeparator(
@@ -64,7 +61,7 @@ public class ConsoleManager {
                         sheetDto.cells().get(
                                         CoordinateFactory.getCoordinate(row,col))
                                 .effectiveValue().value().toString()).length();
-                System.out.print(space.repeat(count));
+                System.out.print(space.repeat(Math.abs(count)));
                 System.out.print("|");
             }
 
@@ -163,6 +160,7 @@ public class ConsoleManager {
         int selectedVersion = showSheetVersionByUserChoice(countsOfChangesPerVersion);
         printSheetCell(manager.GetSheetByVersion(selectedVersion));
     }
+
     private void sheetFromFile(){
         System.out.println("Enter File Path");
         String fileDirectory = scanner.nextLine();
@@ -206,9 +204,7 @@ public class ConsoleManager {
      private void createManger(){
         System.out.println("Enter Sheet Name");
         String sheetName = scanner.nextLine();
-        Map<Coordinate, CellDto> cells = new HashMap<>();
-        List<Integer> colWidths = new ArrayList<>();
-        manager = new Controller(new SheetDto(sheetName,VERSION,NUM_OF_ROWS,NUM_OF_COLS,cells,colWidths));
+        manager = new Controller(new SheetDto(sheetName,VERSION,NUM_OF_ROWS,NUM_OF_COLS,COLS_WIDTH,ROWS_HEIGHT));
      }
 
     public void Run() {

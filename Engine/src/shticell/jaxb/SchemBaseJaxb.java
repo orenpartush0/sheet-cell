@@ -47,7 +47,9 @@ public class SchemBaseJaxb {
         SheetImpl res;
         try {
             checkRowsAndCols(sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
-            res = new SheetImpl(sheet.getName(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
+            res = new SheetImpl(sheet.getName(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns(),
+                    null,sheet.getSTLLayout().getSTLSize().getRowsHeightUnits(),sheet.getSTLLayout().getSTLSize().getColumnWidthUnits());
+
             List<STLCell> creationOrder = getCreationCellsList(sheet.getSTLCells().getSTLCell(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
             creationOrder.forEach(c-> {
                 try {

@@ -17,5 +17,6 @@ public interface Sheet {
     void UpdateCellByCoordinate(Coordinate coordinate, String newValue) throws LoopConnectionException;
     List<Integer> GetCountOfChangesPerVersion();
     SheetImpl GetSheetByVersion(int version);
-    List<Integer> getColsSize();
+    int getColsWidth();
+    int getRowsHeight();
 }

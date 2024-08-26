@@ -23,11 +23,15 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML {
     Map<Coordinate, Cell> cells;
     private final int numberOfRows;
     private final int numberOfColumns;
+    private final int rowHeight;
+    private final int columnWidth;
 
-    public SheetImpl(String _sheetName, int _numberOfRows, int _numberOfColumns) {
+    public SheetImpl(String _sheetName, int _numberOfRows, int _numberOfColumns, int _rowHeight, int _columnWidth) {
         sheetName = _sheetName;
         numberOfRows = _numberOfRows;
         numberOfColumns = _numberOfColumns;
+        rowHeight = _rowHeight;
+        columnWidth = _columnWidth;
         cells = new HashMap<>();
 
         for(int i =1; i <= numberOfRows; i++) {
@@ -38,9 +42,9 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML {
         }
     }
 
-    public SheetImpl(String sheetTitle, int _numberOfRows, int _numberOfColumns, Map<Coordinate, Cell> _cells)
+    public SheetImpl(String sheetTitle, int _numberOfRows, int _numberOfColumns, Map<Coordinate, Cell> _cells, int _rowHeight, int _columnWidth)
     {
-        this(sheetTitle,_numberOfRows,_numberOfColumns);
+        this(sheetTitle,_numberOfRows,_numberOfColumns,_rowHeight,_columnWidth);
         cells = _cells;
     }
 
@@ -61,6 +65,12 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML {
 
     @Override
     public Cell GetCell(Coordinate coordinate) { return cells.get(coordinate);}
+
+    @Override
+    public int getColsWidth() {return columnWidth;}
+
+    @Override
+    public int getRowsHeight() {return rowHeight;}
 
     @Override
     public EffectiveValue GetCellEffectiveValue(Coordinate coordinate) {
@@ -119,38 +129,6 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML {
     }
 
     @Override
-    public List<Integer> getColsSize() {
-        return IntStream.range(0, numberOfColumns)
-                .mapToObj(col -> IntStream.range(1, numberOfRows + 1)
-                        .map(row -> {
-                            Cell cellImpl = cells.get(CoordinateFactory.getCoordinate(row,col));
-                            EffectiveValue effectiveValue = cellImpl.GetEffectiveValue();
-                            return getNumOfThousandsSeparator(effectiveValue);
-                        })
-                        .max()
-                        .orElse(5))
-                .collect(Collectors.toList());
-    }
-
-   public int getNumOfThousandsSeparator(EffectiveValue effectiveValue){
-        if(effectiveValue.getValueType() == ValueType.NUMERIC){
-            String numberStr = effectiveValue.getValueWithExpectation(Double.class).toString();
-            BigDecimal number = new BigDecimal(numberStr);
-            String numStr = number.toPlainString();
-
-            if (numStr.contains(".")) {
-                numStr = numStr.substring(0, numStr.indexOf('.'));
-            }
-
-            int length = numStr.length();
-            int commaCount = (length > 3) ? (length - 1) / 3 : 0;
-
-            return length + commaCount;
-        }
-
-        return Math.max(effectiveValue.getValue().toString().length(),5);
-   }
-    @Override
     public SheetImpl GetSheetByVersion(int version){
 
         Map<Coordinate, Cell> cellsInRequiredVersion = new HashMap<>();
@@ -160,7 +138,7 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML {
             cellsInRequiredVersion.put(key, new CellImpl(cellData));
         });
 
-        return new SheetImpl(sheetName,numberOfRows,numberOfColumns,cellsInRequiredVersion);
+        return new SheetImpl(sheetName,numberOfRows,numberOfColumns,cellsInRequiredVersion,rowHeight,columnWidth);
     }
 
 }
