@@ -145,7 +145,7 @@ public class SchemBaseJaxb {
             cord = orgVal.substring(index+4);
             coordinate = coordinateFromString(cord,rows,columns);
             res.add(coordinate);
-            int add = 5+coordinate.toString().length();
+            int add = 5 + coordinate.toString().length();
             orgVal = orgVal.substring(index+add);
             index = orgVal.indexOf("REF,");
         }
