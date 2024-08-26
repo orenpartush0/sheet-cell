@@ -1,12 +1,13 @@
 package shticell.sheet.cell.connection;
 
+import shticell.sheet.cell.api.Cell;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CellConnectionImpl implements Cloneable, CellConnection {
+public class CellConnectionImpl implements Cloneable, CellConnection,CanRemoveFromDependsOn {
     private final Coordinate coordinate;
     private final List<CellConnection> dependsOn = new ArrayList<>();
     private final List<CellConnection> influenceOn = new ArrayList<>();
@@ -29,6 +30,7 @@ public class CellConnectionImpl implements Cloneable, CellConnection {
 
     @Override
     public List<CellConnection> GetInfluenceOn(){ return influenceOn; }
+
 
     @Override
     public List<CellConnection> GetSortedInfluenceOn() throws LoopConnectionException { return topologicalSort();}
@@ -58,6 +60,11 @@ public class CellConnectionImpl implements Cloneable, CellConnection {
     @Override
     public void RemoveFromInfluenceOn(CellConnection neighbor) {
         influenceOn.remove(neighbor);
+    }
+
+    @Override
+    public void RemoveFromDependsOn(CanRemoveFromDependsOn cell){
+        dependsOn.remove(cell);
     }
 
     public List<CellConnection> ClearDependsOn() {

@@ -48,7 +48,7 @@ public class SchemBaseJaxb {
         try {
             checkRowsAndCols(sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
             res = new SheetImpl(sheet.getName(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns(),
-                    null,sheet.getSTLLayout().getSTLSize().getRowsHeightUnits(),sheet.getSTLLayout().getSTLSize().getColumnWidthUnits());
+                    sheet.getSTLLayout().getSTLSize().getRowsHeightUnits(),sheet.getSTLLayout().getSTLSize().getColumnWidthUnits());
 
             List<STLCell> creationOrder = getCreationCellsList(sheet.getSTLCells().getSTLCell(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
             creationOrder.forEach(c-> {
@@ -67,23 +67,14 @@ public class SchemBaseJaxb {
     }
 
     private static List<STLCell> getCreationCellsList(List<STLCell> cellsList,int rows, int columns) throws LoopConnectionException {
-        List<CellConnection> connectionList = getCellConnectionList(cellsList,rows,columns);
-        List<CellConnection> topoligicalConnectionList = new ArrayList<>();
-        Map<CellConnection, STLCell> connectionCellMap = new HashMap<>();
+        List<CellConnectionImpl> connectionList = getCellConnectionList(cellsList,rows,columns);
+        List<CellConnectionImpl> topoligicalConnectionList = new ArrayList<>();
+        Map<CellConnectionImpl, STLCell> connectionCellMap = new HashMap<>();
         for (int i = 0; i < cellsList.size(); i++) {
             connectionCellMap.put(connectionList.get(i), cellsList.get(i));
         }
 
-        connectionList.forEach(c -> {
-            try {
-                if(!topoligicalConnectionList.contains(c)){
-                    topoligicalConnectionList.add(c);
-                    topoligicalConnectionList.addAll(c.GetSortedInfluenceOn());
-                }
-            } catch (LoopConnectionException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        topoligicalConnectionList = topoligicalConnectionList(connectionList);
         topoligicalConnectionList.retainAll(connectionList);
 
         List<STLCell> topoligicalCellsList = new ArrayList<>();
@@ -91,9 +82,9 @@ public class SchemBaseJaxb {
         return topoligicalCellsList;
     }
 
-    private static List<CellConnection> getCellConnectionList(List<STLCell> cellsList,int rows, int columns) throws RuntimeException {
-        List<CellConnection> res = new ArrayList<CellConnection>();
-        Map<Coordinate,CellConnection> map = new HashMap<Coordinate,CellConnection>();
+    private static List<CellConnectionImpl> getCellConnectionList(List<STLCell> cellsList,int rows, int columns) throws RuntimeException {
+        List<CellConnectionImpl> res = new ArrayList<CellConnectionImpl>();
+        Map<Coordinate,CellConnectionImpl> map = new HashMap<Coordinate,CellConnectionImpl>();
         res.addAll(
                 cellsList.stream()
                         .peek(cell -> {
@@ -152,6 +143,27 @@ public class SchemBaseJaxb {
 
         return res;
     }
+
+    private static List<CellConnectionImpl> topoligicalConnectionList (List<CellConnectionImpl> cellsList){
+        List<CellConnectionImpl> res = new ArrayList<>();
+        List<CellConnectionImpl> noDependedOn = new ArrayList<>(cellsList.stream().filter(c -> c.GetDependsOn().isEmpty()).toList());
+        while(!noDependedOn.isEmpty()) {
+            CellConnectionImpl cell = noDependedOn.getFirst();
+            res.add(cell);
+            List<CellConnectionImpl> influenceOn =cell.GetInfluenceOn().stream().map(c->(CellConnectionImpl)c).toList();
+            CellConnectionImpl finalCell = cell;
+            influenceOn.forEach(c->{
+                c.RemoveFromDependsOn(finalCell);
+                if(c.GetDependsOn().isEmpty()){
+                    noDependedOn.add(c);
+                }
+            });
+            noDependedOn.remove(cell);
+        }
+        return res;
+    }
+
+
 
     private static Coordinate coordinateFromString (String orgVal, int rows, int columns) throws CellOutOfSheetException {
         int col = Integer.parseInt(String.valueOf(orgVal.charAt(0)-'A'));
