@@ -23,52 +23,64 @@ public class ConsoleManager {
 
     ConsoleManager(){}
 
-    private void printColsLetters(SheetDto sheetDto){
+    private void printColsLetters(SheetDto sheetDto) {
         String space = " ";
         System.out.println("Sheet name: " + sheetDto.Name());
         System.out.println("Version: " + sheetDto.version());
-        System.out.print(space.repeat(6) + "|");
-        for(int col = 0; col < sheetDto.numberOfColumns(); col++) {
+        System.out.print(space.repeat(4) + "|");
+
+        for (int col = 0; col < sheetDto.numberOfColumns(); col++) {
             int colWidth = sheetDto.colsWidth();
-            colWidth = colWidth  % 2 == 0 ? colWidth + 1 : colWidth;
-            System.out.print(space.repeat(colWidth/2));
-            System.out.print((char)(col + 'A'));
-            System.out.print(space.repeat(colWidth/2));
+            colWidth = colWidth % 2 == 0 ? colWidth + 1 : colWidth;
+
+            int leftPadding = colWidth / 2;
+            int rightPadding = colWidth - leftPadding - 1;
+
+            System.out.print(space.repeat(leftPadding));
+            System.out.print((char) (col + 'A'));
+            System.out.print(space.repeat(rightPadding));
             System.out.print("|");
         }
 
         System.out.println();
     }
 
-    private void printSheetBody(SheetDto sheetDto){
+
+    private void printSheetBody(SheetDto sheetDto) {
         String space = " ";
-//
-        for(int row = 1; row <= sheetDto.numberOfRows(); row++) {
-            System.out.print(space.repeat(2));
-            System.out.print((row));
-            System.out.print(space.repeat(2));
-            System.out.print(row < 10 ? " " : "");
-            System.out.print("|");
-            for (int col = 0; col < sheetDto.numberOfColumns(); col++) {
-                int colWidth = sheetDto.colsWidth();
-                colWidth = colWidth  % 2 == 0 ? colWidth + 1 : colWidth;
+        int rowHeight = sheetDto.rowsHeight();
+        int maxRowNumber = sheetDto.numberOfRows();
+        int rowNumberWidth = String.valueOf(maxRowNumber).length() + 2;
+        int colWidth = sheetDto.colsWidth() % 2 == 0 ? sheetDto.colsWidth() + 1 : sheetDto.colsWidth();
 
-                System.out.print(addThousandsSeparator(
-                        sheetDto.cells().get(
-                                CoordinateFactory.getCoordinate(row,col))
-                                .effectiveValue().value().toString()));
-
-                int count = colWidth - addThousandsSeparator(
-                        sheetDto.cells().get(
-                                        CoordinateFactory.getCoordinate(row,col))
-                                .effectiveValue().value().toString()).length();
-                System.out.print(space.repeat(Math.abs(count)));
+        for (int row = 1; row <= sheetDto.numberOfRows(); row++) {
+            for (int h = 0; h < rowHeight; h++) {  // Repeat for the row height
+                if (h == rowHeight / 2) {
+                    System.out.print(String.format("%" + rowNumberWidth + "d", row));
+                } else {
+                    System.out.print(space.repeat(rowNumberWidth));
+                }
                 System.out.print("|");
-            }
+                for (int col = 0; col < sheetDto.numberOfColumns(); col++) {
+                    String cellValue = addThousandsSeparator(
+                            sheetDto.cells().get(
+                                            CoordinateFactory.getCoordinate(row, col))
+                                    .effectiveValue().value().toString());
 
-            System.out.println();
+                    if (h == rowHeight / 2) {
+                        System.out.print(cellValue);
+                        int count = colWidth - cellValue.length();
+                        System.out.print(space.repeat(Math.abs(count)));
+                    } else {
+                        System.out.print(space.repeat(colWidth));
+                    }
+                    System.out.print("|");
+                }
+                System.out.println();
+            }
         }
     }
+
 
     private String addThousandsSeparator(String number) throws NumberFormatException {
         try {
