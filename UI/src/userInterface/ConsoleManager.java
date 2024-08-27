@@ -1,11 +1,12 @@
 package userInterface;
-import dto.CellDto;
-import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 import userInterface.Enum.MainMenu;
 import controller.Controller;
 import dto.SheetDto;
 
+import java.io.*;
+import java.net.URL;
+import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -165,7 +166,7 @@ public class ConsoleManager {
         System.out.println("Enter File Path");
         String fileDirectory = scanner.nextLine();
         try {
-            manager.createSheetFromFile(fileDirectory);
+            manager.createSheetFromFile(fileDirectory.replace(" ",""));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -174,7 +175,7 @@ public class ConsoleManager {
     private void createMangerFromFile() throws Exception {
         System.out.println("Enter File Path");
         String fileDirectory = scanner.nextLine();
-        manager = new Controller(fileDirectory);
+        manager = new Controller(fileDirectory.replace(" ",""));
 
         }
 
@@ -201,11 +202,36 @@ public class ConsoleManager {
         }while (doIt);
      }
 
+    private void importSheetToFile()  {
+        System.out.println("Enter Full Path name of the sheet file");
+        String path = scanner.nextLine();
+        path = path.replace(" ","");
+        try{
+            manager.writeSheetToFile(path);
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void retrieveSheetFromFile(){
+        System.out.println("Enter Full Path name of the sheet file");
+        String path = scanner.nextLine().replace(" ","");
+            try {
+                manager.readSheetFromFile(path);
+            }
+            catch (Exception  e) {
+               System.out.println(e.getMessage());
+            }
+    }
+
      private void createManger(){
         System.out.println("Enter Sheet Name");
         String sheetName = scanner.nextLine();
         manager = new Controller(new SheetDto(sheetName,VERSION,NUM_OF_ROWS,NUM_OF_COLS,COLS_WIDTH,ROWS_HEIGHT));
      }
+
+
 
     public void Run() {
         boolean goOn = true;
@@ -220,15 +246,17 @@ public class ConsoleManager {
                     case "3" -> printCellValue();
                     case "4" -> insertData();
                     case "5" -> showVersions();
+                    case "6" ->importSheetToFile();
+                    case "7" ->retrieveSheetFromFile();
                     default -> {
-                        if (choice.equals("6")) {
+                        if (choice.equals("8")) {
                             System.out.println("Bye Bye");
                         } else {
                             System.out.println("Invalid choice. Please choose a number 1-6");
                         }
                     }
                 }
-                goOn = !choice.equals("6");
+                goOn = !choice.equals("8");
             } while (goOn);
         }
         catch (Exception e){

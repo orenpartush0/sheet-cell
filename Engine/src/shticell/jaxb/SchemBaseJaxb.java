@@ -119,7 +119,6 @@ public class SchemBaseJaxb {
                             return cellConnection1;
                         })
                         .toList());
-
         return res;
     }
 

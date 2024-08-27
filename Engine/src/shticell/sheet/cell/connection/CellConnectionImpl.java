@@ -4,10 +4,11 @@ import shticell.sheet.cell.api.Cell;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CellConnectionImpl implements Cloneable, CellConnection,CanRemoveFromDependsOn {
+public class CellConnectionImpl implements Cloneable, CellConnection,CanRemoveFromDependsOn, Serializable {
     private final Coordinate coordinate;
     private final List<CellConnection> dependsOn = new ArrayList<>();
     private final List<CellConnection> influenceOn = new ArrayList<>();

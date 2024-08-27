@@ -3,9 +3,10 @@ package shticell.sheet.cell.connection;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 
+import java.io.Serializable;
 import java.util.*;
 
-public interface CellConnection{
+public interface CellConnection extends Serializable {
     Coordinate GetCellCoordinate();
 
     List<CellConnection> GetDependsOn();

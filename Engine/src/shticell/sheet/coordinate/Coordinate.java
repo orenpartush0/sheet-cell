@@ -1,8 +1,9 @@
 package shticell.sheet.coordinate;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public record Coordinate(int row, int col) {
+public record Coordinate(int row, int col) implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
