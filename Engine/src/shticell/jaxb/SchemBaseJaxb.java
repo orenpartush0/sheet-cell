@@ -6,7 +6,7 @@ import jakarta.xml.bind.Unmarshaller;
 import shticell.jaxb.schema.STLCell;
 import shticell.jaxb.schema.STLSheet;
 import shticell.sheet.api.Sheet;
-import shticell.sheet.cell.connection.CellConnection;
+import shticell.sheet.cell.connection.CanRemoveFromDependsOn;
 import shticell.sheet.cell.connection.CellConnectionImpl;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
@@ -67,14 +67,17 @@ public class SchemBaseJaxb {
     }
 
     private static List<STLCell> getCreationCellsList(List<STLCell> cellsList,int rows, int columns) throws LoopConnectionException {
-        List<CellConnectionImpl> connectionList = getCellConnectionList(cellsList,rows,columns);
-        List<CellConnectionImpl> topoligicalConnectionList = new ArrayList<>();
-        Map<CellConnectionImpl, STLCell> connectionCellMap = new HashMap<>();
+        List<CanRemoveFromDependsOn> connectionList = getCellConnectionList(cellsList,rows,columns);
+        List<CanRemoveFromDependsOn> topoligicalConnectionList;
+        Map<CanRemoveFromDependsOn, STLCell> connectionCellMap = new HashMap<>();
         for (int i = 0; i < cellsList.size(); i++) {
             connectionCellMap.put(connectionList.get(i), cellsList.get(i));
         }
 
         topoligicalConnectionList = topoligicalConnectionList(connectionList);
+        if (topoligicalConnectionList == null) {
+            throw new LoopConnectionException("The sheet in the file contain a loop");
+        }
         topoligicalConnectionList.retainAll(connectionList);
 
         List<STLCell> topoligicalCellsList = new ArrayList<>();
@@ -82,9 +85,9 @@ public class SchemBaseJaxb {
         return topoligicalCellsList;
     }
 
-    private static List<CellConnectionImpl> getCellConnectionList(List<STLCell> cellsList,int rows, int columns) throws RuntimeException {
-        List<CellConnectionImpl> res = new ArrayList<CellConnectionImpl>();
-        Map<Coordinate,CellConnectionImpl> map = new HashMap<Coordinate,CellConnectionImpl>();
+    private static List<CanRemoveFromDependsOn> getCellConnectionList(List<STLCell> cellsList,int rows, int columns) throws RuntimeException {
+        List<CanRemoveFromDependsOn> res = new ArrayList<CanRemoveFromDependsOn>();
+        Map<Coordinate,CanRemoveFromDependsOn> map = new HashMap<Coordinate,CanRemoveFromDependsOn>();
         res.addAll(
                 cellsList.stream()
                         .peek(cell -> {
@@ -96,7 +99,7 @@ public class SchemBaseJaxb {
                         })
                         .map(cell -> {
                             Coordinate coordinate = CoordinateFactory.getCoordinate(cell.getRow(), (int)cell.getColumn().charAt(0)-(int)'A');
-                            CellConnectionImpl cellConnection1 = (CellConnectionImpl) map.computeIfAbsent(coordinate, k -> new CellConnectionImpl(coordinate));
+                            CanRemoveFromDependsOn cellConnection1 =  map.computeIfAbsent(coordinate,k-> new CellConnectionImpl(coordinate));
 
                             List<Coordinate> pointTo = null;
                             try {
@@ -106,7 +109,7 @@ public class SchemBaseJaxb {
                             }
 
                             pointTo.forEach(cord -> {
-                                CellConnectionImpl cellConnection2 = (CellConnectionImpl) map.computeIfAbsent(cord, k -> new CellConnectionImpl(cord));
+                                CanRemoveFromDependsOn cellConnection2 = map.computeIfAbsent(cord,k-> new CellConnectionImpl(cord));
                                 cellConnection1.AddToDependsOn(cellConnection2);
                                 cellConnection2.AddToInfluenceOn(cellConnection1);
                                 map.put(coordinate, cellConnection2);
@@ -144,14 +147,14 @@ public class SchemBaseJaxb {
         return res;
     }
 
-    private static List<CellConnectionImpl> topoligicalConnectionList (List<CellConnectionImpl> cellsList){
-        List<CellConnectionImpl> res = new ArrayList<>();
-        List<CellConnectionImpl> noDependedOn = new ArrayList<>(cellsList.stream().filter(c -> c.GetDependsOn().isEmpty()).toList());
+    private static List<CanRemoveFromDependsOn> topoligicalConnectionList(List<CanRemoveFromDependsOn> cellsList){
+        List<CanRemoveFromDependsOn> res = new ArrayList<>();
+        List<CanRemoveFromDependsOn> noDependedOn = new ArrayList<>(cellsList.stream().filter(c -> c.GetDependsOn().isEmpty()).toList());
         while(!noDependedOn.isEmpty()) {
-            CellConnectionImpl cell = noDependedOn.getFirst();
+            CanRemoveFromDependsOn cell = noDependedOn.getFirst();
             res.add(cell);
-            List<CellConnectionImpl> influenceOn =cell.GetInfluenceOn().stream().map(c->(CellConnectionImpl)c).toList();
-            CellConnectionImpl finalCell = cell;
+            List<CanRemoveFromDependsOn> influenceOn =cell.GetInfluenceOn().stream().map(c->(CanRemoveFromDependsOn)c).toList();
+            CanRemoveFromDependsOn finalCell = cell;
             influenceOn.forEach(c->{
                 c.RemoveFromDependsOn(finalCell);
                 if(c.GetDependsOn().isEmpty()){
@@ -160,10 +163,8 @@ public class SchemBaseJaxb {
             });
             noDependedOn.remove(cell);
         }
-        return res;
+        return res.size() == cellsList.size() ? res : null;
     }
-
-
 
     private static Coordinate coordinateFromString (String orgVal, int rows, int columns) throws CellOutOfSheetException {
         int col = Integer.parseInt(String.valueOf(orgVal.charAt(0)-'A'));
