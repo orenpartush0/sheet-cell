@@ -174,9 +174,9 @@ public class ConsoleManager {
 
     private void sheetFromXMLFile(){
         System.out.println("Enter File Path");
-        String fileDirectory = scanner.nextLine();
+        String fileDirectory = scanner.nextLine().replace(" ","");
         try {
-            manager.createSheetFromFile(fileDirectory.replace(" ",""));
+            manager.createSheetFromFile(fileDirectory);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
