@@ -51,15 +51,17 @@ public class Controller {
         return new SheetDto(sheet.GetSheetByVersion(version));
     }
 
-    public void writeSheetToFile(ObjectOutputStream file) throws IOException {
-        file.writeObject(sheet);
-        file.flush();
-        file.close();
+    public void writeSheetToFile(String filePath) throws IOException {
+        FileOutputStream fileOut = new FileOutputStream(filePath);
+        ObjectOutputStream out = new ObjectOutputStream(fileOut);
+        out.writeObject(sheet);
+        out.close();
     }
 
-    public void readSheetFromFile(ObjectInputStream file) throws IOException, ClassNotFoundException {
-        sheet = (SheetImpl)file.readObject();
-        file.close();
+    public void readSheetFromFile(String filePath) throws IOException, ClassNotFoundException {
+        FileInputStream fileIn = new FileInputStream(filePath);
+        ObjectInputStream in = new ObjectInputStream(fileIn);
+        sheet = (Sheet) in.readObject();
     }
 
 }

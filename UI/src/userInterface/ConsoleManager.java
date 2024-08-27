@@ -5,6 +5,8 @@ import controller.Controller;
 import dto.SheetDto;
 
 import java.io.*;
+import java.net.URL;
+import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -202,33 +204,25 @@ public class ConsoleManager {
 
     private void importSheetToFile()  {
         System.out.println("Enter Full Path name of the sheet file");
-        String fileDirectory = scanner.nextLine();
-        fileDirectory = fileDirectory.replace(" ","");
+        String path = scanner.nextLine();
+        path = path.replace(" ","");
         try{
-            ObjectOutputStream file = new ObjectOutputStream(new FileOutputStream(fileDirectory));
-            manager.writeSheetToFile(file);
+            manager.writeSheetToFile(path);
         }
         catch (Exception e){
             System.out.println(e.getMessage());
-            System.out.println(Arrays.toString(e.getStackTrace()));
         }
     }
 
     private void retrieveSheetFromFile(){
         System.out.println("Enter Full Path name of the sheet file");
-        File filename = new File(scanner.nextLine().replace(" ",""));
-        if(filename.exists()){
+        String path = scanner.nextLine().replace(" ","");
             try {
-                ObjectInputStream file = new ObjectInputStream(new FileInputStream(filename));
-                manager.readSheetFromFile(file);
+                manager.readSheetFromFile(path);
             }
-            catch (IOException | ClassNotFoundException e) {
+            catch (Exception  e) {
                System.out.println(e.getMessage());
             }
-        }
-        else{
-            System.out.println("File does not exist, returning to main menu");
-        }
     }
 
      private void createManger(){
