@@ -1,12 +1,10 @@
 package userInterface;
 import shticell.sheet.coordinate.CoordinateFactory;
+import userInterface.Enum.FirstMenu;
 import userInterface.Enum.MainMenu;
 import controller.Controller;
 import dto.SheetDto;
 
-import java.io.*;
-import java.net.URL;
-import java.nio.file.Path;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -174,7 +172,7 @@ public class ConsoleManager {
         printSheetCell(manager.GetSheetByVersion(selectedVersion));
     }
 
-    private void sheetFromFile(){
+    private void sheetFromXMLFile(){
         System.out.println("Enter File Path");
         String fileDirectory = scanner.nextLine();
         try {
@@ -189,32 +187,9 @@ public class ConsoleManager {
         String fileDirectory = scanner.nextLine();
         manager = new Controller(fileDirectory.replace(" ",""));
 
-        }
+    }
 
-     private void FirstMenu(){
-        boolean doIt = true;
-        do{
-            System.out.println("Press 1 to create a new sheet or press 2 to upload sheet from file");
-            String choice = scanner.nextLine();
-            switch (choice){
-                case "1" -> {
-                    createManger();
-                    doIt = false;
-                }
-                case "2" -> {
-                    try {
-                        createMangerFromFile();
-                        doIt = false;
-                    }
-                    catch (Exception e){
-                        System.out.println(e.getMessage());
-                    }
-                }
-            }
-        }while (doIt);
-     }
-
-    private void importSheetToFile()  {
+    private void importSheetToBinaryFile()  {
         System.out.println("Enter Full Path name of the sheet file");
         String path = scanner.nextLine();
         path = path.replace(" ","");
@@ -226,7 +201,7 @@ public class ConsoleManager {
         }
     }
 
-    private void retrieveSheetFromFile(){
+    private void getSheetFromBinaryFile(){
         System.out.println("Enter Full Path name of the sheet file");
         String path = scanner.nextLine().replace(" ","");
             try {
@@ -243,32 +218,64 @@ public class ConsoleManager {
         manager = new Controller(new SheetDto(sheetName,VERSION,NUM_OF_ROWS,NUM_OF_COLS,COLS_WIDTH,ROWS_HEIGHT));
      }
 
+     void FirstMenuRun() {
+        Scanner scanner = new Scanner(System.in);
+        boolean validSelection = false;
+        while (!validSelection) {
+            try {
+                FirstMenu.PrintMenu();
+                System.out.print("Please select an option (1-4): ");
+                String choice = scanner.nextLine();
+                switch (choice) {
+                    case "1":
+                        createManger();
+                        validSelection = true;
+                        break;
+                    case "2":
+                        createMangerFromFile();
+                        validSelection = true;
+                        break;
+                    case "3":
+                        getSheetFromBinaryFile();
+                        validSelection = true;
+                        break;
+                    case "4":
+                        System.exit(0);
+                        break;
+                    default:
+                        System.out.println("Invalid selection. Please choose a number between 1 and 4.");
+                        break;
+                }
+            }
+            catch (Exception e) {
+                System.out.println("Invalid Path");
+            }
+        }
+     }
+
+
 
 
     public void Run() {
         boolean goOn = true;
-        FirstMenu();
+        FirstMenuRun();
         try {
             do {
                 MainMenu.PrintMenu();
                 String choice = scanner.nextLine();
                 switch (choice) {
-                    case "1" -> sheetFromFile();
+                    case "1" -> sheetFromXMLFile();
                     case "2" -> printSheetCell(manager.getSheet());
                     case "3" -> printCellValue();
                     case "4" -> insertData();
                     case "5" -> showVersions();
-                    case "6" ->importSheetToFile();
-                    case "7" ->retrieveSheetFromFile();
+                    case "6" -> importSheetToBinaryFile();
+                    case "7" -> getSheetFromBinaryFile();
+                    case "8" -> goOn = false;
                     default -> {
-                        if (choice.equals("8")) {
-                            System.out.println("Bye Bye");
-                        } else {
-                            System.out.println("Invalid choice. Please choose a number 1-6");
-                        }
+                        System.out.println("Invalid choice. Please choose a number 1-8");
                     }
                 }
-                goOn = !choice.equals("8");
             } while (goOn);
         }
         catch (Exception e){

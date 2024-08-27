@@ -19,7 +19,7 @@ public enum FirstMenu{
     public static void PrintMenu() {
         System.out.println("=== " + "First Menu" + " ===");
         int number = 1;
-        for (MainMenu option : MainMenu.values()) {
+        for (FirstMenu option : FirstMenu.values()) {
             System.out.printf("%d. %s%n", number++, option.getDescription());
         }
         System.out.println("=================");
