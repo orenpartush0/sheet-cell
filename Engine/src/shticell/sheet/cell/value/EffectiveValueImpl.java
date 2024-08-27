@@ -1,6 +1,8 @@
 package shticell.sheet.cell.value;
 
-public class EffectiveValueImpl implements EffectiveValue {
+import java.io.Serializable;
+
+public class EffectiveValueImpl implements EffectiveValue, Serializable {
 
     Object value = null;
     ValueType valueType;

@@ -5,9 +5,10 @@ import shticell.sheet.cell.value.EffectiveValue;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public interface Cell{
+public interface Cell extends Serializable {
     String GetOriginalValue();
     EffectiveValue GetEffectiveValue();
     Coordinate GetCellCoordinate();

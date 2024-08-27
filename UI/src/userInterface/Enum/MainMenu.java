@@ -1,11 +1,13 @@
 package userInterface.Enum;
 
 public enum MainMenu{
-    READ_FILE("Read private system file"),
+    READ_FILE("Read private system file (XML)"),
     SHOW_SHEET("Show sheet"),
     SHOW_CELL_VALUE("Show value of a single cell"),
     UPDATE_CELL_VALUE("Update value of a single cell"),
     SHOW_VERSIONS("Show versions"),
+    EXPORT_SHEET("Export sheet"),
+    LOAD_SHEET("Load sheet"),
     EXIT("Exit the system");
 
     private final String description;

@@ -1,6 +1,8 @@
 package shticell.sheet.cell.value;
 
-public interface EffectiveValue extends Cloneable {
+import java.io.Serializable;
+
+public interface EffectiveValue extends Cloneable, Serializable {
     Object getValue();
     ValueType getValueType();
     <T> T getValueWithExpectation(Class<T> type);

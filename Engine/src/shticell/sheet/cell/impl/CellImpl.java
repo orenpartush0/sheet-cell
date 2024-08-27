@@ -11,12 +11,13 @@ import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.cell.api.Cell;
 
+import java.io.Serializable;
 import java.util.*;
 
 import static shticell.function.functionIdentifier.calcFunc;
 import static shticell.function.functionIdentifier.isFunc;
 
-public class CellImpl implements Cloneable, Cell{
+public class CellImpl implements Cloneable, Cell, Serializable {
 
     private final String NAN = "NaN";
     private final String UNDEFINED = "!Undefined!";

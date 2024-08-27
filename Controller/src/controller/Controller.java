@@ -7,9 +7,8 @@ import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.impl.SheetImpl;
 import dto.SheetDto;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
+
+import java.io.*;
 import java.util.List;
 
 public class Controller {
@@ -36,7 +35,7 @@ public class Controller {
         sheet.UpdateCellByCoordinate(CoordinateFactory.getCoordinate(square), newValue);
     }
 
-     public SheetDto getSheet(){
+    public SheetDto getSheet(){
         return new SheetDto(sheet);
     }
 
@@ -50,6 +49,17 @@ public class Controller {
 
     public SheetDto GetSheetByVersion(int version){
         return new SheetDto(sheet.GetSheetByVersion(version));
+    }
+
+    public void writeSheetToFile(ObjectOutputStream file) throws IOException {
+        file.writeObject(sheet);
+        file.flush();
+        file.close();
+    }
+
+    public void readSheetFromFile(ObjectInputStream file) throws IOException, ClassNotFoundException {
+        sheet = (SheetImpl)file.readObject();
+        file.close();
     }
 
 }
