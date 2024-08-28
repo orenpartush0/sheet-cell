@@ -14,6 +14,8 @@ import java.util.List;
 public class Controller {
     private Sheet sheet;
 
+    public Controller(){}
+
     public Controller(SheetDto sheetDto) {
         sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns(),sheetDto.rowsHeight(),sheetDto.colsWidth());
     }
@@ -24,7 +26,7 @@ public class Controller {
         sheet = SchemBaseJaxb.CreateSheetFromXML(inputStream);
     }
 
-    public void createSheetFromFile(String fileName) throws Exception {
+    public void GetSheetFromXML(String fileName) throws Exception {
         File file = new File(fileName);
         InputStream inputStream = new FileInputStream(file);
         sheet = SchemBaseJaxb.CreateSheetFromXML(inputStream);
@@ -51,14 +53,14 @@ public class Controller {
         return new SheetDto(sheet.GetSheetByVersion(version));
     }
 
-    public void writeSheetToFile(String filePath) throws IOException {
+    public void InsertSheetToBinaryFile(String filePath) throws IOException {
         FileOutputStream fileOut = new FileOutputStream(filePath);
         ObjectOutputStream out = new ObjectOutputStream(fileOut);
         out.writeObject(sheet);
         out.close();
     }
 
-    public void readSheetFromFile(String filePath) throws IOException, ClassNotFoundException {
+    public void GetSheetFromBinaryFile(String filePath) throws IOException, ClassNotFoundException {
         FileInputStream fileIn = new FileInputStream(filePath);
         ObjectInputStream in = new ObjectInputStream(fileIn);
         sheet = (Sheet) in.readObject();

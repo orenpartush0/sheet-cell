@@ -11,7 +11,7 @@ import java.util.*;
 
 public class ConsoleManager {
 
-    private  Controller manager;
+    private  Controller manager = new Controller();//important new!!!
     private final Scanner scanner = new Scanner(System.in);
     private final int VERSION = 1;
     private final int NUM_OF_COLS = 26;
@@ -23,9 +23,11 @@ public class ConsoleManager {
 
     private void printColsLetters(SheetDto sheetDto) {
         String space = " ";
+        int maxRowNumber = sheetDto.numberOfRows();
+        int rowNumberWidth = String.valueOf(maxRowNumber).length() + 2;
         System.out.println("Sheet name: " + sheetDto.Name());
         System.out.println("Version: " + sheetDto.version());
-        System.out.print(space.repeat(4) + "|");
+        System.out.print(space.repeat(rowNumberWidth) + "|");
 
         for (int col = 0; col < sheetDto.numberOfColumns(); col++) {
             int colWidth = sheetDto.colsWidth();
@@ -174,27 +176,26 @@ public class ConsoleManager {
 
     private void sheetFromXMLFile(){
         System.out.println("Enter File Path");
-        String fileDirectory = scanner.nextLine().replace(" ","");
+        String fileDirectory = scanner.nextLine();
         try {
-            manager.createSheetFromFile(fileDirectory);
+            manager.GetSheetFromXML(fileDirectory);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 //
-    private void createMangerFromFile() throws Exception {
-        System.out.println("Enter File Path");
-        String fileDirectory = scanner.nextLine();
-        manager = new Controller(fileDirectory.replace(" ",""));
+private void createMangerFromFile() throws Exception{
+    System.out.println("Enter File Path");
+    String fileDirectory = scanner.nextLine();
+    manager = new Controller(fileDirectory);
 
-    }
+}
 
     private void importSheetToBinaryFile()  {
         System.out.println("Enter Full Path name of the sheet file");
         String path = scanner.nextLine();
-        path = path.replace(" ","");
         try{
-            manager.writeSheetToFile(path);
+            manager.InsertSheetToBinaryFile(path);
         }
         catch (Exception e){
             System.out.println(e.getMessage());
@@ -203,9 +204,9 @@ public class ConsoleManager {
 
     private void getSheetFromBinaryFile(){
         System.out.println("Enter Full Path name of the sheet file");
-        String path = scanner.nextLine().replace(" ","");
+        String path = scanner.nextLine();
             try {
-                manager.readSheetFromFile(path);
+                manager.GetSheetFromBinaryFile(path);
             }
             catch (Exception  e) {
                System.out.println(e.getMessage());
