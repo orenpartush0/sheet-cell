@@ -1,6 +1,5 @@
 package shticell.sheet.cell.value;
 
-import com.sun.codemodel.JClass;
 
 public enum ValueType {
     STRING(String.class),
