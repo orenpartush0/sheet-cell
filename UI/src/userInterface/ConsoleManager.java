@@ -1,9 +1,9 @@
 package userInterface;
 import shticell.sheet.coordinate.CoordinateFactory;
-import userInterface.Enum.FirstMenu;
-import userInterface.Enum.MainMenu;
 import controller.Controller;
 import dto.SheetDto;
+import userInterface.Enum.FirstMenu;
+import userInterface.Enum.MainMenu;
 
 import java.text.NumberFormat;
 import java.util.*;
