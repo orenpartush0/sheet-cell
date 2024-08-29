@@ -14,10 +14,10 @@ public class ConsoleManager {
     private  Controller manager = new Controller();//important new!!!
     private final Scanner scanner = new Scanner(System.in);
     private final int VERSION = 1;
-    private final int NUM_OF_COLS = 26;
-    private final int NUM_OF_ROWS = 26;
+    private final int NUM_OF_COLS = 8;
+    private final int NUM_OF_ROWS = 8;
     private final int ROWS_HEIGHT = 1;
-    private final int COLS_WIDTH = 5;
+    private final int COLS_WIDTH = 7;
 
     ConsoleManager(){}
 
@@ -187,7 +187,12 @@ public class ConsoleManager {
 private void createMangerFromFile() throws Exception{
     System.out.println("Enter File Path");
     String fileDirectory = scanner.nextLine();
-    manager = new Controller(fileDirectory);
+    try {
+        manager = new Controller(fileDirectory);
+    }
+    catch (Exception e){
+        throw e;
+    }
 
 }
 
@@ -202,15 +207,10 @@ private void createMangerFromFile() throws Exception{
         }
     }
 
-    private void getSheetFromBinaryFile(){
+    private void getSheetFromBinaryFile() throws Exception{
         System.out.println("Enter Full Path name of the sheet file");
         String path = scanner.nextLine();
-            try {
-                manager.GetSheetFromBinaryFile(path);
-            }
-            catch (Exception  e) {
-               System.out.println(e.getMessage());
-            }
+        manager.GetSheetFromBinaryFile(path);
     }
 
      private void createManger(){
@@ -260,29 +260,27 @@ private void createMangerFromFile() throws Exception{
     public void Run() {
         boolean goOn = true;
         FirstMenuRun();
-        try {
             do {
-                MainMenu.PrintMenu();
-                String choice = scanner.nextLine();
-                switch (choice) {
-                    case "1" -> sheetFromXMLFile();
-                    case "2" -> printSheetCell(manager.getSheet());
-                    case "3" -> printCellValue();
-                    case "4" -> insertData();
-                    case "5" -> showVersions();
-                    case "6" -> importSheetToBinaryFile();
-                    case "7" -> getSheetFromBinaryFile();
-                    case "8" -> goOn = false;
-                    default -> {
-                        System.out.println("Invalid choice. Please choose a number 1-8");
+                try {
+                    MainMenu.PrintMenu();
+                    String choice = scanner.nextLine();
+                    switch (choice) {
+                        case "1" -> sheetFromXMLFile();
+                        case "2" -> printSheetCell(manager.getSheet());
+                        case "3" -> printCellValue();
+                        case "4" -> insertData();
+                        case "5" -> showVersions();
+                        case "6" -> importSheetToBinaryFile();
+                        case "7" -> getSheetFromBinaryFile();
+                        case "8" -> goOn = false;
+                        default -> {
+                            System.out.println("Invalid choice. Please choose a number 1-8");
+                        }
                     }
+                }
+                catch (Exception e){
+                    System.out.println(e.getMessage());
                 }
             } while (goOn);
         }
-        catch (Exception e){
-            System.out.println(e.getMessage());
-        }
     }
-
-
-}

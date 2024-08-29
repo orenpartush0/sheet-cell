@@ -2,6 +2,9 @@
   <artifact type="jar" name="Engine">
     <output-path>$PROJECT_DIR$/out/artifacts/Engine</output-path>
     <root id="archive" name="Engine.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/Engine/src/META-INF/MANIFEST.MF" />
+      </element>
       <element id="module-output" name="Engine" />
     </root>
   </artifact>
