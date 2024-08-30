@@ -1,0 +1,48 @@
+/* Main container styles */
+.root {
+    -fx-background-color: #ffffff; /* Light background for a clean look */
+}
+
+/* Header text styling */
+.header-text {
+    -fx-font-size: 36px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333; /* Dark grey for a professional look */
+    -fx-font-family: "Lato", sans-serif;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 5, 0.5, 0, 2);
+    -fx-text-alignment: CENTER;
+}
+/* Button styles */
+.option-button {
+    -fx-background-color: linear-gradient(to bottom, #1abc9c, #16a085); /* Gradient background */
+    -fx-text-fill: white;
+    -fx-font-size: 18px;
+    -fx-padding: 15 30;
+    -fx-border-radius: 30;
+    -fx-background-radius: 30;
+    -fx-border-color: transparent; /* Border is hidden for a cleaner look */
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 12, 0.5, 0, 4); /* Subtle shadow for depth */
+    -fx-font-family: "Lato", sans-serif;
+    -fx-cursor: hand;
+    -fx-transition: all 0.3s ease;
+}
+
+/* Hover effect for buttons */
+.option-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #16a085, #1abc9c); /* Inverted gradient on hover */
+    -fx-border-color: rgba(0, 0, 0, 0.2); /* Light border color on hover */
+    -fx-translate-y: -4px; /* Slight lift effect */
+}
+
+/* Pressed effect for buttons */
+.option-button:pressed {
+    -fx-background-color: linear-gradient(to bottom, #1e8e75, #1b7e66); /* Darker gradient on press */
+    -fx-border-color: transparent; /* Hidden border on press */
+    -fx-translate-y: 2px; /* Slight indentation effect */
+}
+
+/* Focus effect for buttons */
+.option-button:focused {
+    -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 0.6), 8, 0.5, 0, 6); /* Enhanced shadow for focus */
+}
