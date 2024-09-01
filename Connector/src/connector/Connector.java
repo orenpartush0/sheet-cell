@@ -1,4 +1,4 @@
-package controller;
+package connector;
 
 import dto.CellDto;
 import shticell.jaxb.SchemBaseJaxb;
@@ -11,16 +11,16 @@ import dto.SheetDto;
 import java.io.*;
 import java.util.List;
 
-public class Controller {
+public class Connector {
     private Sheet sheet;
 
-    public Controller(){}
+    public Connector(){}
 
-    public Controller(SheetDto sheetDto) {
+    public Connector(SheetDto sheetDto) {
         sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns(),sheetDto.rowsHeight(),sheetDto.colsWidth());
     }
 
-    public Controller(String fileName) throws Exception {
+    public Connector(String fileName) throws Exception {
         File file = new File(fileName);
         InputStream inputStream = new FileInputStream(file);
         sheet = SchemBaseJaxb.CreateSheetFromXML(inputStream);

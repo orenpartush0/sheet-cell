@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.control.Accordion?>
+<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="scene.app.AppController">
+    <top>
+        <fx:include fx:id="topComponent" source="../top/top.fxml"/>
+    </top>
+
+    <left>
+        <fx:include fx:id="rangeComponent" source="../left/range.fxml"/>
+    </left>
+
+    <center>
+        <fx:include fx:id="sheetComponent" source="../sheet/sheet.fxml"/>
+    </center>
+</BorderPane>

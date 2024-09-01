@@ -16,14 +16,4 @@ public record CellDto(Coordinate coordinate, int LatestSheetVersionUpdated, Stri
                 , new EffectiveValueDto(cellImpl.GetEffectiveValue())
                 , cellImpl.GetDependsOnListOfStrings(), cellImpl.GetInfluenceOnListOfStrings());
     }
-
-    @Override
-    public String toString() {
-        return  "Cell Coordinate= " + coordinate + "\n"
-                + "Latest Sheet Version Updated = " + LatestSheetVersionUpdated + "\n"
-                + "Original Value = " + originalValue + "\n"
-                + "Effective Value = " + effectiveValue + "\n"
-                + "References From This Cell = " + referencesFromThisCell +"\n"
-                + "References To This Cell = " + referencesToThisCell + "\n";
-    }
 }

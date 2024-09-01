@@ -6,14 +6,15 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("/scenes/menuScene.fxml"));
-        primaryStage.setTitle("Hello World");
-        Scene scene = new Scene(root,400,400);
-        scene.getStylesheets().add(getClass().getResource("/scenes/styles.css").toExternalForm());
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/scene/app/app.fxml")));
+        primaryStage.setTitle("Sheet Cell");
+        Scene scene = new Scene(root,1000,700);
         primaryStage.setScene(scene);
         primaryStage.show();
     }

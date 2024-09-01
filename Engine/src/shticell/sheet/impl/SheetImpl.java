@@ -5,17 +5,13 @@ import shticell.sheet.api.HasSheetData;
 import shticell.sheet.api.SheetToXML;
 import shticell.sheet.cell.connection.CellConnection;
 import shticell.sheet.cell.value.EffectiveValue;
-import shticell.sheet.cell.value.ValueType;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.cell.api.Cell;
 import shticell.sheet.cell.impl.CellImpl;
-
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable {
