@@ -19,8 +19,19 @@ public record Coordinate(int row, int col) implements Serializable {
         return Objects.hash(row, col);
     }
 
+
+    public static String getColumnLabel(int colIndex) {
+        StringBuilder columnLabel = new StringBuilder();
+        while (colIndex > 0) {
+            colIndex--;
+            columnLabel.insert(0, (char) ('A' + (colIndex % 26)));
+            colIndex /= 26;
+        }
+        return columnLabel.toString();
+    }
+
     @Override
     public String toString() {
-        return Character.toString(('A' + col )) + Integer.toString(row);
+        return getColumnLabel(col) + Integer.toString(row);
     }
 }

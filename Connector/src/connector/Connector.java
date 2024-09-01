@@ -2,7 +2,7 @@ package connector;
 
 import dto.CellDto;
 import shticell.jaxb.SchemBaseJaxb;
-import shticell.sheet.coordinate.CoordinateFactory;
+import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.impl.SheetImpl;
@@ -12,37 +12,34 @@ import java.io.*;
 import java.util.List;
 
 public class Connector {
-    private Sheet sheet;
-
-    public Connector(){}
+    private final Sheet sheet;
 
     public Connector(SheetDto sheetDto) {
         sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns(),sheetDto.rowsHeight(),sheetDto.colsWidth());
     }
 
-    public Connector(String fileName) throws Exception {
-        File file = new File(fileName);
-        InputStream inputStream = new FileInputStream(file);
-        sheet = SchemBaseJaxb.CreateSheetFromXML(inputStream);
+    public Connector(String path) throws Exception {
+        sheet = path.endsWith(".xml")
+                ? GetSheetFromXML(path)
+                : GetSheetFromBinaryFile(path);
     }
 
-    public void GetSheetFromXML(String fileName) throws Exception {
+    private Sheet GetSheetFromXML(String fileName) throws Exception {
         File file = new File(fileName);
         InputStream inputStream = new FileInputStream(file);
-        sheet = SchemBaseJaxb.CreateSheetFromXML(inputStream);
+        return SchemBaseJaxb.CreateSheetFromXML(inputStream);
     }
 
-
-    public void UpdateCellByIndex(String square, String newValue) throws NumberFormatException, LoopConnectionException{
-        sheet.UpdateCellByCoordinate(CoordinateFactory.getCoordinate(square), newValue);
+    public void UpdateCellByCoordinate(Coordinate coordinate, String newValue) throws NumberFormatException, LoopConnectionException{
+        sheet.UpdateCellByCoordinate(coordinate, newValue);
     }
 
     public SheetDto getSheet(){
         return new SheetDto(sheet);
     }
 
-    public CellDto GetCellByCoordinate(String square){
-        return new CellDto(sheet.GetCell(CoordinateFactory.getCoordinate(square)));
+    public CellDto GetCellByCoordinate(Coordinate coordinate){
+        return new CellDto(sheet.GetCell(coordinate));
     }
 
     public List<Integer> GetCountOfChangesPerVersion(){
@@ -60,10 +57,10 @@ public class Connector {
         out.close();
     }
 
-    public void GetSheetFromBinaryFile(String filePath) throws IOException, ClassNotFoundException {
+    private Sheet GetSheetFromBinaryFile(String filePath) throws IOException, ClassNotFoundException {
         FileInputStream fileIn = new FileInputStream(filePath);
         ObjectInputStream in = new ObjectInputStream(fileIn);
-        sheet = (Sheet) in.readObject();
+        return (Sheet) in.readObject();
     }
 
 }

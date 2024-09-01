@@ -1,0 +1,58 @@
+/* General VBox styling */
+.vbox {
+    -fx-padding: 10; /* Reduced padding */
+    -fx-spacing: 10; /* Reduced spacing */
+    -fx-background-color: #ffffff;
+}
+
+/* HBox styling */
+.hbox {
+    -fx-padding: 5; /* Reduced padding */
+    -fx-spacing: 5; /* Reduced spacing */
+}
+
+/* Button styling */
+.button {
+    -fx-background-color: #007aff; /* iOS blue */
+    -fx-text-fill: white;
+    -fx-font-size: 12px; /* Smaller font size */
+    -fx-padding: 6 12; /* Reduced padding */
+    -fx-border-radius: 6; /* Smaller border radius */
+    -fx-background-radius: 6; /* Smaller background radius */
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0.5, 0, 1); /* Smaller shadow */
+    -fx-pref-width: -1; /* Allows button to shrink */
+    -fx-pref-height: -1; /* Allows button to shrink */
+}
+
+/* Label styling */
+.label {
+    -fx-font-size: 14px; /* Smaller font size */
+    -fx-text-fill: #333333;
+    -fx-padding: 7; /* Reduced padding */
+}
+
+/* TextField styling */
+.text-field {
+    -fx-font-size: 14px; /* Smaller font size */
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: #d0d0d0;
+    -fx-border-radius: 8; /* Smaller border radius */
+    -fx-background-radius: 8; /* Smaller background radius */
+    -fx-padding: 8; /* Reduced padding */
+}
+
+/* ComboBox styling */
+.combo-box {
+    -fx-font-size: 14px; /* Smaller font size */
+    -fx-background-color: #f5f5f5;
+    -fx-border-color: #d0d0d0;
+    -fx-border-radius: 8; /* Smaller border radius */
+    -fx-background-radius: 8; /* Smaller background radius */
+}
+
+/* Style specific for labels with background color (applied to all labels) */
+.label {
+    -fx-background-color: #f0f0f0;
+    -fx-padding: 8; /* Reduced padding */
+    -fx-border-radius: 8; /* Smaller border radius */
+}

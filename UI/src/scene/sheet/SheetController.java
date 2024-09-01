@@ -5,11 +5,14 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import scene.app.AppController;
+import shticell.sheet.coordinate.Coordinate;
+import shticell.sheet.exception.LoopConnectionException;
 
 public class SheetController {
 
@@ -54,46 +57,56 @@ public class SheetController {
     public void fillSheet(SheetDto sheet) {
         clearSheet();
 
-        // Add cell data to the grid
         sheet.cells().forEach((coordinate, cell) -> {
             TextField cellField = new TextField(cell.effectiveValue().toString());
-            cellField.setPrefWidth(100);  // Set preferred width for consistency
-            cellField.setPrefHeight(30);  // Set preferred height for consistency
+            cellField.setPrefWidth(100);
+            cellField.setPrefHeight(30);
+            cellField.setId(coordinate.toString());
+            cellField.setOnMouseClicked(event -> updateCoordinateLabel(coordinate));
+            cellField.setOnAction(event -> handleCellAction(cellField, coordinate));
             gridPaneSheet.add(cellField, coordinate.col(), coordinate.row());
         });
 
-        // Add row numbers to the left GridPane
         for (int row = 1; row <= sheet.numberOfRows(); row++) {
             Label rowLabel = new Label(String.valueOf(row));
-            rowLabel.setPrefWidth(50);  // Adjust width as necessary
-            rowLabel.setPrefHeight(30);  // Adjust height as necessary
-            rowLabel.setAlignment(Pos.CENTER);  // Center the text within the label
+            rowLabel.setPrefWidth(50);
+            rowLabel.setPrefHeight(30);
+            rowLabel.setAlignment(Pos.CENTER);
             gridPaneLeft.add(rowLabel, 0, row);
-
-            // Center the label in the GridPane cell
             GridPane.setHalignment(rowLabel, HPos.CENTER);
             GridPane.setValignment(rowLabel, VPos.CENTER);
         }
 
-        // Add column letters to the top GridPane
         for (int col = 0; col <= sheet.numberOfColumns(); col++) {
-            Label colLabel = new Label(getColumnLabel(col));
-            colLabel.setPrefWidth(100);  // Adjust width to match cell width
-            colLabel.setPrefHeight(30);  // Adjust height as necessary
+            Label colLabel = new Label(Coordinate.getColumnLabel(col));
+            colLabel.setPrefWidth(100);
+            colLabel.setPrefHeight(30);
             gridPaneTop.add(colLabel, col, 0);
-
             GridPane.setHalignment(colLabel, HPos.CENTER);
             GridPane.setValignment(colLabel, VPos.CENTER);
         }
     }
 
-    private String getColumnLabel(int colIndex) {
-        StringBuilder columnLabel = new StringBuilder();
-        while (colIndex > 0) {
-            colIndex--;
-            columnLabel.insert(0, (char) ('A' + (colIndex % 26)));
-            colIndex /= 26;
+    private void handleCellAction(TextField cellField, Coordinate coordinate) {
+
+        try {
+            appController.updateCell(coordinate, cellField.getText());
+        } catch (LoopConnectionException e) {
+            showError(e.getMessage());
         }
-        return columnLabel.toString();
+        fillSheet(appController.GetSheet());
+
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void updateCoordinateLabel(Coordinate coordinate){
+        appController.setOnMouseCoordinate(coordinate);
     }
 }
