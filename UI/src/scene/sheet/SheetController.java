@@ -55,6 +55,14 @@ public class SheetController {
     public void fillSheet(SheetDto sheet) {
         clearSheet();
 
+        // Add cell data to the grid
+        sheet.cells().forEach((coordinate, cell) -> {
+            TextField cellField = new TextField(cell.effectiveValue().toString());
+            cellField.setPrefWidth(100);  // Set preferred width for consistency
+            cellField.setPrefHeight(30);  // Set preferred height for consistency
+            gridPaneSheet.add(cellField, coordinate.col(), coordinate.row());
+        });
+
         // Add row numbers to the left GridPane
         for (int row = 1; row <= sheet.numberOfRows(); row++) {
             Label rowLabel = new Label(String.valueOf(row));
@@ -73,15 +81,12 @@ public class SheetController {
             Label colLabel = new Label(getColumnLabel(col));
             colLabel.setPrefWidth(100);  // Adjust width to match cell width
             colLabel.setPrefHeight(30);  // Adjust height as necessary
-            colLabel.setAlignment(Pos.CENTER);  // Center the text within the label
             gridPaneTop.add(colLabel, col, 0);
 
-            // Center the label in the GridPane cell
             GridPane.setHalignment(colLabel, HPos.CENTER);
             GridPane.setValignment(colLabel, VPos.CENTER);
         }
     }
-
 
     private String getColumnLabel(int colIndex) {
         StringBuilder columnLabel = new StringBuilder();
