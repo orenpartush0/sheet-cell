@@ -32,8 +32,8 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
         columnWidth = _columnWidth;
         cells = new HashMap<>();
 
-        for(int i =1; i <= numberOfRows; i++) {
-            for(int j =0; j< numberOfColumns; j++) {
+        for(int i =1 ; i <= numberOfRows; i++) {
+            for(int j = 1 ; j <=  numberOfColumns; j++) {
                 Coordinate coordinate = CoordinateFactory.getCoordinate(i,j);
                 cells.put(coordinate,new CellImpl(coordinate,this,INITIAL_VERSION));
             }

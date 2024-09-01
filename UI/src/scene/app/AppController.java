@@ -80,6 +80,6 @@ public class AppController {
     }
 
     public void setOnMouseCoordinate(Coordinate coordinate){
-        topComponentController.setOnMouseCoordinate(coordinate);
+        topComponentController.setOnMouseCoordinate(connector.GetCellByCoordinate(coordinate));
     }
 }

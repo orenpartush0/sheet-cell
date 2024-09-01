@@ -1,5 +1,6 @@
 package scene.top;
 
+import dto.CellDto;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -71,11 +72,6 @@ public class TopController {
 
     @FXML
     private void comboBoxVersionList() {
-    }
-
-    @FXML
-    private void handleUpdateValue() {
-        // Function body here
     }
 
     public void loadVersions(String[] versions) {
@@ -169,8 +165,10 @@ public class TopController {
         saveButton.setDisable(false);
     }
 
-    public void setOnMouseCoordinate(Coordinate coordinate){
-        cellId.setId(coordinate.toString());
+    public void setOnMouseCoordinate(CellDto cell){
+        cellId.setText(cell.coordinate().toString());
+        originalValue.setText(cell.originalValue());
+        lastUpdate.setText(String.valueOf(cell.LatestSheetVersionUpdated()));
     }
 
 }

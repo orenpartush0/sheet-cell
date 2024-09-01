@@ -41,7 +41,7 @@
 
         <Label fx:id="originalValueLabel" text="Original Cell Value" style="-fx-background-color: lightgray;" />
 
-        <TextField fx:id="originalValue" disable="true" prefWidth="100" />
+        <TextField fx:id="originalValue" editable="false" prefWidth="100" />
 
         <ComboBox fx:id="SheetVersion" promptText="Sheet Version" onAction="#comboBoxVersionList" />
     </HBox>

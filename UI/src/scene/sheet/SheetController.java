@@ -61,10 +61,9 @@ public class SheetController {
             TextField cellField = new TextField(cell.effectiveValue().toString());
             cellField.setPrefWidth(100);
             cellField.setPrefHeight(30);
-            cellField.setId(coordinate.toString());
-            cellField.setOnMouseClicked(event -> updateCoordinateLabel(coordinate));
+            cellField.setOnMouseClicked(event -> updateActionLine(coordinate));
             cellField.setOnAction(event -> handleCellAction(cellField, coordinate));
-            gridPaneSheet.add(cellField, coordinate.col(), coordinate.row());
+            gridPaneSheet.add(cellField, coordinate.col() , coordinate.row());
         });
 
         for (int row = 1; row <= sheet.numberOfRows(); row++) {
@@ -106,7 +105,7 @@ public class SheetController {
         alert.showAndWait();
     }
 
-    private void updateCoordinateLabel(Coordinate coordinate){
+    private void updateActionLine(Coordinate coordinate){
         appController.setOnMouseCoordinate(coordinate);
     }
 }
