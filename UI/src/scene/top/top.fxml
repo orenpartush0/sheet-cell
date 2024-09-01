@@ -6,7 +6,7 @@
 <?import javafx.scene.control.TextField?>
 
 <?import javafx.scene.control.ComboBox?>
-<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="scene.top.TopController">
+<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="scene.top.TopController" stylesheets="@Top.css">
 
     <HBox spacing="10">
         <Button text="Load File Button" onAction="#handleLoadFile"/>
