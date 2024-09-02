@@ -94,6 +94,7 @@ public class CellImpl implements Cloneable, Cell, Serializable {
     @Override
     public void UpdateCell(String newOriginalValue, int sheetVersion) throws  LoopConnectionException{
         List<CellConnection> removed = new ArrayList<>(connections.ClearDependsOn());
+        EffectiveValue preUpdateEffectiveValue = effectiveValue.Clone();
 
         try
         {
@@ -105,12 +106,16 @@ public class CellImpl implements Cloneable, Cell, Serializable {
         catch (IndexOutOfBoundsException e){
             effectiveValue = new EffectiveValueImpl(UNDEFINED, ValueType.UNDEFINED);
         }
+
+        try {
+            sheet.UpdateDependentCells(connections.GetSortedInfluenceOn().stream().map(CellConnection::GetCellCoordinate).toList());
+        }
         catch (Exception e) {
-            connections.recoverDependsOn(removed);
+            connections.recoverDependencies(removed);
+            effectiveValue = preUpdateEffectiveValue;
             throw e;
         }
 
-        sheet.UpdateDependentCells(connections.GetSortedInfluenceOn().stream().map(CellConnection::GetCellCoordinate).toList());
         LatestSheetVersionUpdated = sheetVersion;
         originalValue = newOriginalValue;
         cellByVersion.put(sheetVersion, this.clone());

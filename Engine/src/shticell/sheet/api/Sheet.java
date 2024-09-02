@@ -1,10 +1,10 @@
 package shticell.sheet.api;
 
-import dto.RangeDto;
 import shticell.sheet.cell.api.Cell;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.impl.SheetImpl;
+import shticell.sheet.range.Range;
 
 import java.io.Serializable;
 import java.util.List;
@@ -33,7 +33,7 @@ public interface Sheet extends Serializable {
 
     int getRowsHeight();
 
-    RangeDto GetRangeDto(String rangeName);
+    Range GetRangeDto(String rangeName);
 
-    void AddRange(RangeDto rangeDto);
+    void AddRange(Range rangeDto);
 }

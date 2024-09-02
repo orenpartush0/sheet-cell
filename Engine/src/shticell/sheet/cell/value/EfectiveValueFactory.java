@@ -1,7 +1,6 @@
 package shticell.sheet.cell.value;
 
 import shticell.sheet.api.HasSheetData;
-import shticell.sheet.range.Range;
 
 public interface EfectiveValueFactory {
 

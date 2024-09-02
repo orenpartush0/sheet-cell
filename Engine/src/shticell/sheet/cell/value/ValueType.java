@@ -5,8 +5,6 @@ import shticell.expression.impl.typeexpression.NaNExpression;
 import shticell.expression.impl.typeexpression.Undefinedxpression;
 import shticell.sheet.range.Range;
 
-import java.util.Optional;
-
 public enum ValueType {
     STRING(String.class),
     NUMERIC(Double.class),

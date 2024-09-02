@@ -75,7 +75,13 @@ public class CellConnectionImpl implements Cloneable, CellConnection,CanRemoveFr
         return toRemove;
     }
 
-    public void recoverDependsOn(List<CellConnection> backup) {
+    public void recoverDependencies(List<CellConnection> backup) {
+        dependsOn.
+                stream().
+                filter(depend -> !backup.contains(depend)).
+                forEach(depend -> depend.RemoveFromInfluenceOn(this));
+
+        dependsOn.clear();
         dependsOn.addAll(backup);
         backup.forEach(cellConnection -> cellConnection.AddToInfluenceOn(this));
     }

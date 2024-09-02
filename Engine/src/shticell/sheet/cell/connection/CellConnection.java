@@ -23,7 +23,7 @@ public interface CellConnection extends Serializable {
 
     List<CellConnection> ClearDependsOn();
 
-    void recoverDependsOn(List<CellConnection> neighbors);
+    void recoverDependencies(List<CellConnection> neighbors);
 
     ArrayList<Coordinate> GetDependsOnCoordinates();
 

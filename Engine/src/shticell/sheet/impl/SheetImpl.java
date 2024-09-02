@@ -1,6 +1,5 @@
 package shticell.sheet.impl;
 
-import dto.RangeDto;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.api.HasSheetData;
 import shticell.sheet.api.SheetToXML;
@@ -12,7 +11,6 @@ import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.cell.api.Cell;
 import shticell.sheet.cell.impl.CellImpl;
 import shticell.sheet.range.Range;
-import shticell.sheet.range.RangeImpl;
 
 import java.io.Serializable;
 import java.util.*;
@@ -144,17 +142,17 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     }
 
     @Override
-    public void AddRange(RangeDto rangeDto){
+    public void AddRange(Range rangeDto){
         if(ranges.containsKey(rangeDto.rangeName())){
             throw new RuntimeException("Range already exists");
         }
 
-        ranges.put(rangeDto.rangeName(),new RangeImpl(rangeDto.startCell(),rangeDto.endCell()));
+        ranges.put(rangeDto.rangeName(),new Range(rangeDto.rangeName(),rangeDto.startCellCoordinate(),rangeDto.endCellCoordinate()));
     }
 
     @Override
-    public RangeDto GetRangeDto(String rangeName){
-        return new RangeDto(rangeName,ranges.get(rangeName).getStartCell(),ranges.get(rangeName).getEndCell());
+    public Range GetRangeDto(String rangeName){
+        return new Range(rangeName,ranges.get(rangeName).startCellCoordinate(),ranges.get(rangeName).endCellCoordinate());
     }
 
     @Override
