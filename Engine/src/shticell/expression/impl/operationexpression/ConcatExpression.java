@@ -19,17 +19,16 @@ public class ConcatExpression implements  Expression {
 
     @Override
     public EffectiveValue eval(Expression... expressions) {
+        StringBuilder strBuilder = new StringBuilder();
 
-        if(expressions.length == 1 && expressions[0].eval().getValueType() == ValueType.RANGE){
-            expressions[0].eval().getValueWithExpectation(Range.class);
-        }
-        if(expressions.length != 2){
+        if (expressions.length != 2) {
             throw new UnsupportedOperationException("Concat needs two arguments");
-        }
-        EffectiveValue leftVal = expressions[0].eval();
-        EffectiveValue rightVal = expressions[1].eval();
+        } else {
+            EffectiveValue leftVal = expressions[0].eval();
+            EffectiveValue rightVal = expressions[1].eval();
+            strBuilder.append(leftVal.getValueWithExpectation(String.class).concat(rightVal.getValueWithExpectation(String.class)));
 
-        return new EffectiveValueImpl(leftVal.getValueWithExpectation(String.class).concat(
-                rightVal.getValueWithExpectation(String.class)), ValueType.STRING);
+            return new EffectiveValueImpl(strBuilder.toString(), ValueType.STRING);
+        }
     }
 }
