@@ -25,8 +25,8 @@ public interface CellConnection extends Serializable {
 
     void recoverDependsOn(List<CellConnection> neighbors);
 
-    ArrayList<String> GetDependsOnListOfStrings();
+    ArrayList<Coordinate> GetDependsOnCoordinates();
 
-    ArrayList<String> GetInfluenceOnListOfStrings();
+    ArrayList<Coordinate> GetInfluenceOnCoordinates();
 
 }

@@ -16,6 +16,7 @@ import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 
 import java.io.IOException;
+import java.util.List;
 
 public class AppController {
 
@@ -79,7 +80,11 @@ public class AppController {
         return connector.getSheet();
     }
 
-    public void setOnMouseCoordinate(Coordinate coordinate){
+    public void cellClicked(Coordinate coordinate){
         topComponentController.setOnMouseCoordinate(connector.GetCellByCoordinate(coordinate));
+        List<Coordinate> influenceOn = connector.getSheet().cells().get(coordinate).influenceOn();
+        List<Coordinate> dependsOn = connector.getSheet().cells().get(coordinate).dependsOn();
+        sheetComponentController.PaintCells(influenceOn,dependsOn);
     }
+
 }

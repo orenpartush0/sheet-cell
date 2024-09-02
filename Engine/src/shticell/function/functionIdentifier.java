@@ -64,7 +64,7 @@ public interface functionIdentifier {
             return expression.eval(arguments.toArray(new Expression[0]));
         }
         else{
-            return EfectiveValueFactory.getEffectiveValue(func.getValueWithExpectation(String.class));
+            return EfectiveValueFactory.getEffectiveValue(func.getValueWithExpectation(String.class),hasSheetData);
         }
     }
 }

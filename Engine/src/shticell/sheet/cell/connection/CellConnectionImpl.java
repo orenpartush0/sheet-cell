@@ -19,10 +19,15 @@ public class CellConnectionImpl implements Cloneable, CellConnection,CanRemoveFr
 
     public Coordinate GetCellCoordinate() {return coordinate;}
 
-    public ArrayList<String> GetDependsOnListOfStrings() {
+    public ArrayList<Coordinate> GetDependsOnCoordinates() {
         return dependsOn.stream()
                 .map(CellConnection::GetCellCoordinate)
-                .map(Coordinate::toString)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    public ArrayList<Coordinate> GetInfluenceOnCoordinates() {
+        return influenceOn.stream()
+                .map(CellConnection::GetCellCoordinate)
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -35,12 +40,6 @@ public class CellConnectionImpl implements Cloneable, CellConnection,CanRemoveFr
 
     @Override
     public List<CellConnection> GetSortedInfluenceOn() throws LoopConnectionException { return topologicalSort();}
-
-    public ArrayList<String> GetInfluenceOnListOfStrings() {
-        return influenceOn.stream()
-                .map(CellConnection::GetCellCoordinate)
-                .map(Coordinate::toString)
-                .collect(Collectors.toCollection(ArrayList::new));    }
 
     @Override
     public CellConnectionImpl clone(){

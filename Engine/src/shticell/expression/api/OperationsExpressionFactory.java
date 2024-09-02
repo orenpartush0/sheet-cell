@@ -26,7 +26,7 @@ public interface OperationsExpressionFactory {
                 return new DivideExpression();
             }
             case Operation.CONCAT -> {
-                return new ConcatExpression();
+                return new ConcatExpression(hasSheetData,connection);
             }
             case Operation.TIME -> {
                 return new TimesExpression();

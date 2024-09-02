@@ -12,7 +12,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import scene.app.AppController;
 import shticell.sheet.coordinate.Coordinate;
+import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
+
+import java.util.List;
 
 public class SheetController {
 
@@ -61,8 +64,10 @@ public class SheetController {
             TextField cellField = new TextField(cell.effectiveValue().toString());
             cellField.setPrefWidth(100);
             cellField.setPrefHeight(30);
-            cellField.setOnMouseClicked(event -> updateActionLine(coordinate));
+            cellField.setOnMouseClicked(event -> cellClicked(coordinate));
             cellField.setOnAction(event -> handleCellAction(cellField, coordinate));
+            cellField.setOnMouseReleased(event -> cellUnClicked(coordinate));
+            cellField.setId(coordinate.toString());
             gridPaneSheet.add(cellField, coordinate.col() , coordinate.row());
         });
 
@@ -105,7 +110,22 @@ public class SheetController {
         alert.showAndWait();
     }
 
-    private void updateActionLine(Coordinate coordinate){
-        appController.setOnMouseCoordinate(coordinate);
+    private void cellClicked(Coordinate coordinate){
+        appController.cellClicked(coordinate);
+    }
+
+    private void cellUnClicked(Coordinate coordinate){
+        gridPaneSheet.getChildren().forEach(node->node.setStyle("-fx-border-color: white; -fx-border-width: 2px;"));
+    }
+
+    public void PaintCells(List<Coordinate> influenceOn,List<Coordinate>  dependsOn){
+        gridPaneSheet.getChildren().forEach(node -> {
+            if(influenceOn.contains(CoordinateFactory.getCoordinate(node.getId()))){
+                node.setStyle("-fx-border-color: green; -fx-border-width: 2px;");
+            }
+            else if(dependsOn.contains(CoordinateFactory.getCoordinate(node.getId()))){
+                node.setStyle("-fx-border-color: blue; -fx-border-width: 2px;");
+            }
+        });
     }
 }

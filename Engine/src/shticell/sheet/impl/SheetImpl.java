@@ -157,5 +157,13 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
         return new RangeDto(rangeName,ranges.get(rangeName).getStartCell(),ranges.get(rangeName).getEndCell());
     }
 
+    @Override
+    public boolean IsRangeInSheet(String rangeName) {
+        return ranges.containsKey(rangeName);
+    }
 
+    @Override
+    public Range GetRange(String rangeName) {
+        return ranges.get(rangeName);
+    }
 }

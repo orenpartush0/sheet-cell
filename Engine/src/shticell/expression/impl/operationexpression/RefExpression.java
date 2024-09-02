@@ -28,6 +28,7 @@ public class RefExpression implements Expression {
                 || !hasSheetData.IsCoordinateInSheet(CoordinateFactory.getCoordinate(coordinate))){
             throw new RuntimeException("Unknown coordinate " + coordinate);
         }
+
         hasSheetData.GetCellConnections(
                 CoordinateFactory.getCoordinate(coordinate))
                 .AddToInfluenceOn(connections);

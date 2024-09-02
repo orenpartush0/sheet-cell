@@ -17,6 +17,6 @@ public interface Cell extends Serializable {
     CellConnection GetConnections();
     boolean IsChangedInThisVersion(int version);
     Cell GetCellBySheetVersion(int version);
-    ArrayList<String> GetDependsOnListOfStrings();
-    ArrayList<String> GetInfluenceOnListOfStrings();
+    ArrayList<Coordinate> GetDependsOnCoordinates();
+    ArrayList<Coordinate> GetInfluenceOnCoordinates();
 }

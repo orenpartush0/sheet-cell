@@ -72,13 +72,11 @@ public class CellImpl implements Cloneable, Cell, Serializable {
     }
 
     @Override
-    public ArrayList<String> GetDependsOnListOfStrings() {
-        return connections.GetDependsOnListOfStrings();
-    }
+    public ArrayList<Coordinate> GetDependsOnCoordinates() { return connections.GetDependsOnCoordinates(); }
 
     @Override
-    public ArrayList<String> GetInfluenceOnListOfStrings() {
-        return connections.GetInfluenceOnListOfStrings();
+    public ArrayList<Coordinate> GetInfluenceOnCoordinates() {
+        return connections.GetInfluenceOnCoordinates();
     }
 
     @Override
@@ -102,26 +100,26 @@ public class CellImpl implements Cloneable, Cell, Serializable {
             effectiveValue = parseEffectiveValue(newOriginalValue);
         }
         catch (ArithmeticException e){
-            effectiveValue = new EffectiveValueImpl(NAN, ValueType.STRING);
+            effectiveValue = new EffectiveValueImpl(NAN, ValueType.NAN);
         }
         catch (IndexOutOfBoundsException e){
-            effectiveValue = new EffectiveValueImpl(UNDEFINED, ValueType.STRING);
+            effectiveValue = new EffectiveValueImpl(UNDEFINED, ValueType.UNDEFINED);
         }
         catch (Exception e) {
             connections.recoverDependsOn(removed);
             throw e;
         }
 
+        sheet.UpdateDependentCells(connections.GetSortedInfluenceOn().stream().map(CellConnection::GetCellCoordinate).toList());
         LatestSheetVersionUpdated = sheetVersion;
         originalValue = newOriginalValue;
-        sheet.UpdateDependentCells(connections.GetSortedInfluenceOn().stream().map(CellConnection::GetCellCoordinate).toList());
         cellByVersion.put(sheetVersion, this.clone());
     }
 
     private EffectiveValue parseEffectiveValue(String newOriginalValue) throws NumberFormatException, LoopConnectionException {
         return isFunc(newOriginalValue)
                     ? calcFunc(new EffectiveValueImpl(newOriginalValue,ValueType.STRING),connections, sheet)
-                    : EfectiveValueFactory.getEffectiveValue(newOriginalValue);
+                    : EfectiveValueFactory.getEffectiveValue(newOriginalValue,sheet);
 
     }
 
