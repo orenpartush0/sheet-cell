@@ -1,5 +1,6 @@
 package shticell.sheet.impl;
 
+import dto.RangeDto;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.api.HasSheetData;
 import shticell.sheet.api.SheetToXML;
@@ -10,6 +11,9 @@ import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.cell.api.Cell;
 import shticell.sheet.cell.impl.CellImpl;
+import shticell.sheet.range.Range;
+import shticell.sheet.range.RangeImpl;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -18,7 +22,8 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     private final int INITIAL_VERSION = 1;
     private final String sheetName;
     private int version = INITIAL_VERSION;
-    Map<Coordinate, Cell> cells;
+    Map<Coordinate, Cell> cells = new HashMap<>();
+    Map<String, Range> ranges = new HashMap<>();
     private final int numberOfRows;
     private final int numberOfColumns;
     private final int rowHeight;
@@ -30,7 +35,6 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
         numberOfColumns = _numberOfColumns;
         rowHeight = _rowHeight;
         columnWidth = _columnWidth;
-        cells = new HashMap<>();
 
         for(int i =1 ; i <= numberOfRows; i++) {
             for(int j = 1 ; j <=  numberOfColumns; j++) {
@@ -138,5 +142,20 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
 
         return new SheetImpl(sheetName,numberOfRows,numberOfColumns,cellsInRequiredVersion,rowHeight,columnWidth);
     }
+
+    @Override
+    public void AddRange(RangeDto rangeDto){
+        if(ranges.containsKey(rangeDto.rangeName())){
+            throw new RuntimeException("Range already exists");
+        }
+
+        ranges.put(rangeDto.rangeName(),new RangeImpl(rangeDto.startCell(),rangeDto.endCell()));
+    }
+
+    @Override
+    public RangeDto GetRangeDto(String rangeName){
+        return new RangeDto(rangeName,ranges.get(rangeName).getStartCell(),ranges.get(rangeName).getEndCell());
+    }
+
 
 }

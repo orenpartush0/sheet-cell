@@ -19,13 +19,20 @@ public interface CoordinateFactory extends Serializable {
     }
 
     static Coordinate getCoordinate(String square) {
-        int col = square.substring(0,2).toUpperCase().charAt(0) - 'A';
-        int row = Integer.parseInt(square.substring(1));
-        return getCoordinate(row,col);
+        String columnPart = square.replaceAll("[^A-Za-z]", "").toUpperCase();
+        int row = Integer.parseInt(square.replaceAll("[^0-9]", ""));
+        int col = 0;
+
+        for (int i = 0; i < columnPart.length(); i++) {
+            col = col * 26 + (columnPart.charAt(i) - 'A' + 1);
+        }
+
+        return getCoordinate(row, col);
     }
 
+
     static boolean isValidCoordinate(String coordinate) {
-        String pattern = "^[a-zA-Z]\\d+$";
+        String pattern = "^[a-zA-Z]+\\d+$";
         return coordinate.matches(pattern);
     }
 }
