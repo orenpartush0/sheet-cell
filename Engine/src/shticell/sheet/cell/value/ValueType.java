@@ -10,8 +10,8 @@ public enum ValueType {
     NUMERIC(Double.class),
     BOOLEAN(Boolean.class),
     RANGE(Range.class),
-    UNDEFINED(Undefinedxpression.class),
-    NAN(NaNExpression.class);
+    UNDEFINED(String.class),
+    NAN(String.class);
 
     private final Class<?> type;
 

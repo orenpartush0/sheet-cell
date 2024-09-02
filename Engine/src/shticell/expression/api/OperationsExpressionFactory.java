@@ -26,7 +26,7 @@ public interface OperationsExpressionFactory {
                 return new DivideExpression();
             }
             case Operation.CONCAT -> {
-                return new ConcatExpression(hasSheetData,connection);
+                return new ConcatExpression();
             }
             case Operation.TIME -> {
                 return new TimesExpression();
@@ -37,6 +37,13 @@ public interface OperationsExpressionFactory {
             case Operation.REF ->{
                 return new RefExpression(hasSheetData,connection);
             }
+            case Operation.SUM -> {
+                return new SumExpression(hasSheetData,connection);
+            }
+            case Operation.AVERAGE -> {
+                return new AverageExpression(hasSheetData,connection);
+            }
+
             default -> throw new IllegalArgumentException("Unsupported operation: " + operation);
         }
     }

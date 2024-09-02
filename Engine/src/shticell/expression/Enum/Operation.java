@@ -9,5 +9,7 @@ public enum Operation {
     PLUS,
     SUB,
     TIME,
-    REF
+    REF,
+    SUM,
+    AVERAGE
 }

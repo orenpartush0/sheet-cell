@@ -6,10 +6,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import scene.left.RangeController;
 import scene.sheet.SheetController;
 import scene.top.TopController;
 import shticell.sheet.coordinate.Coordinate;
@@ -28,8 +25,6 @@ public class AppController {
 
     @FXML private ScrollPane sheetComponent;
 
-    @FXML private RangeController rangeComponentController;
-
     @FXML private TopController topComponentController;
 
     @FXML private SheetController sheetComponentController;
@@ -39,7 +34,6 @@ public class AppController {
     public void initialize() {
         topComponentController.setAppController(this);
         sheetComponentController.setAppController(this);
-        rangeComponentController.setAppController(this);
     }
 
     public void importFile(String path) {
@@ -84,7 +78,8 @@ public class AppController {
         topComponentController.setOnMouseCoordinate(connector.GetCellByCoordinate(coordinate));
         List<Coordinate> influenceOn = connector.getSheet().cells().get(coordinate).influenceOn();
         List<Coordinate> dependsOn = connector.getSheet().cells().get(coordinate).dependsOn();
-        sheetComponentController.PaintCells(influenceOn,dependsOn);
+        sheetComponentController.PaintCells(influenceOn,"Green");
+        sheetComponentController.PaintCells(dependsOn,"Blue");
     }
 
 }

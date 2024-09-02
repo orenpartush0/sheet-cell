@@ -10,13 +10,6 @@ import shticell.sheet.range.Range;
 
 public class ConcatExpression implements  Expression {
 
-    HasSheetData hasSheetData;
-    CellConnection connections;
-    public ConcatExpression(HasSheetData _hasSheetData , CellConnection cellConnection){
-        hasSheetData = _hasSheetData;
-        connections = cellConnection;
-    }
-
     @Override
     public EffectiveValue eval(Expression... expressions) {
         StringBuilder strBuilder = new StringBuilder();

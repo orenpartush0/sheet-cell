@@ -1,58 +1,64 @@
-/* General VBox styling */
+/* Style for the entire VBox */
 .vbox {
-    -fx-padding: 10; /* Reduced padding */
-    -fx-spacing: 10; /* Reduced spacing */
-    -fx-background-color: #ffffff;
+    -fx-padding: 10;
+    -fx-spacing: 15;
+    -fx-background-color: #f4f4f4;
 }
 
-/* HBox styling */
+/* Style for the HBox containers */
 .hbox {
-    -fx-padding: 5; /* Reduced padding */
-    -fx-spacing: 5; /* Reduced spacing */
+    -fx-spacing: 10;
+    -fx-alignment: center-left;
 }
 
-/* Button styling */
-.button {
-    -fx-background-color: #007aff; /* iOS blue */
-    -fx-text-fill: white;
-    -fx-font-size: 12px; /* Smaller font size */
-    -fx-padding: 6 12; /* Reduced padding */
-    -fx-border-radius: 6; /* Smaller border radius */
-    -fx-background-radius: 6; /* Smaller background radius */
-    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 4, 0.5, 0, 1); /* Smaller shadow */
-    -fx-pref-width: -1; /* Allows button to shrink */
-    -fx-pref-height: -1; /* Allows button to shrink */
-}
-
-/* Label styling */
+/* Style for Labels */
 .label {
-    -fx-font-size: 14px; /* Smaller font size */
+    -fx-font-size: 14px;
     -fx-text-fill: #333333;
-    -fx-padding: 7; /* Reduced padding */
+    -fx-background-color: lightgray;
+    -fx-padding: 5 10;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
 }
 
-/* TextField styling */
+/* Style for TextFields */
 .text-field {
-    -fx-font-size: 14px; /* Smaller font size */
-    -fx-background-color: #f5f5f5;
-    -fx-border-color: #d0d0d0;
-    -fx-border-radius: 8; /* Smaller border radius */
-    -fx-background-radius: 8; /* Smaller background radius */
-    -fx-padding: 8; /* Reduced padding */
+    -fx-font-size: 14px;
+    -fx-border-color: #c0c0c0;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 5 10;
 }
 
-/* ComboBox styling */
+/* Style for ComboBox */
 .combo-box {
-    -fx-font-size: 14px; /* Smaller font size */
-    -fx-background-color: #f5f5f5;
-    -fx-border-color: #d0d0d0;
-    -fx-border-radius: 8; /* Smaller border radius */
-    -fx-background-radius: 8; /* Smaller background radius */
+    -fx-font-size: 14px;
+    -fx-border-color: #c0c0c0;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
 }
 
-/* Style specific for labels with background color (applied to all labels) */
-.label {
-    -fx-background-color: #f0f0f0;
-    -fx-padding: 8; /* Reduced padding */
-    -fx-border-radius: 8; /* Smaller border radius */
+/* Style for Buttons */
+.button {
+    -fx-font-size: 14px;
+    -fx-background-color: lightblue;
+    -fx-text-fill: white;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 5 10;
 }
+
+.button:hover {
+    -fx-background-color: #87ceeb;
+}
+
+.button:pressed {
+    -fx-background-color: #4682b4;
+}
+
+/* Optional style for disabled elements */
+.text-field:disabled,
+.combo-box:disabled {
+    -fx-opacity: 0.6;
+}
+

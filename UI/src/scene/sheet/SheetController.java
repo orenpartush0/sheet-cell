@@ -118,13 +118,10 @@ public class SheetController {
         gridPaneSheet.getChildren().forEach(node->node.setStyle("-fx-border-color: white; -fx-border-width: 2px;"));
     }
 
-    public void PaintCells(List<Coordinate> influenceOn,List<Coordinate>  dependsOn){
+    public void PaintCells(List<Coordinate> coordinateList,String color){
         gridPaneSheet.getChildren().forEach(node -> {
-            if(influenceOn.contains(CoordinateFactory.getCoordinate(node.getId()))){
-                node.setStyle("-fx-border-color: green; -fx-border-width: 2px;");
-            }
-            else if(dependsOn.contains(CoordinateFactory.getCoordinate(node.getId()))){
-                node.setStyle("-fx-border-color: blue; -fx-border-width: 2px;");
+            if(coordinateList.contains(CoordinateFactory.getCoordinate(node.getId()))){
+                node.setStyle("-fx-border-color: " + color + "; -fx-border-width: 2px;");
             }
         });
     }

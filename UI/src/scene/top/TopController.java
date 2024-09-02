@@ -46,16 +46,10 @@ public class TopController {
     private TextField cellId;
 
     @FXML
-    private Label cellIdLabel;
-
-    @FXML
-    private Label originalValueLabel;
+    public ComboBox Ranges;
 
     @FXML
     private TextField updateValueField;
-
-    @FXML
-    private Label lastUpdatedVersionLabel;
 
     @FXML
     private ScrollPane versionScrollPane;
