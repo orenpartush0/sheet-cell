@@ -14,7 +14,11 @@ public class PowExpression implements Expression {
         }
         EffectiveValue left = expressions[0].eval();
         EffectiveValue right = expressions[1].eval();
-
-        return new EffectiveValueImpl(Math.pow(left.getValueWithExpectation(Double.class),right.getValueWithExpectation(Double.class)), ValueType.NUMERIC);
+        try{
+            return new EffectiveValueImpl(Math.pow(left.getValueWithExpectation(Double.class),right.getValueWithExpectation(Double.class)), ValueType.NUMERIC);
+        }
+        catch (IllegalArgumentException e){
+            throw new ArithmeticException();
+        }
     }
 }
