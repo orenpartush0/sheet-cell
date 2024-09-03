@@ -14,4 +14,11 @@ public enum Operation {
     AVERAGE,
     PERCENT,
     EQUAL,
+    POW,
+    NOT,
+    OR,
+    AND,
+    BIGGER,
+    LESS,
+    IF
 }
