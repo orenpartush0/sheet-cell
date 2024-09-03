@@ -10,7 +10,7 @@ public class BiggerExpression implements Expression {
     @Override
     public EffectiveValue eval(Expression... expressions) {
         if(expressions.length != 2){
-            throw new IllegalArgumentException("Bigger must have 2 expressions");
+            throw new UnsupportedOperationException("Bigger must have 2 expressions");
         }
 
         EffectiveValue leftVal = expressions[0].eval();

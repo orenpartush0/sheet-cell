@@ -11,7 +11,8 @@ public enum ValueType {
     BOOLEAN(Boolean.class),
     RANGE(Range.class),
     UNDEFINED(String.class),
-    NAN(String.class);
+    NAN(String.class),
+    UNKNOWN(String.class);
 
     private final Class<?> type;
 

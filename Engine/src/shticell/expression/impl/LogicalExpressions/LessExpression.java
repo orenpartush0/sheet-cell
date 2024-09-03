@@ -9,7 +9,7 @@ public class LessExpression implements Expression {
     @Override
     public EffectiveValue eval(Expression... expressions) {
         if(expressions.length != 2){
-            throw new IllegalArgumentException("Less must have 2 expressions");
+            throw new UnsupportedOperationException("Less must have 2 expressions");
         }
 
         EffectiveValue leftVal = expressions[0].eval();

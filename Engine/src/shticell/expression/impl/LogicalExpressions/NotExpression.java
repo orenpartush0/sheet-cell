@@ -9,7 +9,7 @@ public class NotExpression implements Expression {
     @Override
     public EffectiveValue eval(Expression... expressions) {
         if(expressions.length != 1){
-            throw new IllegalArgumentException("Not must have 1 expression");
+            throw new UnsupportedOperationException("Not must have 1 expression");
         }
         return new EffectiveValueImpl(!expressions[0].eval().getValueWithExpectation(Boolean.class), ValueType.BOOLEAN);
     }
