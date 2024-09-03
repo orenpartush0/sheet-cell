@@ -14,10 +14,10 @@ public class ModExpression implements Expression {
         EffectiveValue leftVal = expressions[0].eval();
         EffectiveValue rightVal = expressions[1].eval();
 
+        try{
         if(rightVal.getValueWithExpectation(Double.class) == 0){
             throw new ArithmeticException("Can't mod with 0");
         }
-        try{
             return new EffectiveValueImpl(leftVal.getValueWithExpectation(Double.class) %
                     rightVal.getValueWithExpectation(Double.class), ValueType.NUMERIC);
         }

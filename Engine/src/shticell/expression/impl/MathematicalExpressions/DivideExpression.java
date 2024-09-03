@@ -13,11 +13,12 @@ public class DivideExpression implements Expression {
         }
         EffectiveValue leftVal = expressions[0].eval();
         EffectiveValue rightVal = expressions[1].eval();
-
-        if(rightVal.getValueWithExpectation(Double.class) == 0){
-            throw new ArithmeticException("Cant divide by zero");
-        }
         try{
+
+            if(rightVal.getValueWithExpectation(Double.class) == 0){
+                throw new ArithmeticException("Cant divide by zero");
+            }
+
             return new EffectiveValueImpl(leftVal.getValueWithExpectation(Double.class) /
                     rightVal.getValueWithExpectation(double.class), ValueType.NUMERIC);
         }
