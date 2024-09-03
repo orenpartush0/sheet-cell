@@ -11,5 +11,7 @@ public enum Operation {
     TIME,
     REF,
     SUM,
-    AVERAGE
+    AVERAGE,
+    PERCENT,
+    EQUAL,
 }

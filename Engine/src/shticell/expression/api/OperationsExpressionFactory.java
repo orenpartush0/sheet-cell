@@ -1,11 +1,12 @@
 package shticell.expression.api;
 
 import shticell.expression.Enum.Operation;
-import shticell.expression.impl.operationexpression.*;
+import shticell.expression.impl.MathematicalExpressions.*;
+import shticell.expression.impl.StringExpressions.ConcatExpression;
+import shticell.expression.impl.StringExpressions.SubExpression;
+import shticell.expression.impl.SystemExpressions.*;
 import shticell.sheet.api.HasSheetData;
 import shticell.sheet.cell.connection.CellConnection;
-
-import java.sql.Connection;
 
 public interface OperationsExpressionFactory {
     static Expression getExpression(Operation operation, HasSheetData hasSheetData, CellConnection connection){

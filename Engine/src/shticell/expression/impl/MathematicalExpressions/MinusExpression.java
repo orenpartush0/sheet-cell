@@ -1,4 +1,4 @@
-package shticell.expression.impl.operationexpression;
+package shticell.expression.impl.MathematicalExpressions;
 
 import shticell.expression.api.Expression;
 import shticell.sheet.cell.value.EffectiveValue;

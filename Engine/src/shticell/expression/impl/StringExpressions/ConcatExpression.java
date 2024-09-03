@@ -1,12 +1,9 @@
-package shticell.expression.impl.operationexpression;
+package shticell.expression.impl.StringExpressions;
 
 import shticell.expression.api.Expression;
-import shticell.sheet.api.HasSheetData;
-import shticell.sheet.cell.connection.CellConnection;
 import shticell.sheet.cell.value.EffectiveValue;
 import shticell.sheet.cell.value.EffectiveValueImpl;
 import shticell.sheet.cell.value.ValueType;
-import shticell.sheet.range.Range;
 
 public class ConcatExpression implements  Expression {
 
