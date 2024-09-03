@@ -14,6 +14,7 @@ import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.CellOutOfSheetException;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.impl.SheetImpl;
+import shticell.sheet.range.Range;
 
 import java.io.InputStream;
 import java.util.*;
@@ -51,6 +52,8 @@ public class SchemBaseJaxb {
             res = new SheetImpl(sheet.getName(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns(),
                     sheet.getSTLLayout().getSTLSize().getRowsHeightUnits(),sheet.getSTLLayout().getSTLSize().getColumnWidthUnits());
 
+            createRanges(sheet,sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns(),res);
+
             List<STLCell> creationOrder = getCreationCellsList(sheet.getSTLCells().getSTLCell(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
             creationOrder.forEach(cell-> {
                 try {
@@ -66,7 +69,7 @@ public class SchemBaseJaxb {
         return res;
 
     }
-    private static void createRanges (STLSheet sheet,int rows,int cols) {
+    private static void createRanges (STLSheet sheet,int rows,int cols,Sheet resSheet) {
         List <STLRange> ranges = new ArrayList<STLRange>(sheet.getSTLRanges().getSTLRange());
         Set <String> rangesName = new HashSet<>();
         ranges.forEach(r->{
@@ -79,6 +82,8 @@ public class SchemBaseJaxb {
             } catch (CellOutOfSheetException e) {
                 throw new RuntimeException(e.getMessage() + "boundary of range " + r.getName() + "is out of sheet");
             }
+            resSheet.AddRange(new Range(r.getName(),CoordinateFactory.getCoordinate(r.getSTLBoundaries().getFrom())
+                    ,CoordinateFactory.getCoordinate(r.getSTLBoundaries().getTo())));
 
         });
 
