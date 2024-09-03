@@ -9,7 +9,7 @@ public class IfExpression implements Expression {
     @Override
     public EffectiveValue eval(Expression... expressions) {
         if(expressions.length != 3){
-            throw new IllegalArgumentException("If must have 2 expressions");
+            throw new IllegalArgumentException("If must have 3 expressions");
         }
 
         EffectiveValue condition = expressions[0].eval();
