@@ -11,6 +11,11 @@ public class AbsExpression implements Expression{
         if(expressions.length != 1){
             throw new UnsupportedOperationException("Abs needs one argument");
         }
-        return new EffectiveValueImpl(Math.abs(expressions[0].eval().getValueWithExpectation(Double.class)), ValueType.NUMERIC);
+        try {
+            return new EffectiveValueImpl(Math.abs(expressions[0].eval().getValueWithExpectation(Double.class)), ValueType.NUMERIC);
+        }
+        catch(IllegalArgumentException e){
+            throw new ArithmeticException(e.getMessage());
+        }
     }
 }

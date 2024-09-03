@@ -17,8 +17,12 @@ public class DivideExpression implements Expression {
         if(rightVal.getValueWithExpectation(Double.class) == 0){
             throw new ArithmeticException("Cant divide by zero");
         }
-
-        return new EffectiveValueImpl(leftVal.getValueWithExpectation(Double.class) /
-                rightVal.getValueWithExpectation(double.class), ValueType.NUMERIC);
+        try{
+            return new EffectiveValueImpl(leftVal.getValueWithExpectation(Double.class) /
+                    rightVal.getValueWithExpectation(double.class), ValueType.NUMERIC);
+        }
+        catch(IllegalArgumentException e){
+            throw new ArithmeticException();
+        }
     }
 }

@@ -17,8 +17,12 @@ public class ModExpression implements Expression {
         if(rightVal.getValueWithExpectation(Double.class) == 0){
             throw new ArithmeticException("Can't mod with 0");
         }
-
-        return new EffectiveValueImpl(leftVal.getValueWithExpectation(Double.class) %
-                rightVal.getValueWithExpectation(Double.class), ValueType.NUMERIC);
+        try{
+            return new EffectiveValueImpl(leftVal.getValueWithExpectation(Double.class) %
+                    rightVal.getValueWithExpectation(Double.class), ValueType.NUMERIC);
+        }
+        catch (IllegalArgumentException e){
+            throw new ArithmeticException(e.getMessage());
+        }
     }
 }

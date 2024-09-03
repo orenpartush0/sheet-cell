@@ -19,8 +19,14 @@ public class PercentExpression implements Expression {
         if(whole.getValueWithExpectation(Double.class) == 0){
             throw new ArithmeticException("Can't calculate percent with 0");
         }
-        return new EffectiveValueImpl(part.getValueWithExpectation(Double.class) /
-                whole.getValueWithExpectation(Double.class)*100, ValueType.NUMERIC);
+        try{
+            return new EffectiveValueImpl(part.getValueWithExpectation(Double.class) /
+                    whole.getValueWithExpectation(Double.class)*100, ValueType.NUMERIC);
+        }
+        catch (IllegalArgumentException e){
+            throw new ArithmeticException();
+        }
+
 
     }
 }
