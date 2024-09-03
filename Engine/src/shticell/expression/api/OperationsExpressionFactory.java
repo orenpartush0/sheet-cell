@@ -1,6 +1,7 @@
 package shticell.expression.api;
 
 import shticell.expression.Enum.Operation;
+import shticell.expression.impl.LogicalExpressions.*;
 import shticell.expression.impl.MathematicalExpressions.*;
 import shticell.expression.impl.StringExpressions.ConcatExpression;
 import shticell.expression.impl.StringExpressions.SubExpression;
@@ -43,6 +44,33 @@ public interface OperationsExpressionFactory {
             }
             case Operation.AVERAGE -> {
                 return new AverageExpression(hasSheetData,connection);
+            }
+            case Operation.PERCENT -> {
+                return new PercentExpression();
+            }
+            case Operation.EQUAL -> {
+                return new EqualExpression();
+            }
+            case Operation.POW -> {
+                return new PowExpression();
+            }
+            case Operation.NOT -> {
+                return new NotExpression();
+            }
+            case Operation.AND -> {
+                return new AndExpression();
+            }
+            case Operation.OR -> {
+                return new OrExpression();
+            }
+            case Operation.IF -> {
+                return new IfExpression();
+            }
+            case Operation.BIGGER -> {
+                return new BiggerExpression();
+            }
+            case Operation.LESS -> {
+                return new LessExpression();
             }
 
             default -> throw new IllegalArgumentException("Unsupported operation: " + operation);
