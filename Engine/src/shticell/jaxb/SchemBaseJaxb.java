@@ -4,6 +4,7 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import shticell.jaxb.schema.STLCell;
+import shticell.jaxb.schema.STLRange;
 import shticell.jaxb.schema.STLSheet;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.cell.connection.CanRemoveFromDependsOn;
@@ -64,6 +65,30 @@ public class SchemBaseJaxb {
         }
         return res;
 
+    }
+    private static void createRanges (STLSheet sheet,int rows,int cols) {
+        List <STLRange> ranges = new ArrayList<STLRange>(sheet.getSTLRanges().getSTLRange());
+        Set <String> rangesName = new HashSet<>();
+        ranges.forEach(r->{
+            if(rangesName.contains(r.getName())) {
+                throw new RuntimeException("Duplicate range " + r.getName());
+            }
+            rangesName.add(r.getName());
+            try {
+                checkRange(r.getSTLBoundaries().getFrom(),r.getSTLBoundaries().getTo(),rows,cols);
+            } catch (CellOutOfSheetException e) {
+                throw new RuntimeException(e.getMessage() + "boundary of range " + r.getName() + "is out of sheet");
+            }
+
+        });
+
+    }
+
+    private static void checkRange(String from, String to,int rows,int cols) throws CellOutOfSheetException {
+        Coordinate fromCord = CoordinateFactory.getCoordinate(from);
+        Coordinate toCord = CoordinateFactory.getCoordinate(to);
+        checkCoordinateInSheet(rows,cols,fromCord.row(),fromCord.col());
+        checkCoordinateInSheet(rows,cols,toCord.row(),toCord.col());
     }
 
     private static List<STLCell> getCreationCellsList(List<STLCell> cellsList,int rows, int columns) throws LoopConnectionException {
