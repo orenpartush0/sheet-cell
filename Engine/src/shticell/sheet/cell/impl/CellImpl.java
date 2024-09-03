@@ -1,5 +1,6 @@
 package shticell.sheet.cell.impl;
 
+import shticell.expression.impl.BoolienFuncUnknown;
 import shticell.sheet.cell.connection.CellConnection;
 import shticell.sheet.cell.connection.CellConnectionImpl;
 import shticell.sheet.api.HasSheetData;
@@ -21,6 +22,7 @@ public class CellImpl implements Cloneable, Cell, Serializable {
 
     private final String NAN = "NaN";
     private final String UNDEFINED = "!Undefined!";
+    private final String UNKNOWN = "Unknown";
     private HasSheetData sheet;
     private Coordinate coordinate;
     private String originalValue = "";
@@ -105,6 +107,9 @@ public class CellImpl implements Cloneable, Cell, Serializable {
         }
         catch (IndexOutOfBoundsException e){
             effectiveValue = new EffectiveValueImpl(UNDEFINED, ValueType.UNDEFINED);
+        }
+        catch (BoolienFuncUnknown e){
+            effectiveValue = new EffectiveValueImpl(UNKNOWN, ValueType.UNKNOWN);
         }
 
         try {

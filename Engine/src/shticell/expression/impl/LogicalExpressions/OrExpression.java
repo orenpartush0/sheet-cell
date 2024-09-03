@@ -1,6 +1,7 @@
 package shticell.expression.impl.LogicalExpressions;
 
 import shticell.expression.api.Expression;
+import shticell.expression.impl.BoolienFuncUnknown;
 import shticell.sheet.cell.value.EffectiveValue;
 import shticell.sheet.cell.value.EffectiveValueImpl;
 import shticell.sheet.cell.value.ValueType;
@@ -14,8 +15,12 @@ public class OrExpression implements Expression {
 
         EffectiveValue leftVal = expressions[0].eval();
         EffectiveValue rightVal = expressions[1].eval();
-
-        return new EffectiveValueImpl(leftVal.getValueWithExpectation(Boolean.class)  || rightVal.getValueWithExpectation(Boolean.class)
+    try {
+        return new EffectiveValueImpl(leftVal.getValueWithExpectation(Boolean.class) || rightVal.getValueWithExpectation(Boolean.class)
                 , ValueType.BOOLEAN);
+    }
+    catch (IllegalArgumentException e){
+        throw new BoolienFuncUnknown();
+    }
     }
 }
