@@ -2,7 +2,7 @@
 .vbox {
     -fx-padding: 10;
     -fx-spacing: 15;
-    -fx-background-color: #f4f4f4;
+    -fx-background-color: rgba(200, 200, 200, 0.4);
 }
 
 /* Style for the HBox containers */
@@ -18,13 +18,13 @@
     -fx-background-color: lightgray;
     -fx-padding: 5 10;
     -fx-border-radius: 5;
-    -fx-background-radius: 5;
+    -fx-background-radius: 10;
 }
 
 /* Style for TextFields */
 .text-field {
     -fx-font-size: 14px;
-    -fx-border-color: #c0c0c0;
+    -fx-border-color: rgba(200, 200, 200, 0.4);
     -fx-border-radius: 5;
     -fx-background-radius: 5;
     -fx-padding: 5 10;
@@ -33,7 +33,7 @@
 /* Style for ComboBox */
 .combo-box {
     -fx-font-size: 14px;
-    -fx-border-color: #c0c0c0;
+    -fx-border-color: rgba(200, 200, 200, 0.4);
     -fx-border-radius: 5;
     -fx-background-radius: 5;
 }
@@ -43,8 +43,8 @@
     -fx-font-size: 14px;
     -fx-background-color: lightblue;
     -fx-text-fill: white;
-    -fx-border-radius: 5;
-    -fx-background-radius: 5;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
     -fx-padding: 5 10;
 }
 
@@ -62,3 +62,39 @@
     -fx-opacity: 0.6;
 }
 
+/* Style for the HBox containers, specifically for the one with buttons */
+#box {
+    -fx-padding: 15; /* Adjust padding to your liking */
+    -fx-spacing: 20; /* Increase spacing for better separation between buttons */
+}
+
+/* Reset default styling for MenuItems */
+.menu-item {
+    -fx-background-color: transparent; /* Ensure background color is transparent */
+    -fx-text-fill: rgba(200, 200, 200, 0.4); /* Set text color */
+    -fx-padding: 5 10; /* Adjust padding if needed */
+}
+
+/* Customize MenuItem on hover and pressed states */
+.menu-item:hover {
+    -fx-background-color: rgba(200, 200, 200, 0.4) /* Light grey on hover */
+}
+
+.menu-item:pressed {
+    -fx-background-color: rgba(200, 200, 200, 0.4); /* Slightly darker grey when pressed */
+}
+
+/* Style for MenuBar */
+.menu-bar {
+    -fx-background-color: rgba(200, 200, 200, 0.4); /* Semi-transparent background */
+}
+
+/* Ensure Menu items within MenuBar are styled consistently */
+.menu {
+    -fx-background-color: rgba(200, 200, 200, 0.4); /* Consistent transparency */
+}
+
+/* New CSS for button press effect */
+.button:pressed {
+    -fx-background-color: #4682b4;
+}

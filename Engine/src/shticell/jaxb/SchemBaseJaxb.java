@@ -51,9 +51,9 @@ public class SchemBaseJaxb {
                     sheet.getSTLLayout().getSTLSize().getRowsHeightUnits(),sheet.getSTLLayout().getSTLSize().getColumnWidthUnits());
 
             List<STLCell> creationOrder = getCreationCellsList(sheet.getSTLCells().getSTLCell(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
-            creationOrder.forEach(c-> {
+            creationOrder.forEach(cell-> {
                 try {
-                    res.UpdateCellByCoordinateWithOutVersionUpdate(CoordinateFactory.getCoordinate(c.getRow(),(int)c.getColumn().charAt(0)-(int)'A'), c.getSTLOriginalValue());
+                    res.UpdateCellByCoordinateWithOutVersionUpdate(CoordinateFactory.getCoordinate(cell.getRow(),(int)cell.getColumn().charAt(0)-(int)'A' + 1), cell.getSTLOriginalValue());
                 } catch (LoopConnectionException e) {
                     throw new RuntimeException(e);
                 }
