@@ -70,6 +70,7 @@ public class TopController {
             if(((String) rangesComboBox.getValue()).isEmpty()) {
                 appController.removePaint();
             }else{
+                appController.removePaint();
                 handleRangeSelected((String)rangesComboBox.getValue());
             }
         });

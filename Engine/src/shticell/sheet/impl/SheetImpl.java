@@ -148,12 +148,13 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
 
     @Override
     public void AddRange(Range rangeDto){
-        if(ranges.containsKey(rangeDto.rangeName())){
+        if(ranges.containsKey(rangeDto.rangeName()) || ranges.values().stream().anyMatch(range->range.equals(rangeDto))){
             throw new RuntimeException("Range already exists");
         }
         else if(!cells.containsKey(rangeDto.endCellCoordinate()) || !cells.containsKey(rangeDto.startCellCoordinate())){
             throw new RuntimeException("Range out of bounds");
         }
+
 
         ranges.put(rangeDto.rangeName(),new Range(rangeDto.rangeName(),rangeDto.startCellCoordinate(),rangeDto.endCellCoordinate()));
     }

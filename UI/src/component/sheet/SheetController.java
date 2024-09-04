@@ -32,7 +32,7 @@ public class SheetController {
     @FXML private GridPane gridPaneSheet;
     @FXML public ScrollPane upDownScroller;
     @FXML public ScrollPane rightLeftScroller;
-
+    public final StringProperty defaultCellStyle = new TextField().styleProperty();
 
     private final SimpleStringProperty dependsOnColor = new SimpleStringProperty("white");
     private final List<StringProperty> bindToDependsOnColor = new ArrayList<>();
@@ -141,9 +141,9 @@ public class SheetController {
 
 
     public void removePaint(){
-        setColor(dependsOnColor,"white");
-        setColor(influenceOnColor,"white");
-        setColor(colorProp,"white");
+        dependsOnColor.set(defaultCellStyle.toString());
+        influenceOnColor.set(defaultCellStyle.toString());
+        colorProp.set(defaultCellStyle.toString());
         bindToColorProp.forEach(Property::unbind);
         bindToDependsOnColor.forEach(Property::unbind);
         bindToInfluenceOnColor.forEach(Property::unbind);

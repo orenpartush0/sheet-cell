@@ -6,31 +6,11 @@
 
 
 package shticell.jaxb.schema;
-
 import jakarta.xml.bind.annotation.*;
 
 
-/**
- * <p>Java class for anonymous complex type</p>.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.</p>
- * 
- * <pre>{@code
- * <complexType>
- *   <complexContent>
- *     <restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       <sequence>
- *         <element ref="{}STL-Original-Value"/>
- *       </sequence>
- *       <attribute name="row" use="required" type="{http://www.w3.org/2001/XMLSchema}int" />
- *       <attribute name="column" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *     </restriction>
- *   </complexContent>
- * </complexType>
- * }</pre>
- * 
- * 
- */
+
+
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "stlOriginalValue"
