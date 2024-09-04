@@ -1,4 +1,4 @@
-package scene.top.dialog;
+package component.top.dialog.sheet;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -31,6 +31,11 @@ public class SheetDialogController {
             okClicked = true;
             dialogStage.close();
         }
+    }
+
+    @FXML
+    private void handeCancel(){
+        dialogStage.close();
     }
 
     @FXML

@@ -10,42 +10,44 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.Region?>
-<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="scene.top.TopController" stylesheets="@Top.css">
+<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="component.top.TopController" stylesheets="@Top.css">
 
     <HBox id="box" spacing="10">
         <MenuBar id="menuBar">
             <Menu id="menu" text="File">
-                <MenuItem  id="new" text="New" onAction="#handleCreateFile"/>
+                <MenuItem  id="new" text="New" onAction="#handleCreateNewSheet"/>
                 <MenuItem  fx:id ="saveButton" text="Save" disable="true" onAction="#HandleSaveFile"/>
                 <MenuItem  id = "load" text="Load" onAction="#handleLoadFile"/>
             </Menu>
         </MenuBar>
 
         <Label text="Currently Loaded File path:"/>
-        <TextField fx:id="path" prefWidth="275" editable="false"/>
+        <TextField fx:id="pathTextField" prefWidth="275" editable="false"/>
     </HBox>
 
     <!-- Action line section -->
     <HBox spacing="10" > <!-- Corrected padding -->
         <Label text="Selected Cell ID" style="-fx-background-color: lightgray;" />
 
-        <TextField fx:id="cellId" disable="true" prefWidth="35" />
+        <TextField fx:id="cellIdTextField" disable="true" prefWidth="35" />
 
         <Label text="Last update cell version" style="-fx-background-color: lightgray;" />
 
-        <TextField fx:id="lastUpdate" disable="true" prefWidth="35"/>
+        <TextField fx:id="lastUpdateTextField" disable="true" prefWidth="35"/>
 
         <Label text="Original Cell Value" style="-fx-background-color: lightgray;" />
 
-        <TextField fx:id="originalValue" editable="false" prefWidth="100" />
+        <TextField fx:id="originalValueTextField" editable="false" prefWidth="100" />
 
-        <ComboBox fx:id="Ranges" promptText="Range" onAction="#comboBoxVersionList" />
+        <ComboBox fx:id="rangesComboBox" promptText="Range" />
 
-        <Button id= "plus" text="+" style="-fx-background-color: lightblue;" />
+        <Button fx:id= "plus" text="+" onAction="#addRangeAction" style="-fx-background-color: lightblue;" />
+
+        <Button fx:id= "minus" text="-" style="-fx-background-color:  #FFA07A;" />
 
         <Region HBox.hgrow="ALWAYS" />
 
-        <ComboBox fx:id="SheetVersion" promptText="Sheet Version" onAction="#comboBoxVersionList" />
+        <ComboBox fx:id="SheetVersionComboBox" promptText="Sheet Version" />
     </HBox>
 
 </VBox>

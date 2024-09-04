@@ -7,18 +7,19 @@ import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.impl.SheetImpl;
 import dto.SheetDto;
+import shticell.sheet.range.Range;
 
 import java.io.*;
 import java.util.List;
 
 public class Connector {
-    private final Sheet sheet;
+    private Sheet sheet;
 
-    public Connector(SheetDto sheetDto) {
+    public void SetSheet(SheetDto sheetDto) {
         sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns(),sheetDto.rowsHeight(),sheetDto.colsWidth());
     }
 
-    public Connector(String path) throws Exception {
+    public void SetSheet(String path) throws Exception {
         sheet = path.endsWith(".xml")
                 ? GetSheetFromXML(path)
                 : GetSheetFromBinaryFile(path);
@@ -61,6 +62,22 @@ public class Connector {
         FileInputStream fileIn = new FileInputStream(filePath);
         ObjectInputStream in = new ObjectInputStream(fileIn);
         return (Sheet) in.readObject();
+    }
+
+    public void AddRange(Range rangeDto){
+        sheet.AddRange(rangeDto);
+    }
+
+    public Range GetRangeDto(String rangeName){
+        return sheet.GetRangeDto(rangeName);
+    }
+
+    public Range GetRange(String rangeName) {
+        return sheet.GetRangeDto(rangeName);
+    }
+
+    public List<Range> getRanges(){
+        return sheet.GetRangesDto();
     }
 
 }

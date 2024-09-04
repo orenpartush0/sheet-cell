@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.HBox?>
 
 <GridPane xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="scene.top.dialog.SheetDialogController"
+          fx:controller="component.top.dialog.sheet.SheetDialogController"
           hgap="10" vgap="10" alignment="center">
     <Label text="Sheet Name:" />
     <TextField fx:id="sheetNameField" GridPane.columnIndex="1" />
@@ -20,6 +20,6 @@
 
     <HBox spacing="10" GridPane.rowIndex="3" GridPane.columnSpan="2" alignment="center">
         <Button text="OK" onAction="#handleOk" fx:id="okButton" />
-        <Button text="Cancel" fx:id="cancelButton" />
+        <Button text="Cancel" fx:id="cancelButton" onAction="#handeCancel" />
     </HBox>
 </GridPane>

@@ -2,7 +2,7 @@
 <?import javafx.scene.layout.*?>
 
 <?import javafx.scene.control.Accordion?>
-<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="scene.app.AppController">
+<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="component.app.AppController">
     <top>
         <fx:include fx:id="topComponent" source="../top/top.fxml"/>
     </top>

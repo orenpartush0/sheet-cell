@@ -12,7 +12,7 @@ public record SheetDto(String Name, int version, int numberOfRows, int numberOfC
 {
     public SheetDto(Sheet sheet) {
         this(sheet.GetSheetName(), sheet.GetVersion(), sheet.GetNumberOfRows(), sheet.GetNumberOfColumns(),
-        sheet.getColsWidth(), sheet.getRowsHeight(),
+        sheet.GetColsWidth(), sheet.GetRowsHeight(),
                 sheet.GetCells().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry ->new CellDto(entry.getValue()))));
     }
 

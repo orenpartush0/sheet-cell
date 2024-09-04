@@ -67,10 +67,10 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     public Cell GetCell(Coordinate coordinate) { return cells.get(coordinate);}
 
     @Override
-    public int getColsWidth() {return columnWidth;}
+    public int GetColsWidth() {return columnWidth;}
 
     @Override
-    public int getRowsHeight() {return rowHeight;}
+    public int GetRowsHeight() {return rowHeight;}
 
     @Override
     public EffectiveValue GetCellEffectiveValue(Coordinate coordinate) {
@@ -129,6 +129,11 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     }
 
     @Override
+    public boolean IsRangeInSheet(String rangeName) {
+       return ranges.containsKey(rangeName);
+    }
+
+    @Override
     public SheetImpl GetSheetByVersion(int version){
 
         Map<Coordinate, Cell> cellsInRequiredVersion = new HashMap<>();
@@ -146,6 +151,9 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
         if(ranges.containsKey(rangeDto.rangeName())){
             throw new RuntimeException("Range already exists");
         }
+        else if(!cells.containsKey(rangeDto.endCellCoordinate()) || !cells.containsKey(rangeDto.startCellCoordinate())){
+            throw new RuntimeException("Range out of bounds");
+        }
 
         ranges.put(rangeDto.rangeName(),new Range(rangeDto.rangeName(),rangeDto.startCellCoordinate(),rangeDto.endCellCoordinate()));
     }
@@ -156,12 +164,12 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     }
 
     @Override
-    public boolean IsRangeInSheet(String rangeName) {
-        return ranges.containsKey(rangeName);
+    public Range GetRange(String rangeName) {
+        return ranges.get(rangeName);
     }
 
     @Override
-    public Range GetRange(String rangeName) {
-        return ranges.get(rangeName);
+    public List<Range> GetRangesDto(){
+        return ranges.values().stream().toList();
     }
 }

@@ -30,6 +30,18 @@
     -fx-padding: 5 10;
 }
 
+#cellIdTextField{
+    -fx-pref-width: 40;
+}
+
+#lastUpdateTextField{
+    -fx-pref-width: 40;
+}
+
+#originalValueTextField{
+    -fx-pref-width: 100;
+}
+
 /* Style for ComboBox */
 .combo-box {
     -fx-font-size: 14px;
@@ -97,4 +109,37 @@
 /* New CSS for button press effect */
 .button:pressed {
     -fx-background-color: #4682b4;
+}
+
+#plus, #minus {
+    -fx-background-radius: 50%; /* Makes the button circular */
+    -fx-min-width: 30px;        /* Smaller width for circle */
+    -fx-min-height: 30px;       /* Smaller height for circle */
+    -fx-max-width: 30px;        /* Fixed width for circle */
+    -fx-max-height: 30px;       /* Fixed height for circle */
+    -fx-text-fill: white;       /* Text color */
+    -fx-font-size: 14px;        /* Smaller font size */
+    -fx-alignment: center;      /* Center the text inside the button */
+    -fx-cursor: hand;           /* Change cursor on hover */
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.25), 5, 0, 2, 2); /* Add a slight shadow */
+    -fx-transition: all 0.3s ease; /* Smooth transition */
+}
+
+/* Darker shade for pressed state */
+#plus:pressed {
+    -fx-background-color: #4682B4; /* Darker blue */
+    -fx-effect: none; /* Remove shadow on press */
+    -fx-translate-y: 2px; /* Create press effect by shifting down */
+}
+
+#minus:pressed {
+    -fx-background-color: #CD5C5C; /* Darker shade of light salmon */
+    -fx-effect: none; /* Remove shadow on press */
+    -fx-translate-y: 2px; /* Create press effect by shifting down */
+}
+
+#plus:hover, #minus:hover {
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 7, 0, 3, 3); /* Enhanced shadow on hover */
 }

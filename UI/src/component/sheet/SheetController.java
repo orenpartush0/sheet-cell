@@ -1,6 +1,7 @@
-package scene.sheet;
+package component.sheet;
 
 import dto.SheetDto;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -10,7 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import scene.app.AppController;
+import component.app.AppController;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
@@ -21,30 +22,25 @@ public class SheetController {
 
     private AppController appController;
 
-    @FXML
-    private ScrollPane borderPane;
+    @FXML private ScrollPane borderPane;
+    @FXML private GridPane gridPaneTop;
+    @FXML private GridPane gridPaneLeft;
+    @FXML private GridPane gridPaneSheet;
+    @FXML public ScrollPane upDownScroller;
+    @FXML public ScrollPane rightLeftScroller;
 
-    @FXML
-    private GridPane gridPaneTop;
 
-    @FXML
-    private GridPane gridPaneLeft;
-
-    @FXML
-    private GridPane gridPaneSheet;
-
-    @FXML
-    public ScrollPane upDownScroller;
-
-    @FXML
-    public ScrollPane rightLeftScroller;
-
+    private final SimpleStringProperty color = new SimpleStringProperty("");
 
     public void initialize() {
         upDownScroller.vvalueProperty().addListener((obs, oldVal, newVal) -> gridPaneLeft.setLayoutY(-newVal.doubleValue() * (gridPaneSheet.getHeight() - upDownScroller.getViewportBounds().getHeight())));
         rightLeftScroller.hvalueProperty().addListener((obs, oldVal, newVal) -> {
             gridPaneTop.setLayoutX(Math.max(0, -newVal.doubleValue() * (gridPaneSheet.getWidth() - rightLeftScroller.getViewportBounds().getWidth())));
         });
+    }
+
+    void setColor(String color) {
+        this.color.set(color);
     }
 
     public void setAppController(AppController appController) {
@@ -98,6 +94,7 @@ public class SheetController {
         } catch (LoopConnectionException e) {
             showError(e.getMessage());
         }
+
         fillSheet(appController.GetSheet());
 
     }
@@ -119,10 +116,15 @@ public class SheetController {
     }
 
     public void PaintCells(List<Coordinate> coordinateList,String color){
+        removePaint();
         gridPaneSheet.getChildren().forEach(node -> {
             if(coordinateList.contains(CoordinateFactory.getCoordinate(node.getId()))){
                 node.setStyle("-fx-border-color: " + color + "; -fx-border-width: 2px;");
             }
         });
+    }
+
+    public void removePaint(){
+        gridPaneSheet.getChildren().forEach(node -> node.setStyle("-fx-border-color: white ; -fx-border-width: 2px;"));
     }
 }

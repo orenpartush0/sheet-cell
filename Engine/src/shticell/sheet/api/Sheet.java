@@ -29,11 +29,13 @@ public interface Sheet extends Serializable {
 
     SheetImpl GetSheetByVersion(int version);
 
-    int getColsWidth();
+    int GetColsWidth();
 
-    int getRowsHeight();
+    int GetRowsHeight();
 
     Range GetRangeDto(String rangeName);
 
     void AddRange(Range rangeDto);
+
+    List<Range> GetRangesDto();
 }
