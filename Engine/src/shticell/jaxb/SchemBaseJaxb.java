@@ -4,6 +4,7 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
 import shticell.jaxb.schema.STLCell;
+import shticell.jaxb.schema.STLRange;
 import shticell.jaxb.schema.STLSheet;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.cell.connection.CanRemoveFromDependsOn;
@@ -13,6 +14,7 @@ import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.CellOutOfSheetException;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.impl.SheetImpl;
+import shticell.sheet.range.Range;
 
 import java.io.InputStream;
 import java.util.*;
@@ -50,6 +52,8 @@ public class SchemBaseJaxb {
             res = new SheetImpl(sheet.getName(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns(),
                     sheet.getSTLLayout().getSTLSize().getRowsHeightUnits(),sheet.getSTLLayout().getSTLSize().getColumnWidthUnits());
 
+            createRanges(sheet,sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns(),res);
+
             List<STLCell> creationOrder = getCreationCellsList(sheet.getSTLCells().getSTLCell(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
             creationOrder.forEach(cell-> {
                 try {
@@ -64,6 +68,32 @@ public class SchemBaseJaxb {
         }
         return res;
 
+    }
+    private static void createRanges (STLSheet sheet,int rows,int cols,Sheet resSheet) {
+        List <STLRange> ranges = new ArrayList<STLRange>(sheet.getSTLRanges().getSTLRange());
+        Set <String> rangesName = new HashSet<>();
+        ranges.forEach(r->{
+            if(rangesName.contains(r.getName())) {
+                throw new RuntimeException("Duplicate range " + r.getName());
+            }
+            rangesName.add(r.getName());
+            try {
+                checkRange(r.getSTLBoundaries().getFrom(),r.getSTLBoundaries().getTo(),rows,cols);
+            } catch (CellOutOfSheetException e) {
+                throw new RuntimeException(e.getMessage() + "boundary of range " + r.getName() + "is out of sheet");
+            }
+            resSheet.AddRange(new Range(r.getName(),CoordinateFactory.getCoordinate(r.getSTLBoundaries().getFrom())
+                    ,CoordinateFactory.getCoordinate(r.getSTLBoundaries().getTo())));
+
+        });
+
+    }
+
+    private static void checkRange(String from, String to,int rows,int cols) throws CellOutOfSheetException {
+        Coordinate fromCord = CoordinateFactory.getCoordinate(from);
+        Coordinate toCord = CoordinateFactory.getCoordinate(to);
+        checkCoordinateInSheet(rows,cols,fromCord.row(),fromCord.col());
+        checkCoordinateInSheet(rows,cols,toCord.row(),toCord.col());
     }
 
     private static List<STLCell> getCreationCellsList(List<STLCell> cellsList,int rows, int columns) throws LoopConnectionException {

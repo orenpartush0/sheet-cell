@@ -29,3 +29,5 @@ bin/
 .DS_Store
 
 lib
+/test/noa
+/test/Noaa

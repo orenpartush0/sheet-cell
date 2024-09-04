@@ -1,4 +1,4 @@
-package shticell.expression.impl.operationexpression;
+package shticell.expression.impl.MathematicalExpressions;
 
 import shticell.expression.api.Expression;
 import shticell.sheet.cell.value.EffectiveValue;
@@ -13,12 +13,17 @@ public class DivideExpression implements Expression {
         }
         EffectiveValue leftVal = expressions[0].eval();
         EffectiveValue rightVal = expressions[1].eval();
+        try{
 
-        if(rightVal.getValueWithExpectation(Double.class) == 0){
-            throw new ArithmeticException("Cant divide by zero");
+            if(rightVal.getValueWithExpectation(Double.class) == 0){
+                throw new ArithmeticException("Cant divide by zero");
+            }
+
+            return new EffectiveValueImpl(leftVal.getValueWithExpectation(Double.class) /
+                    rightVal.getValueWithExpectation(double.class), ValueType.NUMERIC);
         }
-
-        return new EffectiveValueImpl(leftVal.getValueWithExpectation(Double.class) /
-                rightVal.getValueWithExpectation(double.class), ValueType.NUMERIC);
+        catch(IllegalArgumentException e){
+            throw new ArithmeticException();
+        }
     }
 }

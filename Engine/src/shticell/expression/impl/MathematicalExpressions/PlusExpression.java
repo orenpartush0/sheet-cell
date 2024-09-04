@@ -1,4 +1,4 @@
-package shticell.expression.impl.operationexpression;
+package shticell.expression.impl.MathematicalExpressions;
 
 import shticell.expression.api.Expression;
 import shticell.sheet.cell.value.EffectiveValue;
@@ -13,7 +13,12 @@ public class PlusExpression implements Expression {
         }
         EffectiveValue leftVal = expressions[0].eval();
         EffectiveValue rightVal = expressions[1].eval();
-        return new EffectiveValueImpl(leftVal.getValueWithExpectation(Double.class) +
-                rightVal.getValueWithExpectation(Double.class), ValueType.NUMERIC);
+        try {
+            return new EffectiveValueImpl(leftVal.getValueWithExpectation(Double.class) +
+                    rightVal.getValueWithExpectation(Double.class), ValueType.NUMERIC);
+        }
+        catch (IllegalArgumentException e){
+            throw new ArithmeticException();
+        }
     }
 }
