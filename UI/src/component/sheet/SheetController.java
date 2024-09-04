@@ -1,7 +1,10 @@
 package component.sheet;
 
+import component.sheet.Enum.PropType;
 import dto.SheetDto;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -16,6 +19,7 @@ import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SheetController {
@@ -30,17 +34,24 @@ public class SheetController {
     @FXML public ScrollPane rightLeftScroller;
 
 
-    private final SimpleStringProperty color = new SimpleStringProperty("");
+    private final SimpleStringProperty dependsOnColor = new SimpleStringProperty("white");
+    private final List<StringProperty> bindToDependsOnColor = new ArrayList<>();
+    private final SimpleStringProperty influenceOnColor = new SimpleStringProperty("white");
+    private final List<StringProperty> bindToInfluenceOnColor = new ArrayList<>();
+    private final SimpleStringProperty colorProp = new SimpleStringProperty("white");
+    private final List<StringProperty> bindToColorProp = new ArrayList<>();
+
 
     public void initialize() {
         upDownScroller.vvalueProperty().addListener((obs, oldVal, newVal) -> gridPaneLeft.setLayoutY(-newVal.doubleValue() * (gridPaneSheet.getHeight() - upDownScroller.getViewportBounds().getHeight())));
         rightLeftScroller.hvalueProperty().addListener((obs, oldVal, newVal) -> {
             gridPaneTop.setLayoutX(Math.max(0, -newVal.doubleValue() * (gridPaneSheet.getWidth() - rightLeftScroller.getViewportBounds().getWidth())));
         });
+
     }
 
-    void setColor(String color) {
-        this.color.set(color);
+    void setColor(SimpleStringProperty prop,String color) {
+        prop.set("-fx-border-color: " + color + "; -fx-border-width: 2px;");
     }
 
     public void setAppController(AppController appController) {
@@ -62,7 +73,11 @@ public class SheetController {
             cellField.setPrefHeight(30);
             cellField.setOnMouseClicked(event -> cellClicked(coordinate));
             cellField.setOnAction(event -> handleCellAction(cellField, coordinate));
-            cellField.setOnMouseReleased(event -> cellUnClicked(coordinate));
+            cellField.focusedProperty().addListener((obs, wasFocused, isNowFocused) -> {
+                if (!isNowFocused) {
+                    removePaint();
+                }
+            });
             cellField.setId(coordinate.toString());
             gridPaneSheet.add(cellField, coordinate.col() , coordinate.row());
         });
@@ -111,20 +126,47 @@ public class SheetController {
         appController.cellClicked(coordinate);
     }
 
-    private void cellUnClicked(Coordinate coordinate){
-        gridPaneSheet.getChildren().forEach(node->node.setStyle("-fx-border-color: white; -fx-border-width: 2px;"));
-    }
-
-    public void PaintCells(List<Coordinate> coordinateList,String color){
-        removePaint();
+    public void Paint(List<Coordinate> coordinateList,String color,PropType propType){
+        SimpleStringProperty styleProp = getProp(propType);
+        List<StringProperty> bindingToProp = getBindingsToProp(propType);
         gridPaneSheet.getChildren().forEach(node -> {
             if(coordinateList.contains(CoordinateFactory.getCoordinate(node.getId()))){
-                node.setStyle("-fx-border-color: " + color + "; -fx-border-width: 2px;");
+                node.styleProperty().bind(styleProp);
+                bindingToProp.add(node.styleProperty());
             }
         });
+
+        setColor(styleProp,color);
     }
 
+
     public void removePaint(){
-        gridPaneSheet.getChildren().forEach(node -> node.setStyle("-fx-border-color: white ; -fx-border-width: 2px;"));
+        setColor(dependsOnColor,"white");
+        setColor(influenceOnColor,"white");
+        setColor(colorProp,"white");
+        bindToColorProp.forEach(Property::unbind);
+        bindToDependsOnColor.forEach(Property::unbind);
+        bindToInfluenceOnColor.forEach(Property::unbind);
+        bindToDependsOnColor.clear();
+        bindToInfluenceOnColor.clear();
+        bindToColorProp.clear();
+
+    }
+
+    private SimpleStringProperty getProp(PropType prop){
+        return switch (prop) {
+            case PropType.INFLUENCE_ON -> influenceOnColor;
+            case PropType.DEPENDS_ON -> dependsOnColor;
+            case PropType.COLOR -> colorProp;
+        };
+    }
+
+    private List<StringProperty> getBindingsToProp(PropType prop){
+        return switch (prop) {
+            case PropType.INFLUENCE_ON -> bindToInfluenceOnColor;
+            case PropType.DEPENDS_ON -> bindToDependsOnColor;
+            case PropType.COLOR -> bindToColorProp;
+        };
+
     }
 }

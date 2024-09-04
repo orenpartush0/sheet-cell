@@ -1,5 +1,6 @@
 package component.app;
 
+import component.sheet.Enum.PropType;
 import connector.Connector;
 import dto.SheetDto;
 import javafx.application.Platform;
@@ -78,12 +79,12 @@ public class AppController {
         topComponentController.setOnMouseCoordinate(connector.GetCellByCoordinate(coordinate));
         List<Coordinate> influenceOn = connector.getSheet().cells().get(coordinate).influenceOn();
         List<Coordinate> dependsOn = connector.getSheet().cells().get(coordinate).dependsOn();
-        sheetComponentController.PaintCells(influenceOn,"Green");
-        sheetComponentController.PaintCells(dependsOn,"Blue");
+        sheetComponentController.Paint(influenceOn,"Green", PropType.INFLUENCE_ON);
+        sheetComponentController.Paint(dependsOn,"Blue",PropType.DEPENDS_ON);
     }
 
     public void PaintCells(List<Coordinate> coordinates,String color){
-        sheetComponentController.PaintCells(coordinates,color);
+        sheetComponentController.Paint(coordinates,color,PropType.COLOR);
     }
 
     public void addRange(String rangeName,Coordinate startCoordinate,Coordinate endCoordinate){
