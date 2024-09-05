@@ -17,7 +17,7 @@ public class PercentExpression implements Expression {
         EffectiveValue whole = expressions[1].eval();
 
         try{
-        if(whole.getValueWithExpectation(double.class) == 0){
+        if(whole.getValueWithExpectation(Double.class) == 0){
             throw new ArithmeticException("Can't calculate percent with 0");
         }
             return new EffectiveValueImpl(part.getValueWithExpectation(Double.class) /

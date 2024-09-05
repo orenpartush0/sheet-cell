@@ -29,18 +29,12 @@ public class SumExpression  implements Expression {
                 throw new RuntimeException("Unknown range");
             }
 
-//            double sum =range.getRangeCellsCoordinate().
-//                    stream().
-//                    filter(coordinate -> hasSheetData.GetCellEffectiveValue(coordinate).getValueType() == ValueType.NUMERIC).
-//                    mapToDouble(coordinate->hasSheetData.GetCellEffectiveValue(coordinate).getValueWithExpectation(double.class)).
-//                    sum();
+            double sum =range.getRangeCellsCoordinate().
+                    stream().
+                    filter(coordinate -> hasSheetData.GetCellEffectiveValue(coordinate).getValueType() == ValueType.NUMERIC).
+                    mapToDouble(coordinate->hasSheetData.GetCellEffectiveValue(coordinate).getValueWithExpectation(Double.class)).
+                    sum();
 
-            double sum = 0;
-            for(Coordinate coor : range.getRangeCellsCoordinate()){
-                if(hasSheetData.GetCellEffectiveValue(coor).getValueType() == ValueType.NUMERIC){
-                    sum+=hasSheetData.GetCellEffectiveValue(coor).getValueWithExpectation(Double.class);
-                }
-            }
 
             range.getRangeCellsCoordinate().
                     forEach(coordinate -> {
