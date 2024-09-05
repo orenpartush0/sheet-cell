@@ -29,7 +29,7 @@ public class SumExpression  implements Expression {
                 throw new RuntimeException("Unknown range");
             }
 
-            double sum =range.getRangeCellsCoordinate().
+            Double sum =range.getRangeCellsCoordinate().
                     stream().
                     filter(coordinate -> hasSheetData.GetCellEffectiveValue(coordinate).getValueType() == ValueType.NUMERIC).
                     mapToDouble(coordinate->hasSheetData.GetCellEffectiveValue(coordinate).getValueWithExpectation(Double.class)).
@@ -43,7 +43,7 @@ public class SumExpression  implements Expression {
                     });
 
 
-            return new EffectiveValueImpl(sum, ValueType.STRING);
+            return new EffectiveValueImpl(sum, ValueType.NUMERIC);
         }
     }
 }
