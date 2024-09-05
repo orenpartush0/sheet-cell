@@ -6,6 +6,7 @@ import shticell.sheet.cell.connection.CellConnection;
 import shticell.sheet.cell.value.EffectiveValue;
 import shticell.sheet.cell.value.EffectiveValueImpl;
 import shticell.sheet.cell.value.ValueType;
+import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.range.Range;
 
 public class SumExpression  implements Expression {
@@ -28,11 +29,18 @@ public class SumExpression  implements Expression {
                 throw new RuntimeException("Unknown range");
             }
 
-            double sum =range.getRangeCellsCoordinate().
-                    stream().
-                    filter(coordinate -> hasSheetData.GetCellEffectiveValue(coordinate).getValueType() == ValueType.NUMERIC).
-                    mapToDouble(coordinate->hasSheetData.GetCellEffectiveValue(coordinate).getValueWithExpectation(double.class)).
-                    sum();
+//            double sum =range.getRangeCellsCoordinate().
+//                    stream().
+//                    filter(coordinate -> hasSheetData.GetCellEffectiveValue(coordinate).getValueType() == ValueType.NUMERIC).
+//                    mapToDouble(coordinate->hasSheetData.GetCellEffectiveValue(coordinate).getValueWithExpectation(double.class)).
+//                    sum();
+
+            double sum = 0;
+            for(Coordinate coor : range.getRangeCellsCoordinate()){
+                if(hasSheetData.GetCellEffectiveValue(coor).getValueType() == ValueType.NUMERIC){
+                    sum+=hasSheetData.GetCellEffectiveValue(coor).getValueWithExpectation(Double.class);
+                }
+            }
 
             range.getRangeCellsCoordinate().
                     forEach(coordinate -> {

@@ -20,7 +20,7 @@ public class DivideExpression implements Expression {
             }
 
             return new EffectiveValueImpl(leftVal.getValueWithExpectation(Double.class) /
-                    rightVal.getValueWithExpectation(double.class), ValueType.NUMERIC);
+                    rightVal.getValueWithExpectation(Double.class), ValueType.NUMERIC);
         }
         catch(IllegalArgumentException e){
             throw new ArithmeticException();

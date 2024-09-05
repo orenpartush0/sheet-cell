@@ -6,9 +6,9 @@ import shticell.sheet.cell.value.EffectiveValueImpl;
 import shticell.sheet.cell.value.ValueType;
 
 public class BooleanExpression implements Expression {
-    private final boolean expression;
+    private final Boolean expression;
 
-    public BooleanExpression(boolean expression) {
+    public BooleanExpression(Boolean expression) {
         this.expression = expression;
     }
 

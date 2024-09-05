@@ -16,7 +16,7 @@ public class MinusExpression implements Expression{
         EffectiveValue rightVal = expressions[1].eval();
         try{
             return new EffectiveValueImpl(leftVal.getValueWithExpectation(Double.class) -
-                    rightVal.getValueWithExpectation(double.class), ValueType.NUMERIC);
+                    rightVal.getValueWithExpectation(Double.class), ValueType.NUMERIC);
         }
         catch (IllegalArgumentException e){
             throw new ArithmeticException();

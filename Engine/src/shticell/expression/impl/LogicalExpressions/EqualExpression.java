@@ -15,13 +15,12 @@ public class EqualExpression implements Expression {
         EffectiveValue leftVal = expressions[0].eval();
         EffectiveValue rightVal = expressions[1].eval();
 
-        if(leftVal.getValueType() != rightVal.getValueType()){
-            return new EffectiveValueImpl(false , ValueType.BOOLEAN);
-        }
-        if(leftVal.getValue() == rightVal.getValue()){
+        if(leftVal.getValueType().equals(rightVal.getValueType())){
             return new EffectiveValueImpl(true , ValueType.BOOLEAN);
         }
-        return new EffectiveValueImpl(false, ValueType.BOOLEAN);
+        else{
+            return new EffectiveValueImpl(false , ValueType.BOOLEAN);
+        }
     }
 
 

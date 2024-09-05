@@ -8,7 +8,7 @@ import shticell.sheet.cell.value.ValueType;
 public class IfExpression implements Expression {
     @Override
     public EffectiveValue eval(Expression... expressions) {
-        if(expressions.length != 3){
+        if(expressions.length != 3 || expressions[1].eval().getValueType() != expressions[2].eval().getValueType()){
             throw new UnsupportedOperationException("If must have 3 expressions");
         }
 
@@ -16,11 +16,10 @@ public class IfExpression implements Expression {
 
         Boolean conditionValue = condition.getValueWithExpectation(Boolean.class);
         if(conditionValue){
-            return expressions[1].eval();
+            return new EffectiveValueImpl(expressions[1].eval().getValue(),expressions[1].eval().getValueType());
         }
         else{
-            return expressions[2].eval();
+            return new EffectiveValueImpl(expressions[2].eval().getValue(),expressions[2].eval().getValueType());
         }
-
     }
 }

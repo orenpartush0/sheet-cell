@@ -34,7 +34,7 @@ public class AverageExpression  implements Expression {
             OptionalDouble avg =range.getRangeCellsCoordinate().
                     stream().
                     filter(coordinate -> hasSheetData.GetCellEffectiveValue(coordinate).getValueType() == ValueType.NUMERIC).
-                    mapToDouble(coordinate->hasSheetData.GetCellEffectiveValue(coordinate).getValueWithExpectation(double.class)).
+                    mapToDouble(coordinate->hasSheetData.GetCellEffectiveValue(coordinate).getValueWithExpectation(Double.class)).
                     average();
 
             range.getRangeCellsCoordinate().
@@ -44,7 +44,7 @@ public class AverageExpression  implements Expression {
                     });
 
 
-            return new EffectiveValueImpl(avg, ValueType.STRING);
+            return new EffectiveValueImpl(avg.getAsDouble(), ValueType.NUMERIC);
         }
     }
 }
