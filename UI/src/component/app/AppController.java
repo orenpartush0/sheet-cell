@@ -2,6 +2,7 @@ package component.app;
 
 import component.sheet.Enum.PropType;
 import connector.Connector;
+import dto.CellDto;
 import dto.SheetDto;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -106,6 +107,19 @@ public class AppController {
 
     public void removePaint(){
         sheetComponentController.removePaint();
+    }
+
+    public List<String> createFilter(Coordinate startCell, Coordinate endCell, String col){
+         return connector.createNewFilter(startCell,endCell,col);
+
+    }
+
+    public List<String> setFilterCol(String col){
+        return connector.setFilterCol(col);
+    }
+
+    public List<CellDto> applyFilter(String ... vals){
+        return connector.applyFilter(vals);
     }
 
 }

@@ -45,6 +45,8 @@
 
         <Button fx:id= "minus" text="-" style="-fx-background-color:  #FFA07A;" />
 
+        <Button fx:id="addFilter" text="Add Filter" onAction="#addFilter" style="-fx-background-color: lightgray;"  />
+
         <Region HBox.hgrow="ALWAYS" />
 
         <ComboBox fx:id="SheetVersionComboBox" promptText="Sheet Version" />

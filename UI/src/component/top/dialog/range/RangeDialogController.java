@@ -40,10 +40,6 @@ public class RangeDialogController {
         dialogStage.close();
     }
 
-    @FXML
-    private void handleCancel() {
-        dialogStage.close();
-    }
 
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
@@ -100,4 +96,5 @@ public class RangeDialogController {
         return startPointCoordinate.row() <= endPointCoordinate.row()
                 && startPointCoordinate.col() <= endPointCoordinate.col();
     }
+
 }

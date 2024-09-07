@@ -1,6 +1,5 @@
 package shticell.sheet.util;
 
-import dto.CellDto;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
@@ -9,15 +8,15 @@ import shticell.sheet.range.Range;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class filter {
+public class Filter {
     private final List<Coordinate> coordinatesInRange;
     private int col;
     private Sheet sheet;
     private final List<String> filterdValues = new ArrayList<>();
 
-    public filter(String col, String upperLeft, String lowerRight) {
+    public Filter(String col, Coordinate upperLeft, Coordinate lowerRight) {
         this.col = Integer.parseInt(String.valueOf(col.charAt(0)));
-        Range range = new Range("", CoordinateFactory.getCoordinate(upperLeft), CoordinateFactory.getCoordinate(lowerRight));
+        Range range = new Range("", upperLeft, lowerRight);
         coordinatesInRange = range.getRangeCellsCoordinate();
     }
 
@@ -60,7 +59,7 @@ public class filter {
         return relevantCoordinates;
     }
 
-    public List<Coordinate> getFilterdCordinates(Range range) {
+    public List<Coordinate> getFilterdCordinates() {
         List <Coordinate> relevantRows = new ArrayList<>();
         getCellsFromRangeInColumn(this.col).forEach((coordinate) -> {
             if(filterdValues.stream().anyMatch((val)-> {

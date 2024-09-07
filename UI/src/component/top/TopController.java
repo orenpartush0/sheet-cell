@@ -1,6 +1,7 @@
 package component.top;
 
 import component.app.AppController;
+import component.top.dialog.filter.FilterDialogController;
 import component.top.dialog.sheet.SheetDialogController;
 import component.top.dialog.range.RangeDialogController;
 import dto.CellDto;
@@ -8,6 +9,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -51,6 +53,8 @@ public class TopController {
     private Button plus;
     @FXML
     private Button minus;
+    @FXML
+    private Button addFilter;
 
 
     private final SimpleBooleanProperty isSheetLoaded = new SimpleBooleanProperty(false);
@@ -78,6 +82,7 @@ public class TopController {
         SheetVersionComboBox.setVisibleRowCount(5);
         plus.disableProperty().bind(isSheetLoaded.not());
         minus.disableProperty().bind(isSheetLoaded.not());
+        addFilter.disableProperty().bind(isSheetLoaded.not());
         pathTextField.styleProperty().unbind();
     }
 
@@ -167,6 +172,21 @@ public class TopController {
         originalValue.set(cell.originalValue());
         lastUpdate.set(cell.LatestSheetVersionUpdated());
     }
+    @FXML
+    public void addFilter() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/component/top/dialog/filter/createFilterDialog.fxml"));
+        Parent root  = loader.load();
+        FilterDialogController controller = loader.getController();
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.WINDOW_MODAL);
+        dialogStage.setScene(new Scene(root));
+        dialogStage.setTitle("Filter");
+        controller.setDialogStage(dialogStage);
+        controller.setAppController(appController);
+        dialogStage.showAndWait();
+
+
+    }
 
     @FXML
     public void addRangeAction() throws IOException {
@@ -202,4 +222,6 @@ public class TopController {
     private void clearRangeComboBox(){
         rangesComboBox.getItems().clear();
     }
+
+
 }
