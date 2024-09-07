@@ -1,5 +1,7 @@
 package shticell.sheet.impl;
 
+import com.sun.codemodel.JForEach;
+import dto.CellDto;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.api.HasSheetData;
 import shticell.sheet.api.SheetToXML;
@@ -14,6 +16,7 @@ import shticell.sheet.range.Range;
 
 import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable {
@@ -173,4 +176,9 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     public List<Range> GetRangesDto(){
         return ranges.values().stream().toList();
     }
+
+
+
+
 }
+
