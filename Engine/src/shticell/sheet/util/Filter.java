@@ -14,16 +14,17 @@ public class Filter {
     private Sheet sheet;
     private final List<String> filterdValues = new ArrayList<>();
 
-    public Filter(String col, Coordinate upperLeft, Coordinate lowerRight) {
-        this.col = Integer.parseInt(String.valueOf(col.charAt(0)));
+    public Filter(String col, Coordinate upperLeft, Coordinate lowerRight,Sheet sheet) {
+        this.col = (int)col.toUpperCase().charAt(0)- (int)'A'+1;
         Range range = new Range("", upperLeft, lowerRight);
         coordinatesInRange = range.getRangeCellsCoordinate();
+        this.sheet = sheet;
     }
 
     public List<String> getValuesInColumn() {
         List<String>relevantValues = new ArrayList<>();
         coordinatesInRange.forEach(((coordinate) -> {
-            if(coordinate.col() == this.col && Objects.equals(sheet.GetCell(coordinate).GetOriginalValue(), "")) {
+            if(coordinate.col() == this.col && !Objects.equals(sheet.GetCell(coordinate).GetOriginalValue(),"")) {
                 relevantValues.add(sheet.GetCell(coordinate).GetEffectiveValue().toString());
             }
 
@@ -32,11 +33,11 @@ public class Filter {
     }
 
     public void Setcol(String col){
-        this.col = Integer.parseInt(String.valueOf(col.charAt(0)));
+        this.col = this.col = (int)col.toUpperCase().charAt(0)- (int)'A'+1;
     }
 
-    public void AddFilterValues(String ... args) {
-        filterdValues.addAll(Arrays.asList(args));
+    public void AddFilterValues(List<String>vals) {
+        filterdValues.addAll(vals);
     }
 
     private List<Coordinate> getCellsFromRangeInRow(int row) {

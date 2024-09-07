@@ -1,17 +1,24 @@
 package component.top.dialog.filter;
 
 import component.app.AppController;
+import dto.CellDto;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.stage.Stage;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FilterDialogController {
+    public Button okButton;
     private AppController appController;
     public TextField startPointField;
     public TextField endPointField;
@@ -23,6 +30,7 @@ public class FilterDialogController {
     private Stage dialogStage;
 
     private boolean firstTime = true;
+    private Map<String, Boolean> checkedItems = new HashMap<>();
 
     public  void handelOK(){
         if(isInputValid()){
@@ -81,6 +89,10 @@ public class FilterDialogController {
 
     public void setValuesComboBox (List<String> valuesList){
         ValuesComboBox.getItems().addAll(valuesList);
+        ValuesComboBox.setCellFactory(lv -> new CheckBoxListCell<>(item -> new SimpleBooleanProperty(false)));
+        ValuesComboBox.setButtonCell(new CheckBoxListCell<>(item -> new SimpleBooleanProperty(false)));
+        valuesList.forEach(val-> checkedItems.put(val,false));
+
     }
 
     private void clearValuesComboBox(){
@@ -102,13 +114,28 @@ public class FilterDialogController {
      }
 
      public void ApplyFilter(){
+        List<String> valuesList = new ArrayList<>();
+        checkedItems.forEach((val, checked) -> {
+            if(checked){
+                valuesList.add(val);
+            }
+        });
+         List<CellDto> temp = appController.applyFilter(valuesList);
+         List<Coordinate>coordinates = new ArrayList<>();
+         temp.forEach(c->coordinates.add(c.coordinate()));
+        appController.PaintCells(coordinates,"pink");
 
+     }
+
+     public void handelValueSelected(String value){
+         checkedItems.compute(value, (k, checked) -> !checked);
      }
 
      @FXML
     public void handeCancel(){
         dialogStage.close();
      }
+
 
 
 }

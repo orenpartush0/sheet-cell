@@ -30,7 +30,7 @@ public class Connector {
     }
 
     public List<String> createNewFilter(Coordinate start,Coordinate end, String col) {
-        this.filter = new Filter(col,start,end);
+        this.filter = new Filter(col,start,end,sheet);
         return filter.getValuesInColumn();
     }
 
@@ -39,7 +39,7 @@ public class Connector {
         return filter.getValuesInColumn();
     }
 
-    public List<CellDto> applyFilter(String ... values){
+    public List<CellDto> applyFilter(List<String> values) {
         filter.AddFilterValues(values);
         List<Coordinate> filterdCordinates = filter.getFilterdCordinates();
         return filterdCordinates.stream()

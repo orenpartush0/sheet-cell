@@ -20,7 +20,7 @@
 
     <Label text ="Key column:" GridPane.rowIndex="3"/>
     <TextField fx:id="KeyColumnFiled" onAction="#keyColumnChanged" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-    <Button text="OK" fx:id="okButton" onAction="#handelOK"/>
+    <Button text="OK" fx:id="okButton" onAction="#handelOK" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
 
     <ComboBox fx:id="ValuesComboBox" promptText="Values" GridPane.rowIndex="4"/>
     <TextField fx:id="SelectedValues" GridPane.columnIndex="1" GridPane.rowIndex="4"/>

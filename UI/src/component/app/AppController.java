@@ -118,7 +118,7 @@ public class AppController {
         return connector.setFilterCol(col);
     }
 
-    public List<CellDto> applyFilter(String ... vals){
+    public List<CellDto> applyFilter(List<String> vals){
         return connector.applyFilter(vals);
     }
 
