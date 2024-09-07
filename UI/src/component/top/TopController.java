@@ -184,11 +184,6 @@ public class TopController {
         controller.setDialogStage(dialogStage);
         controller.setAppController(appController);
         dialogStage.showAndWait();
-        controller.ValuesComboBox.setOnAction(event -> {
-            String selectedValue = (String) controller.ValuesComboBox.getValue();
-            if (selectedValue != null) {
-                controller.handelValueSelected(selectedValue);
-            }});
     }
 
     @FXML

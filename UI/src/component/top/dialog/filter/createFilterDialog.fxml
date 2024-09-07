@@ -23,7 +23,6 @@
     <Button text="OK" fx:id="okButton" onAction="#handelOK" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
 
     <ComboBox fx:id="ValuesComboBox" promptText="Values" GridPane.rowIndex="4"/>
-    <TextField fx:id="SelectedValues" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
 
     <HBox spacing="10" GridPane.rowIndex="5" GridPane.columnSpan="2" alignment="center">
         <Button text="Apply Filter" onAction="#ApplyFilter" fx:id="ApplyFilter" />

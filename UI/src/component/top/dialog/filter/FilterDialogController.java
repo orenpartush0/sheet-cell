@@ -5,6 +5,7 @@ import dto.CellDto;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxListCell;
@@ -30,11 +31,13 @@ public class FilterDialogController {
     private Stage dialogStage;
 
     private boolean firstTime = true;
+    private SimpleBooleanProperty canApplyFilter = new SimpleBooleanProperty(false);
     private Map<String, Boolean> checkedItems = new HashMap<>();
 
     public  void handelOK(){
         if(isInputValid()){
             keyColumnChanged();
+
         }
     }
 
@@ -124,11 +127,11 @@ public class FilterDialogController {
          List<Coordinate>coordinates = new ArrayList<>();
          temp.forEach(c->coordinates.add(c.coordinate()));
         appController.PaintCells(coordinates,"pink");
-
      }
 
      public void handelValueSelected(String value){
          checkedItems.compute(value, (k, checked) -> !checked);
+         canApplyFilter.set(checkedItems.containsValue(true));
      }
 
      @FXML
