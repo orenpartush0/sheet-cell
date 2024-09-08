@@ -269,7 +269,6 @@ public class TopController {
         borderPane.setTop(gridPaneTop);
 
         Stage newStage = new Stage();
-        newStage.setTitle("New Sheet Window");
 
         Scene scene = new Scene(borderPane, 800, 600);
         newStage.setScene(scene);
