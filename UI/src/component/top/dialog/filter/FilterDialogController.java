@@ -3,12 +3,14 @@ package component.top.dialog.filter;
 import component.app.AppController;
 import dto.CellDto;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.CheckBoxListCell;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
@@ -19,27 +21,18 @@ import java.util.List;
 import java.util.Map;
 
 public class FilterDialogController {
-    public Button okButton;
-    private AppController appController;
-    public TextField startPointField;
-    public TextField endPointField;
-    public TextField KeyColumnFiled;
-    public ComboBox ValuesComboBox;
-    public TextField SelectedValues;
-    public Button ApplyFilter;
-    public Button cancelButton;
-    private Stage dialogStage;
+    @FXML public Button okButton;
+    @FXML private AppController appController;
+    @FXML public TextField startPointField;
+    @FXML public TextField endPointField;
+    @FXML public TextField KeyColumnFiled;
+    @FXML public ListView<String> valuesListView;
+    @FXML public Button ApplyFilter;
+    @FXML public Button cancelButton;
+    @FXML private Stage dialogStage;
 
     private boolean firstTime = true;
-    private SimpleBooleanProperty canApplyFilter = new SimpleBooleanProperty(false);
-    private Map<String, Boolean> checkedItems = new HashMap<>();
-
-    public  void handelOK(){
-        if(isInputValid()){
-            keyColumnChanged();
-
-        }
-    }
+    private final Map<String, SimpleBooleanProperty> checked = new HashMap<>();
 
     public void setAppController(AppController appController) {
         this.appController = appController;
@@ -91,54 +84,84 @@ public class FilterDialogController {
     }
 
     public void setValuesComboBox (List<String> valuesList){
-        ValuesComboBox.getItems().addAll(valuesList);
-        ValuesComboBox.setCellFactory(lv -> new CheckBoxListCell<>(item -> new SimpleBooleanProperty(false)));
-        ValuesComboBox.setButtonCell(new CheckBoxListCell<>(item -> new SimpleBooleanProperty(false)));
-        valuesList.forEach(val-> checkedItems.put(val,false));
 
-    }
+        ObservableList<String> observableList = FXCollections.observableArrayList(valuesList);
+        valuesListView.setItems(observableList);
 
-    private void clearValuesComboBox(){
-        ValuesComboBox.getItems().clear();
-    }
-     @FXML
-    public void keyColumnChanged(){
-        clearValuesComboBox();
-        Coordinate startPointCoordinate = getStartPoint();
-        Coordinate endPointCoordinate = getEndPoint();
-        String col = getKeyColumnFiled();
-        if(firstTime){
-            setValuesComboBox(appController.createFilter(startPointCoordinate, endPointCoordinate, col));
-            firstTime = false;
-        }
-        else{
-            setValuesComboBox(appController.setFilterCol(col));
-        }
-     }
+        valuesListView.setCellFactory(param -> new ListCell<String>() {
+            private final Label label = new Label();
+            private final CheckBox checkBox = new CheckBox();
+            private final HBox hbox = new HBox(label, checkBox);
 
-     public void ApplyFilter(){
-        List<String> valuesList = new ArrayList<>();
-        checkedItems.forEach((val, checked) -> {
-            if(checked){
-                valuesList.add(val);
+            {
+                hbox.setSpacing(10);
+                hbox.setAlignment(Pos.CENTER_LEFT); // Align items to the left
+                setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
             }
-        });
-         List<CellDto> temp = appController.applyFilter(valuesList);
-         List<Coordinate>coordinates = new ArrayList<>();
-         temp.forEach(c->coordinates.add(c.coordinate()));
-        appController.PaintCells(coordinates,"pink");
-     }
 
-     public void handelValueSelected(String value){
-         checkedItems.compute(value, (k, checked) -> !checked);
-         canApplyFilter.set(checkedItems.containsValue(true));
-     }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else {
+                    label.setText(item);
+                    SimpleBooleanProperty selected = new SimpleBooleanProperty();
+                    checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                        @Override
+                        public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                            selected.set(newValue);
+                        }
+                    });
+                    checked.put(item, selected);
+                    setGraphic(hbox);
+                }
+            }
+       });
+    }
 
-     @FXML
-    public void handeCancel(){
-        dialogStage.close();
-     }
+            private void clearValuesComboBox() {
+                valuesListView.getItems().clear();
+            }
+
+            public void handelOK() {
+                if (isInputValid()) {
+                    keyColumnChanged();
+
+                }
+            }
+
+            @FXML
+            public void keyColumnChanged() {
+                clearValuesComboBox();
+                Coordinate startPointCoordinate = getStartPoint();
+                Coordinate endPointCoordinate = getEndPoint();
+                String col = getKeyColumnFiled();
+                if (firstTime) {
+                    setValuesComboBox(appController.createFilter(startPointCoordinate, endPointCoordinate, col));
+                    firstTime = false;
+                } else {
+                    setValuesComboBox(appController.setFilterCol(col));
+                }
+            }
+
+            public void ApplyFilter() {
+                List<String> valuesList = new ArrayList<>();
+                checked.forEach((val, checked) -> {
+                    if (checked.getValue()) {
+                        valuesList.add(val);
+                    }
+                });
+                List<CellDto> temp = appController.applyFilter(valuesList);
+                List<Coordinate> coordinates = new ArrayList<>();
+                temp.forEach(c -> coordinates.add(c.coordinate()));
+                appController.PaintCells(coordinates, "pink");
+            }
+
+            @FXML
+            public void handeCancel() {
+                dialogStage.close();
+            }
 
 
-
-}
+        }
