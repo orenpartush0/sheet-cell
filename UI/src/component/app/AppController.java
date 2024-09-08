@@ -40,6 +40,8 @@ public class AppController {
     public void importFile(String path) {
         try {
             connector.SetSheet(path);
+            topComponentController.clearVersion();
+            topComponentController.addVersion();
             fillSheet();
             topComponentController.setSaveButtonAble();
         }
@@ -65,14 +67,18 @@ public class AppController {
     public void createNewSheet(String sheetName, int numColumns, int numRows){
         connector.SetSheet(new SheetDto(sheetName,1,numColumns,numRows,1,1));
         fillSheet();
+        topComponentController.clearVersion();
+        topComponentController.addVersion();
         topComponentController.setSaveButtonAble();
     }
 
     public void updateCell(Coordinate coordinate,String value) throws LoopConnectionException {
+        topComponentController.addVersion();
         connector.UpdateCellByCoordinate(coordinate,value);
     }
 
     public SheetDto GetSheet(){
+
         return connector.getSheet();
     }
 
@@ -122,4 +128,8 @@ public class AppController {
         return connector.applyFilter(vals);
     }
 
+
+    public SheetDto getSheetByVersion(int version){
+        return connector.GetSheetByVersion(version);
+    }
 }

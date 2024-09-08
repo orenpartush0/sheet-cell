@@ -1,20 +1,26 @@
 package component.top;
 
 import component.app.AppController;
+import component.sheet.SheetController;
 import component.top.dialog.filter.FilterDialogController;
 import component.top.dialog.sheet.SheetDialogController;
 import component.top.dialog.range.RangeDialogController;
 import dto.CellDto;
+import dto.SheetDto;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -48,8 +54,6 @@ public class TopController {
     @FXML
     private ComboBox rangesComboBox;
     @FXML
-    private ComboBox SheetVersion;
-    @FXML
     private Button plus;
     @FXML
     private Button minus;
@@ -71,11 +75,11 @@ public class TopController {
         cellIdTextField.textProperty().bind(cellId);
         saveButton.disableProperty().bind(isSheetLoaded.not());
         rangesComboBox.setOnAction(event -> {
-            if(((String) rangesComboBox.getValue()).isEmpty()) {
+            if (((String) rangesComboBox.getValue()).isEmpty()) {
                 appController.removePaint();
-            }else{
+            } else {
                 appController.removePaint();
-                handleRangeSelected((String)rangesComboBox.getValue());
+                handleRangeSelected((String) rangesComboBox.getValue());
             }
         });
         rangesComboBox.setVisibleRowCount(5);
@@ -84,6 +88,13 @@ public class TopController {
         minus.disableProperty().bind(isSheetLoaded.not());
         addFilter.disableProperty().bind(isSheetLoaded.not());
         pathTextField.styleProperty().unbind();
+        SheetVersionComboBox.getItems().add("Version");
+        SheetVersionComboBox.setOnAction(event -> {
+            if (!SheetVersionComboBox.getValue().equals("Version")) {
+                handleVersionSelected((String) SheetVersionComboBox.getValue());
+                SheetVersionComboBox.setValue("Version");
+            }
+        });
     }
 
 
@@ -172,10 +183,11 @@ public class TopController {
         originalValue.set(cell.originalValue());
         lastUpdate.set(cell.LatestSheetVersionUpdated());
     }
+
     @FXML
     public void addFilter() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/component/top/dialog/filter/createFilterDialog.fxml"));
-        Parent root  = loader.load();
+        Parent root = loader.load();
         FilterDialogController controller = loader.getController();
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -214,12 +226,56 @@ public class TopController {
     public void addRangesToComboBox(List<String> ranges) {
         clearRangeComboBox();
         rangesComboBox.getItems().add("");
-        ranges.forEach(rangeName->rangesComboBox.getItems().add(rangeName));
+        ranges.forEach(rangeName -> rangesComboBox.getItems().add(rangeName));
     }
 
-    private void clearRangeComboBox(){
+    private void clearRangeComboBox() {
         rangesComboBox.getItems().clear();
     }
 
+    public void addVersion() {
+        SheetVersionComboBox.getItems().add(String.valueOf(SheetVersionComboBox.getItems().size()));
+    }
+
+    public void clearVersion() {
+        SheetVersionComboBox.getItems().clear();
+        SheetVersionComboBox.getItems().add("Version");
+    }
+
+    private void handleVersionSelected(String selectedItem) {
+        SheetDto sheet = appController.getSheetByVersion(Integer.parseInt(selectedItem));
+        createNewSheetInDifferentWindows(sheet);
+    }
+
+    public static void createNewSheetInDifferentWindows(SheetDto sheet) {
+        GridPane gridPaneSheet = new GridPane();
+        GridPane gridPaneLeft = new GridPane();
+        GridPane gridPaneTop = new GridPane();
+
+
+        sheet.cells().forEach((coordinate, cell) -> {
+            TextField cellField = new TextField(cell.effectiveValue().toString());
+            cellField.setPrefWidth(100);
+            cellField.setPrefHeight(30);
+            cellField.setId(coordinate.toString());
+            gridPaneSheet.add(cellField, coordinate.col(), coordinate.row());
+        });
+
+        SheetController.printRowAndColumnsLabels(sheet, gridPaneLeft, gridPaneTop);
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(gridPaneSheet);
+        borderPane.setLeft(gridPaneLeft);
+        borderPane.setTop(gridPaneTop);
+
+        Stage newStage = new Stage();
+        newStage.setTitle("New Sheet Window");
+
+        Scene scene = new Scene(borderPane, 800, 600);
+        newStage.setScene(scene);
+
+        newStage.show();
+    }
 
 }
+

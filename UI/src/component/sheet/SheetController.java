@@ -1,6 +1,7 @@
 package component.sheet;
 
 import component.sheet.Enum.PropType;
+import component.top.TopController;
 import dto.SheetDto;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleStringProperty;
@@ -63,6 +64,26 @@ public class SheetController {
         gridPaneTop.getChildren().clear();
         gridPaneLeft.getChildren().clear();
     }
+    public static void printRowAndColumnsLabels(SheetDto sheet, GridPane gridPaneLeft, GridPane gridPaneTop) {
+        for (int row = 1; row <= sheet.numberOfRows(); row++) {
+            Label rowLabel = new Label(String.valueOf(row));
+            rowLabel.setPrefWidth(50);
+            rowLabel.setPrefHeight(30);
+            rowLabel.setAlignment(Pos.CENTER);
+            gridPaneLeft.add(rowLabel, 0, row);
+            GridPane.setHalignment(rowLabel, HPos.CENTER);
+            GridPane.setValignment(rowLabel, VPos.CENTER);
+        }
+
+        for (int col = 0; col <= sheet.numberOfColumns(); col++) {
+            Label colLabel = new Label(Coordinate.getColumnLabel(col));
+            colLabel.setPrefWidth(100);
+            colLabel.setPrefHeight(30);
+            gridPaneTop.add(colLabel, col, 0);
+            GridPane.setHalignment(colLabel, HPos.CENTER);
+            GridPane.setValignment(colLabel, VPos.CENTER);
+        }
+    }
 
     public void fillSheet(SheetDto sheet) {
         clearSheet();
@@ -82,24 +103,7 @@ public class SheetController {
             gridPaneSheet.add(cellField, coordinate.col() , coordinate.row());
         });
 
-        for (int row = 1; row <= sheet.numberOfRows(); row++) {
-            Label rowLabel = new Label(String.valueOf(row));
-            rowLabel.setPrefWidth(50);
-            rowLabel.setPrefHeight(30);
-            rowLabel.setAlignment(Pos.CENTER);
-            gridPaneLeft.add(rowLabel, 0, row);
-            GridPane.setHalignment(rowLabel, HPos.CENTER);
-            GridPane.setValignment(rowLabel, VPos.CENTER);
-        }
-
-        for (int col = 0; col <= sheet.numberOfColumns(); col++) {
-            Label colLabel = new Label(Coordinate.getColumnLabel(col));
-            colLabel.setPrefWidth(100);
-            colLabel.setPrefHeight(30);
-            gridPaneTop.add(colLabel, col, 0);
-            GridPane.setHalignment(colLabel, HPos.CENTER);
-            GridPane.setValignment(colLabel, VPos.CENTER);
-        }
+        printRowAndColumnsLabels(sheet, gridPaneLeft, gridPaneTop);
     }
 
     private void handleCellAction(TextField cellField, Coordinate coordinate) {
