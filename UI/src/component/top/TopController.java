@@ -159,6 +159,9 @@ public class TopController {
         dialogStage.setTitle("Sheet Details");
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setScene(new Scene(root));
+
+        dialogStage.setHeight(240);
+
         controller.setDialogStage(dialogStage);
         dialogStage.showAndWait();
         if (controller.isOkClicked()) {
@@ -169,6 +172,7 @@ public class TopController {
             isSheetLoaded.set(true);
         }
     }
+
 
     public void setPreviousPath() {
         path.set(previousPath);

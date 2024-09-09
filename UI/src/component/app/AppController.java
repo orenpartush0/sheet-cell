@@ -42,6 +42,7 @@ public class AppController {
             connector.SetSheet(path);
             topComponentController.clearVersion();
             topComponentController.addVersion();
+            sheetComponentController.clearSheet();
             fillSheet();
             topComponentController.setSaveButtonAble();
         }
@@ -66,6 +67,7 @@ public class AppController {
 
     public void createNewSheet(String sheetName, int numColumns, int numRows){
         connector.SetSheet(new SheetDto(sheetName,1,numColumns,numRows,1,1));
+        sheetComponentController.clearSheet();
         fillSheet();
         topComponentController.clearVersion();
         topComponentController.addVersion();
@@ -98,18 +100,10 @@ public class AppController {
         connector.AddRange(new Range(rangeName,startCoordinate,endCoordinate));
     }
 
-
-    public Range GetRangeDto(String rangeName){
-        return connector.GetRangeDto(rangeName);
-    }
-
     public Range GetRange(String rangeName) {
         return connector.GetRangeDto(rangeName);
     }
 
-    public List<Range> getRanges(){
-        return connector.getRanges();
-    }
 
     public void removePaint(){
         sheetComponentController.removePaint();
