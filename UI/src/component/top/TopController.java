@@ -74,6 +74,8 @@ public class TopController {
         lastUpdateTextField.textProperty().bind(Bindings.format("%d", lastUpdate));
         cellIdTextField.textProperty().bind(cellId);
         saveButton.disableProperty().bind(isSheetLoaded.not());
+        SheetVersionComboBox.disableProperty().bind(isSheetLoaded.not());
+        rangesComboBox.disableProperty().bind(isSheetLoaded.not());
         rangesComboBox.setOnAction(event -> {
             if (((String) rangesComboBox.getValue()).isEmpty()) {
                 appController.removePaint();
@@ -155,6 +157,8 @@ public class TopController {
         Parent root = loader.load();
 
         SheetDialogController controller = loader.getController();
+        controller.setTopController(this);
+        controller.setAppController(appController);
         Stage dialogStage = new Stage();
         dialogStage.setTitle("Sheet Details");
         dialogStage.initModality(Modality.WINDOW_MODAL);
@@ -164,22 +168,14 @@ public class TopController {
 
         controller.setDialogStage(dialogStage);
         dialogStage.showAndWait();
-        if (controller.isOkClicked()) {
-            String sheetName = controller.getSheetName();
-            int numColumns = controller.getNumColumns();
-            int numRows = controller.getNumRows();
-            appController.createNewSheet(sheetName, numColumns, numRows);
-            isSheetLoaded.set(true);
-        }
     }
 
+    public void EnableButtons(){
+        isSheetLoaded.set(true);
+    }
 
     public void setPreviousPath() {
         path.set(previousPath);
-    }
-
-    public void setSaveButtonAble() {
-        isSheetLoaded.set(false);
     }
 
     public void setOnMouseCoordinate(CellDto cell) {
@@ -193,6 +189,8 @@ public class TopController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/component/top/dialog/filter/createFilterDialog.fxml"));
         Parent root = loader.load();
         FilterDialogController controller = loader.getController();
+        controller.setAppController(appController);
+        controller.setBoundaries(appController.getNumOfRows(),appController.getNumOfCols());
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setScene(new Scene(root));
@@ -208,19 +206,17 @@ public class TopController {
         Parent root = loader.load();
 
         RangeDialogController controller = loader.getController();
+        controller.setBoundaries(appController.getNumOfRows(),appController.getNumOfCols());
+        controller.setAppController(appController);
+        controller.setTopController(this);
         Stage dialogStage = new Stage();
         dialogStage.setTitle("Range Details");
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setScene(new Scene(root));
+        dialogStage.setHeight(240);
+        dialogStage.setWidth(350);
         controller.setDialogStage(dialogStage);
         dialogStage.showAndWait();
-        if (controller.isOkClicked()) {
-            String rangeName = controller.getRangeName();
-            Coordinate startCoordinate = controller.getStartPoint();
-            Coordinate endCoordinate = controller.getEndPoint();
-            appController.addRange(rangeName, startCoordinate, endCoordinate);
-            rangesComboBox.getItems().add(rangeName);
-        }
     }
 
     private void handleRangeSelected(String selectedItem) {
@@ -265,7 +261,7 @@ public class TopController {
             gridPaneSheet.add(cellField, coordinate.col(), coordinate.row());
         });
 
-        SheetController.printRowAndColumnsLabels(sheet, gridPaneLeft, gridPaneTop);
+        SheetController.printRowAndColumnsLabels(sheet, gridPaneLeft, gridPaneTop,100,30);
 
         BorderPane borderPane = new BorderPane();
         borderPane.setCenter(gridPaneSheet);
@@ -278,6 +274,10 @@ public class TopController {
         newStage.setScene(scene);
 
         newStage.show();
+    }
+
+    public void addRangeToComboBox(String rangeName){
+        rangesComboBox.getItems().add(rangeName);
     }
 
 }

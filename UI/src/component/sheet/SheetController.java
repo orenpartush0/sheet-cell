@@ -1,24 +1,19 @@
 package component.sheet;
 
 import component.sheet.Enum.PropType;
-import component.top.TopController;
 import dto.SheetDto;
 import javafx.animation.PauseTransition;
 import javafx.beans.property.Property;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import component.app.AppController;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
@@ -33,8 +28,6 @@ public class SheetController {
 
     private AppController appController;
     private boolean isSheetLoaded = false;
-    private final Rectangle selectionRectangle = new Rectangle();
-    private final List<TextField> selectedCells = new ArrayList<>();
 
     @FXML private GridPane gridPaneTop;
     @FXML private GridPane gridPaneLeft;
@@ -50,17 +43,13 @@ public class SheetController {
     private final SimpleStringProperty colorProp = new SimpleStringProperty("white");
     private final List<StringProperty> bindToColorProp = new ArrayList<>();
     private final Map<Coordinate,SimpleStringProperty> sheetData = new HashMap<>();
+    private final SimpleIntegerProperty cellWidth = new SimpleIntegerProperty(100);
+    private final SimpleIntegerProperty cellHeight = new SimpleIntegerProperty(30);
 
 
     public void initialize() {
         upDownScroller.vvalueProperty().addListener((obs, oldVal, newVal) -> gridPaneLeft.setLayoutY(-newVal.doubleValue() * (gridPaneSheet.getHeight() - upDownScroller.getViewportBounds().getHeight())));
-        rightLeftScroller.hvalueProperty().addListener((obs, oldVal, newVal) -> {
-            gridPaneTop.setLayoutX(Math.max(0, -newVal.doubleValue() * (gridPaneSheet.getWidth() - rightLeftScroller.getViewportBounds().getWidth())));
-        });
-
-        selectionRectangle.setStroke(Color.BLUE);
-        selectionRectangle.setFill(Color.TRANSPARENT);
-        selectionRectangle.setStrokeWidth(1);
+        rightLeftScroller.hvalueProperty().addListener((obs, oldVal, newVal) -> gridPaneTop.setLayoutX(Math.max(0, -newVal.doubleValue() * (gridPaneSheet.getWidth() - rightLeftScroller.getViewportBounds().getWidth()))));
     }
 
 
@@ -78,11 +67,11 @@ public class SheetController {
         gridPaneTop.getChildren().clear();
         gridPaneLeft.getChildren().clear();
     }
-    public static void printRowAndColumnsLabels(SheetDto sheet, GridPane gridPaneLeft, GridPane gridPaneTop) {
+    public static void printRowAndColumnsLabels(SheetDto sheet, GridPane gridPaneLeft, GridPane gridPaneTop,int width, int height) {
         for (int row = 1; row <= sheet.numberOfRows(); row++) {
             Label rowLabel = new Label(String.valueOf(row));
-            rowLabel.setPrefWidth(50);
-            rowLabel.setPrefHeight(30);
+            rowLabel.setPrefWidth((double) width /2);
+            rowLabel.setPrefHeight(height);
             rowLabel.setAlignment(Pos.CENTER);
             gridPaneLeft.add(rowLabel, 0, row);
             GridPane.setHalignment(rowLabel, HPos.CENTER);
@@ -91,8 +80,8 @@ public class SheetController {
 
         for (int col = 0; col <= sheet.numberOfColumns(); col++) {
             Label colLabel = new Label(Coordinate.getColumnLabel(col));
-            colLabel.setPrefWidth(100);
-            colLabel.setPrefHeight(30);
+            colLabel.setPrefWidth(width);
+            colLabel.setPrefHeight(height);
             gridPaneTop.add(colLabel, col, 0);
             GridPane.setHalignment(colLabel, HPos.CENTER);
             GridPane.setValignment(colLabel, VPos.CENTER);
@@ -100,6 +89,8 @@ public class SheetController {
     }
 
     public void fillSheet(SheetDto sheet) {
+        cellWidth.set(sheet.colsWidth());
+        cellHeight.set(sheet.rowsHeight());
         if (isSheetLoaded) {
             fillExistSheetWithData(sheet);
         } else {
@@ -111,17 +102,15 @@ public class SheetController {
     private void fillExistSheetWithData(SheetDto sheet){
         sheet.cells().forEach((coordinate, cellDto) -> sheetData.get(coordinate).set(""));
         PauseTransition pause = new PauseTransition(Duration.millis(100));
-        pause.setOnFinished(event -> {
-            sheet.cells().forEach((coordinate, cellDto) -> sheetData.get(coordinate).set(cellDto.effectiveValue().toString()));
-        });
+        pause.setOnFinished(event -> sheet.cells().forEach((coordinate, cellDto) -> sheetData.get(coordinate).set(cellDto.effectiveValue().toString())));
         pause.play();
     }
 
     private void createNewSheet(SheetDto sheet){
         sheet.cells().forEach((coordinate, cell) -> {
             TextField cellField = new TextField(cell.effectiveValue().toString());
-            cellField.setPrefWidth(100);
-            cellField.setPrefHeight(30);
+            cellField.prefWidthProperty().bind(cellWidth);
+            cellField.prefHeightProperty().bind(cellHeight);
             sheetData.put(coordinate,new SimpleStringProperty(cell.effectiveValue().toString()));
             cellField.textProperty().bindBidirectional(sheetData.get(coordinate));
             cellField.setOnMouseClicked(event -> cellClicked(coordinate));
@@ -135,7 +124,7 @@ public class SheetController {
             gridPaneSheet.add(cellField, coordinate.col() , coordinate.row());
         });
 
-        printRowAndColumnsLabels(sheet, gridPaneLeft, gridPaneTop);
+        printRowAndColumnsLabels(sheet, gridPaneLeft, gridPaneTop,cellWidth.get(),cellHeight.get());
     }
 
     private void handleCellAction(TextField cellField, Coordinate coordinate) {
@@ -203,6 +192,5 @@ public class SheetController {
             case PropType.COLOR -> bindToColorProp;
         };
     }
-
 }
 

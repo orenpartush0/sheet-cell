@@ -7,9 +7,7 @@ import dto.SheetDto;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import component.sheet.SheetController;
 import component.top.TopController;
 import shticell.sheet.coordinate.Coordinate;
@@ -24,12 +22,11 @@ public class AppController {
     public BorderPane root;
     private final Connector connector = new Connector();
 
-    @FXML private VBox rangeComponent;
-    @FXML private VBox topComponent;
-    @FXML private ScrollPane sheetComponent;
     @FXML private TopController topComponentController;
     @FXML private SheetController sheetComponentController;
 
+    private int numOfCols;
+    private int numOfRows;
 
     @FXML
     public void initialize() {
@@ -44,7 +41,6 @@ public class AppController {
             topComponentController.addVersion();
             sheetComponentController.clearSheet();
             fillSheet();
-            topComponentController.setSaveButtonAble();
         }
         catch (Exception e) {
             topComponentController.setPreviousPath();
@@ -57,7 +53,10 @@ public class AppController {
     }
 
     private void fillSheet(){
-        sheetComponentController.fillSheet(connector.getSheet());
+        SheetDto sheet = connector.getSheet();
+        numOfCols = sheet.numberOfColumns();
+        numOfRows = sheet.numberOfRows();
+        sheetComponentController.fillSheet(sheet);
         topComponentController.addRangesToComboBox(connector.getRanges().stream().map(Range::rangeName).toList());
     }
 
@@ -66,12 +65,11 @@ public class AppController {
     }
 
     public void createNewSheet(String sheetName, int numColumns, int numRows){
-        connector.SetSheet(new SheetDto(sheetName,1,numColumns,numRows,1,1));
+        connector.SetSheet(new SheetDto(sheetName,1,numColumns,numRows,100,30));
         sheetComponentController.clearSheet();
         fillSheet();
         topComponentController.clearVersion();
         topComponentController.addVersion();
-        topComponentController.setSaveButtonAble();
     }
 
     public void updateCell(Coordinate coordinate,String value) throws LoopConnectionException {
@@ -122,8 +120,15 @@ public class AppController {
         return connector.applyFilter(vals);
     }
 
-
     public SheetDto getSheetByVersion(int version){
         return connector.GetSheetByVersion(version);
+    }
+
+    public int getNumOfCols(){
+        return numOfCols;
+    }
+
+    public int getNumOfRows(){
+        return numOfRows;
     }
 }

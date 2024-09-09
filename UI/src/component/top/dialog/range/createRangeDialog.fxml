@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 
+<?import javafx.scene.layout.VBox?>
 <GridPane xmlns:fx="http://javafx.com/fxml"
           fx:controller= "component.top.dialog.range.RangeDialogController"
           hgap="10" vgap="10" alignment="center">
@@ -18,8 +19,12 @@
     <Label text="End Point:" GridPane.rowIndex="2"/>
     <TextField fx:id="endPointField" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
 
-    <HBox spacing="10" GridPane.rowIndex="3" GridPane.columnSpan="2" alignment="center">
-        <Button text="OK" onAction="#handleOk" fx:id="okButton" />
-        <Button text="Cancel" fx:id="cancelButton" onAction="#handeCancel" />
+    <VBox fx:id="errorBox" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2" alignment="center">
+
+    </VBox>
+
+    <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2" alignment="center">
+        <Button text="OK" onAction="#handleOk" />
+        <Button text="Cancel" onAction="#handeCancel" />
     </HBox>
 </GridPane>

@@ -29,14 +29,15 @@ public class Filter {
             }
 
         }));
-        return new HashSet<>(relevantValues).stream().toList();
+
+        return relevantValues;
     }
 
     public void Setcol(String col){
         this.col = this.col = (int)col.toUpperCase().charAt(0)- (int)'A'+1;
     }
 
-    public void AddFilterValues(List<String>vals) {
+    public void AddFilterValues(List<String> vals) {
         filterdValues.addAll(vals);
     }
 

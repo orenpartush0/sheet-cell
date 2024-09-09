@@ -26,6 +26,6 @@
 
     <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="4" GridPane.columnSpan="2" alignment="center">
         <Button text="OK" onAction="#handleOk" />
-        <Button text="Cancel" onAction="#handeCancel" />
+        <Button text="Cancel" onAction="#handleCancel" />
     </HBox>
 </GridPane>

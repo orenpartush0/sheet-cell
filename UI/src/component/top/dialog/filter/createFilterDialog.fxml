@@ -21,17 +21,21 @@
 
     <Label text="Key Column:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
     <TextField fx:id="KeyColumnFiled" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-    <Button text="OK" fx:id="okButton" onAction="#handelOK" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+    <Button text="OK" onAction="#handelOK" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
 
-    <ScrollPane fitToWidth="true" fitToHeight="true" GridPane.rowIndex="3" GridPane.columnSpan="3">
+    <VBox fx:id="errorBox" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="2" alignment="center">
+
+    </VBox>
+
+    <ScrollPane fitToWidth="true" fitToHeight="true" GridPane.rowIndex="4" GridPane.columnSpan="3">
         <VBox spacing="5" prefHeight="150" minHeight="100" maxHeight="300">
             <Label text="Values to filter" />
             <ListView fx:id="valuesListView" />
         </VBox>
     </ScrollPane>
 
-    <HBox spacing="10" GridPane.rowIndex="4" GridPane.columnSpan="3" alignment="center">
+    <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="5" GridPane.columnSpan="2" alignment="center">
         <Button text="Apply Filter" onAction="#ApplyFilter"/>
-        <Button text="Cancel" fx:id="cancelButton" onAction="#handeCancel" />
+        <Button text="Cancel" onAction="#handeCancel" />
     </HBox>
 </GridPane>
