@@ -40,4 +40,6 @@ public interface Sheet extends Cloneable, Serializable {
     List<Range> GetRangesDto();
 
     Sheet clone();
+
+    void removeRange(String rangeName);
 }

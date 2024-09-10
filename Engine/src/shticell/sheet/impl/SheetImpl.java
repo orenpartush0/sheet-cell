@@ -181,7 +181,8 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
         return clone;
     }
 
-
-
+    public void removeRange(String rangeName){
+        ranges.remove(rangeName);
+    }
 }
 

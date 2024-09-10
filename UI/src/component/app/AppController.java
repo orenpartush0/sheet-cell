@@ -76,7 +76,6 @@ public class AppController {
     }
 
     public SheetDto GetSheet(){
-
         return connector.getSheet();
     }
 
@@ -100,7 +99,6 @@ public class AppController {
         return connector.GetRangeDto(rangeName);
     }
 
-
     public void removePaint(){
         sheetComponentController.removePaint();
     }
@@ -122,5 +120,9 @@ public class AppController {
     }
     public SheetDto applyFilter(int col, Range range ,List<String> filters) {
         return connector.applyFilter(col,range,filters);
+    }
+
+    public void removeRange(String rangeName){
+        connector.removeRange(rangeName);
     }
 }

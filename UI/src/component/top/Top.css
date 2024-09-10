@@ -5,13 +5,6 @@
     -fx-background-color: rgba(200, 200, 200, 0.4);
 }
 
-/* Style for the HBox containers */
-.hbox {
-    -fx-spacing: 10;
-    -fx-alignment: center-left;
-}
-
-/* Style for Labels */
 .label {
     -fx-font-size: 14px;
     -fx-text-fill: #333333;
@@ -21,7 +14,6 @@
     -fx-background-radius: 10;
 }
 
-/* Style for TextFields */
 .text-field {
     -fx-font-size: 14px;
     -fx-border-color: rgba(200, 200, 200, 0.4);

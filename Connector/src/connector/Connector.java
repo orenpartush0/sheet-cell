@@ -88,4 +88,8 @@ public class Connector {
         return sheet.GetRangesDto();
     }
 
+    public void removeRange(String rangeName){
+        sheet.removeRange(rangeName);
+    }
+
 }

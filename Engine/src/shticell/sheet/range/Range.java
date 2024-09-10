@@ -3,10 +3,11 @@ package shticell.sheet.range;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public record Range(String rangeName, Coordinate startCellCoordinate, Coordinate endCellCoordinate) implements Cloneable {
+public record Range(String rangeName, Coordinate startCellCoordinate, Coordinate endCellCoordinate) implements Serializable {
 
     public boolean containsCell(Coordinate cell) {
         return startCellCoordinate.col() <= cell.col() && startCellCoordinate.row() <= cell.row()

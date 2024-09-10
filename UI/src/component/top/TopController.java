@@ -21,6 +21,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -50,9 +51,9 @@ public class TopController {
     @FXML
     private TextField cellIdTextField;
     @FXML
-    private ComboBox SheetVersionComboBox;
+    private ComboBox<String> SheetVersionComboBox;
     @FXML
-    private ComboBox rangesComboBox;
+    private ComboBox<HBox> rangesComboBox;
     @FXML
     private Button plus;
     @FXML
@@ -86,6 +87,7 @@ public class TopController {
         });
 
         rangesComboBox.setVisibleRowCount(5);
+        rangesComboBox.getSelectionModel().select(0);
         SheetVersionComboBox.setVisibleRowCount(5);
         plus.disableProperty().bind(isSheetLoaded.not());
         minus.disableProperty().bind(isSheetLoaded.not());
@@ -226,8 +228,38 @@ public class TopController {
 
     public void addRangesToComboBox(List<String> ranges) {
         clearRangeComboBox();
-        rangesComboBox.getItems().add("");
-        ranges.forEach(rangeName -> rangesComboBox.getItems().add(rangeName));
+        rangesComboBox.getItems().add(new HBox()); // Empty item
+        ranges.forEach(this::addRangeToComboBox);
+    }
+
+    public void addRangeToComboBox(String rangeName) {
+        HBox rangeBox = createRangeHBox(rangeName);
+        rangesComboBox.getItems().add(rangeBox);
+    }
+
+    private HBox createRangeHBox(String rangeName) {
+        Label rangeLabel = new Label(rangeName);
+        Button removeButton = new Button("-");
+        HBox rangeBox = new HBox();
+        rangeBox.getChildren().addAll(rangeLabel,removeButton);
+
+        rangeLabel.setOnMouseClicked(mouseEvent ->{
+            String selectedRange = rangeLabel.getText();
+            appController.removePaint();
+            if (!selectedRange.isEmpty()) {
+                handleRangeSelected(selectedRange);
+            }
+        });
+
+        removeButton.setOnMouseClicked(event-> {
+            appController.removeRange(rangeName);
+            rangesComboBox.getItems().remove(rangeBox);
+        });
+
+        rangeBox.setSpacing(10);
+        rangeBox.setAlignment(Pos.CENTER_LEFT);
+
+        return rangeBox;
     }
 
     private void clearRangeComboBox() {
@@ -243,9 +275,10 @@ public class TopController {
         SheetVersionComboBox.getItems().add("Version");
     }
 
+
     private void handleVersionSelected(String selectedItem) {
-        SheetDto sheet = appController.getSheetByVersion(Integer.parseInt(selectedItem));
-        createNewSheetInDifferentWindows(sheet);
+        SheetDto sheetByVersionVersion = appController.getSheetByVersion(Integer.parseInt(selectedItem));
+        createNewSheetInDifferentWindows(sheetByVersionVersion);
     }
 
     public static void createNewSheetInDifferentWindows(SheetDto sheet) {
@@ -273,13 +306,7 @@ public class TopController {
 
         Scene scene = new Scene(borderPane, 800, 600);
         newStage.setScene(scene);
-
         newStage.show();
     }
-
-    public void addRangeToComboBox(String rangeName){
-        rangesComboBox.getItems().add(rangeName);
-    }
-
 }
 
