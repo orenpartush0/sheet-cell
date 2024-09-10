@@ -1,9 +1,11 @@
 package shticell.sheet.coordinate;
 
 import java.io.Serializable;
+import java.util.Comparator;
 import java.util.Objects;
 
-public record Coordinate(int row, int col) implements Serializable {
+public record Coordinate(int row, int col) implements Serializable,Comparable<Coordinate> {
+
 
     @Override
     public boolean equals(Object obj) {
@@ -33,5 +35,18 @@ public record Coordinate(int row, int col) implements Serializable {
     @Override
     public String toString() {
         return getColumnLabel(col) + Integer.toString(row);
+    }
+
+    @Override
+    public int compareTo(Coordinate o) {
+        if(o != null) {
+            int rowComparison = Integer.compare(this.row, ((Coordinate) o).row);
+            if (rowComparison != 0) {
+                return rowComparison;
+            }
+            return Integer.compare(this.col, ((Coordinate) o).col);
+        }
+
+        return -1;
     }
 }

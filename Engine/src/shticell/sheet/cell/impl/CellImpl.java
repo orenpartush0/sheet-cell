@@ -18,7 +18,7 @@ import java.util.*;
 import static shticell.function.functionIdentifier.calcFunc;
 import static shticell.function.functionIdentifier.isFunc;
 
-public class CellImpl implements Cloneable, Cell, Serializable {
+public class CellImpl implements Cell, Serializable {
 
     private final String NAN = "NaN";
     private final String UNDEFINED = "!Undefined!";
@@ -85,10 +85,9 @@ public class CellImpl implements Cloneable, Cell, Serializable {
     public Cell clone(){
         CellImpl clonedCellImpl = new CellImpl();
         clonedCellImpl.originalValue = originalValue;
-        clonedCellImpl.effectiveValue = effectiveValue;
         clonedCellImpl.coordinate = coordinate;
-        clonedCellImpl.sheet = sheet;
         clonedCellImpl.effectiveValue = effectiveValue.Clone();
+        clonedCellImpl.LatestSheetVersionUpdated = LatestSheetVersionUpdated;
 
         return clonedCellImpl;
     }

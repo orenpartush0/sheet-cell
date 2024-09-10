@@ -8,7 +8,7 @@ import shticell.sheet.exception.LoopConnectionException;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public interface Cell extends Serializable {
+public interface Cell extends Serializable ,Cloneable {
     String GetOriginalValue();
     EffectiveValue GetEffectiveValue();
     Coordinate GetCellCoordinate();
@@ -19,4 +19,5 @@ public interface Cell extends Serializable {
     Cell GetCellBySheetVersion(int version);
     ArrayList<Coordinate> GetDependsOnCoordinates();
     ArrayList<Coordinate> GetInfluenceOnCoordinates();
+    Cell clone();
 }

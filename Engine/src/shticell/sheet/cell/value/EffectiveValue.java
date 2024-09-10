@@ -7,4 +7,5 @@ public interface EffectiveValue extends Cloneable, Serializable {
     ValueType getValueType();
     <T> T getValueWithExpectation(Class<T> type);
     EffectiveValue Clone();
+    void setValue(Object _value,ValueType _valueType);
 }

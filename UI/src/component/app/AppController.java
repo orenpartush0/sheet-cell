@@ -2,7 +2,6 @@ package component.app;
 
 import component.sheet.Enum.PropType;
 import connector.Connector;
-import dto.CellDto;
 import dto.SheetDto;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -13,7 +12,6 @@ import component.top.TopController;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.range.Range;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -107,19 +105,6 @@ public class AppController {
         sheetComponentController.removePaint();
     }
 
-    public List<String> createFilter(Coordinate startCell, Coordinate endCell, String col){
-         return connector.createNewFilter(startCell,endCell,col);
-
-    }
-
-    public List<String> setFilterCol(String col){
-        return connector.setFilterCol(col);
-    }
-
-    public List<CellDto> applyFilter(List<String> vals){
-        return connector.applyFilter(vals);
-    }
-
     public SheetDto getSheetByVersion(int version){
         return connector.GetSheetByVersion(version);
     }
@@ -130,5 +115,12 @@ public class AppController {
 
     public int getNumOfRows(){
         return numOfRows;
+    }
+
+    public List<String> getValuesInColumn(Range range ,int col){
+        return connector.getValuesInColumn(range ,col);
+    }
+    public SheetDto applyFilter(int col, Range range ,List<String> filters) {
+        return connector.applyFilter(col,range,filters);
     }
 }

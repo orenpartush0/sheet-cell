@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public interface Sheet extends Serializable {
+public interface Sheet extends Cloneable, Serializable {
     String GetSheetName();
 
     int GetVersion();
@@ -38,4 +38,6 @@ public interface Sheet extends Serializable {
     void AddRange(Range rangeDto);
 
     List<Range> GetRangesDto();
+
+    Sheet clone();
 }

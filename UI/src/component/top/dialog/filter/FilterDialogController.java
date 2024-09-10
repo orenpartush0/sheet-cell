@@ -3,6 +3,7 @@ package component.top.dialog.filter;
 import component.app.AppController;
 import component.top.dialog.range.RangeDialogController;
 import dto.CellDto;
+import dto.SheetDto;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,10 +15,14 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
+import shticell.sheet.range.Range;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static component.top.TopController.createNewSheetInDifferentWindows;
 
 public class FilterDialogController {
 
@@ -32,7 +37,6 @@ public class FilterDialogController {
     @FXML private Stage dialogStage;
     @FXML private VBox errorBox;
 
-    private boolean firstTime = true;
     private final Map<String, SimpleBooleanProperty> checked = new HashMap<>();
 
     public void setAppController(AppController appController) {
@@ -51,7 +55,7 @@ public class FilterDialogController {
         return CoordinateFactory.getCoordinate(endPointField.getText());
     }
 
-    public String getKeyColumnFiled() {
+    public String getKeyColumn() {
         return KeyColumnFiled.getText();
     }
 
@@ -93,7 +97,7 @@ public class FilterDialogController {
                 errorBox.getChildren().add(errorLabel);
                 isValid = false;
             }
-            else if(!(KeyColumnFiled.getText().length() == 1) || KeyColumnFiled.getText().charAt(0) < 'A' || KeyColumnFiled.getText().charAt(0) >= ('A' + numOfCols)){
+            else if(!(KeyColumnFiled.getText().length() == 1) || KeyColumnFiled.getText().toUpperCase().charAt(0) < 'A' || KeyColumnFiled.getText().toUpperCase().charAt(0) >= ('A' + numOfCols)){
                 Label errorLabel = new Label("Invalid key column\n");
                 errorLabel.setStyle("-fx-text-fill: red;");
                 errorBox.getChildren().add(errorLabel);
@@ -136,10 +140,6 @@ public class FilterDialogController {
         });
     }
 
-    private void clearValuesComboBox() {
-        valuesListView.getItems().clear();
-    }
-
     public void handelOK() {
         if (isInputValid()) {
             keyColumnChanged();
@@ -148,29 +148,30 @@ public class FilterDialogController {
 
     @FXML
     public void keyColumnChanged() {
-        clearValuesComboBox();
+        valuesListView.getItems().clear();
+        setValuesComboBox(appController.getValuesInColumn(getRange(),getCol()));
+    }
+
+    private Range getRange(){
         Coordinate startPointCoordinate = getStartPoint();
         Coordinate endPointCoordinate = getEndPoint();
-        String col = getKeyColumnFiled();
-        if (firstTime) {
-            setValuesComboBox(appController.createFilter(startPointCoordinate, endPointCoordinate, col));
-            firstTime = false;
-        } else {
-            setValuesComboBox(appController.setFilterCol(col));
-        }
+        return new Range("",startPointCoordinate,endPointCoordinate);
+    }
+
+    private int getCol(){
+        return getKeyColumn().toLowerCase().charAt(0) - 'a' + 1;
     }
 
     public void ApplyFilter() {
-        List<String> valuesList = new ArrayList<>();
+        List<String> filters = new ArrayList<>();
         checked.forEach((val, checked) -> {
             if (checked.getValue()) {
-                valuesList.add(val);
+                filters.add(val);
             }
         });
-        List<CellDto> temp = appController.applyFilter(valuesList);
-        List<Coordinate> coordinates = new ArrayList<>();
-        temp.forEach(c -> coordinates.add(c.coordinate()));
-        appController.PaintCells(coordinates, "pink");
+
+        SheetDto sheet = appController.applyFilter(getCol(),getRange(),filters);
+        createNewSheetInDifferentWindows(sheet);
     }
 
     @FXML

@@ -1,7 +1,5 @@
 package shticell.sheet.impl;
 
-import com.sun.codemodel.JForEach;
-import dto.CellDto;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.api.HasSheetData;
 import shticell.sheet.api.SheetToXML;
@@ -13,13 +11,11 @@ import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.cell.api.Cell;
 import shticell.sheet.cell.impl.CellImpl;
 import shticell.sheet.range.Range;
-
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable {
+public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable ,Cloneable {
     private final int INITIAL_VERSION = 1;
     private final String sheetName;
     private int version = INITIAL_VERSION;
@@ -177,6 +173,13 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
         return ranges.values().stream().toList();
     }
 
+    @Override
+    public Sheet clone(){
+        Sheet clone = new SheetImpl(sheetName,numberOfRows,numberOfColumns,rowHeight,columnWidth);
+        cells.forEach((key, value) -> clone.GetCells().put(key, value.clone()));
+        ranges.forEach((key, value) ->clone.AddRange(new Range(key,value.startCellCoordinate(),value.endCellCoordinate())));
+        return clone;
+    }
 
 
 

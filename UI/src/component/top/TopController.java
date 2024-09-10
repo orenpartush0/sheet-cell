@@ -84,6 +84,7 @@ public class TopController {
                 handleRangeSelected((String) rangesComboBox.getValue());
             }
         });
+
         rangesComboBox.setVisibleRowCount(5);
         SheetVersionComboBox.setVisibleRowCount(5);
         plus.disableProperty().bind(isSheetLoaded.not());

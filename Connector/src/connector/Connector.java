@@ -8,16 +8,12 @@ import shticell.sheet.api.Sheet;
 import shticell.sheet.impl.SheetImpl;
 import dto.SheetDto;
 import shticell.sheet.range.Range;
-import shticell.sheet.util.Filter;
-
+import shticell.util.Filter;
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Connector {
     private Sheet sheet;
-    private Filter filter;
 
     public void SetSheet(SheetDto sheetDto) {
         sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns(),sheetDto.rowsHeight(),sheetDto.colsWidth());
@@ -29,22 +25,12 @@ public class Connector {
                 : GetSheetFromBinaryFile(path);
     }
 
-    public List<String> createNewFilter(Coordinate start,Coordinate end, String col) {
-        this.filter = new Filter(col,start,end,sheet);
-        return filter.getValuesInColumn();
+    public List<String> getValuesInColumn(Range range ,int col) {
+        return Filter.getValuesInColumn(sheet.clone(),range,col);
     }
 
-    public List<String> setFilterCol(String col) {
-        this.filter.Setcol(col);
-        return filter.getValuesInColumn();
-    }
-
-    public List<CellDto> applyFilter(List<String> values) {
-        filter.AddFilterValues(values);
-        List<Coordinate> filterdCordinates = filter.getFilterdCordinates();
-        return filterdCordinates.stream()
-                .map(coordinate -> new CellDto(sheet.GetCell(coordinate)))
-                .collect(Collectors.toList());
+    public SheetDto applyFilter(int col, Range range ,List<String> filters) {
+        return Filter.getFilteredSheetDto(sheet.clone(),col,range,filters);
     }
 
     private Sheet GetSheetFromXML(String fileName) throws Exception {

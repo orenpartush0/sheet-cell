@@ -2,7 +2,7 @@ package shticell.sheet.cell.value;
 
 import java.io.Serializable;
 
-public class EffectiveValueImpl implements EffectiveValue, Serializable {
+public class EffectiveValueImpl implements EffectiveValue, Serializable, Cloneable {
 
     Object value = null;
     ValueType valueType;
@@ -22,6 +22,11 @@ public class EffectiveValueImpl implements EffectiveValue, Serializable {
         return value;
     }
 
+    @Override
+    public void setValue(Object _value,ValueType _valueType){
+        value = _value;
+        valueType = _valueType;
+    }
 
     @Override
     public ValueType getValueType() {
@@ -46,5 +51,15 @@ public class EffectiveValueImpl implements EffectiveValue, Serializable {
     @Override
     public EffectiveValue Clone() {
         return new EffectiveValueImpl(value,valueType);
+    }
+
+
+    @Override
+    public EffectiveValueImpl clone() {
+        try {
+            return (EffectiveValueImpl) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

@@ -6,7 +6,7 @@ import shticell.sheet.coordinate.CoordinateFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public record Range(String rangeName, Coordinate startCellCoordinate, Coordinate endCellCoordinate) {
+public record Range(String rangeName, Coordinate startCellCoordinate, Coordinate endCellCoordinate) implements Cloneable {
 
     public boolean containsCell(Coordinate cell) {
         return startCellCoordinate.col() <= cell.col() && startCellCoordinate.row() <= cell.row()
