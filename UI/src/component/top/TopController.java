@@ -49,7 +49,7 @@ public class TopController {
     @FXML
     private ComboBox<String> SheetVersionComboBox;
     @FXML
-    private ComboBox<HBox> rangesComboBox;
+    private ComboBox<String> rangesComboBox;
     @FXML
     private Button plus;
     @FXML
@@ -139,6 +139,7 @@ public class TopController {
             FileWriter writer = new FileWriter(file);
             appController.saveSheet(path.get());
         }
+
     }
 
     @FXML
@@ -215,31 +216,25 @@ public class TopController {
 
     public void addRangesToComboBox(List<String> ranges) {
         clearRangeComboBox();
-        rangesComboBox.getItems().add(new HBox());
+        rangesComboBox.getItems().add("");
         ranges.forEach(this::addRangeToComboBox);
 
         rangesComboBox.setOnAction(event -> {
-            HBox selectedHBox = rangesComboBox.getSelectionModel().getSelectedItem();
-            if (selectedHBox != rangesComboBox.getItems().getFirst()) {
-                Label rangeName = (Label) selectedHBox.getChildren().get(0);
-                Button removeButton = (Button) selectedHBox.getChildren().get(1);
+            String selectedRange = rangesComboBox.getSelectionModel().getSelectedItem();
+            if (selectedRange != rangesComboBox.getItems().getFirst()) {
+                appController.removePaint();
+                handleRangeSelected(selectedRange);
 
-                rangeName.setOnMouseClicked(mouseEvent -> {
-                    appController.removePaint();
-                    handleRangeSelected(rangeName.getText());
-                });
-
-                removeButton.setOnMouseClicked(mouseEvent -> {
-                    appController.removeRange(rangeName.getText());
-                    rangesComboBox.getItems().remove(selectedHBox);
+                minus.setOnMouseClicked(mouseEvent -> {
+                    appController.removeRange(selectedRange);
+                    rangesComboBox.getItems().remove(selectedRange);
                 });
             }
         });
     }
 
     private void addRangeToComboBox(String rangeName) {
-        HBox rangeBox = createRangeHBox(rangeName);
-        rangesComboBox.getItems().add(rangeBox);
+        rangesComboBox.getItems().add(rangeName);
     }
 
     private HBox createRangeHBox(String rangeName) {

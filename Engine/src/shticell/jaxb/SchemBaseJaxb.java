@@ -54,7 +54,7 @@ public class SchemBaseJaxb {
 
             createRanges(sheet,sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns(),res);
 
-            List<STLCell> creationOrder = getCreationCellsList(sheet.getSTLCells().getSTLCell(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns());
+            List<STLCell> creationOrder = getCreationCellsList(sheet.getSTLCells().getSTLCell(),sheet.getSTLLayout().getRows(),sheet.getSTLLayout().getColumns(),res);
             creationOrder.forEach(cell-> {
                 try {
                     res.UpdateCellByCoordinateWithOutVersionUpdate(CoordinateFactory.getCoordinate(cell.getRow(),(int)cell.getColumn().charAt(0)-(int)'A' + 1), cell.getSTLOriginalValue());
@@ -67,7 +67,6 @@ public class SchemBaseJaxb {
             throw new Exception(e);
         }
         return res;
-
     }
     private static void createRanges (STLSheet sheet,int rows,int cols,Sheet resSheet) {
         List <STLRange> ranges = new ArrayList<STLRange>(sheet.getSTLRanges().getSTLRange());
@@ -96,8 +95,8 @@ public class SchemBaseJaxb {
         checkCoordinateInSheet(rows,cols,toCord.row(),toCord.col());
     }
 
-    private static List<STLCell> getCreationCellsList(List<STLCell> cellsList,int rows, int columns) throws LoopConnectionException {
-        List<CanRemoveFromDependsOn> connectionList = getCellConnectionList(cellsList,rows,columns);
+    private static List<STLCell> getCreationCellsList(List<STLCell> cellsList,int rows, int columns, Sheet resSheet) throws LoopConnectionException {
+        List<CanRemoveFromDependsOn> connectionList = getCellConnectionList(cellsList,rows,columns,resSheet);
         List<CanRemoveFromDependsOn> topoligicalConnectionList;
         Map<CanRemoveFromDependsOn, STLCell> connectionCellMap = new HashMap<>();
         for (int i = 0; i < cellsList.size(); i++) {
@@ -115,7 +114,7 @@ public class SchemBaseJaxb {
         return topoligicalCellsList;
     }
 
-    private static List<CanRemoveFromDependsOn> getCellConnectionList(List<STLCell> cellsList,int rows, int columns) throws RuntimeException {
+    private static List<CanRemoveFromDependsOn> getCellConnectionList(List<STLCell> cellsList,int rows, int columns, Sheet resSheet) throws RuntimeException {
         List<CanRemoveFromDependsOn> res = new ArrayList<CanRemoveFromDependsOn>();
         Map<Coordinate,CanRemoveFromDependsOn> map = new HashMap<Coordinate,CanRemoveFromDependsOn>();
         res.addAll(
@@ -128,13 +127,19 @@ public class SchemBaseJaxb {
                             }
                         })
                         .map(cell -> {
-                            Coordinate coordinate = CoordinateFactory.getCoordinate(cell.getRow(), (int)cell.getColumn().charAt(0)-(int)'A');
+                            Coordinate coordinate = CoordinateFactory.getCoordinate(cell.getColumn()+cell.getRow());
                             CanRemoveFromDependsOn cellConnection1 =  map.computeIfAbsent(coordinate,k-> new CellConnectionImpl(coordinate));
 
                             List<Coordinate> pointTo = null;
                             try {
                                 pointTo = getRefList(cell, rows, columns);
+                                List<Coordinate> rangeDepndecies = getRangeInCellList(cell, rows, columns, resSheet);
+                                if (rangeDepndecies != null) {
+                                    pointTo.addAll(rangeDepndecies);
+                                }
                             } catch (CellOutOfSheetException e) {
+                                throw new RuntimeException(e);
+                            } catch (Exception e) {
                                 throw new RuntimeException(e);
                             }
 
@@ -174,6 +179,21 @@ public class SchemBaseJaxb {
         }
 
         return res;
+    }
+
+    private static List<Coordinate> getRangeInCellList(STLCell cell,int rows, int columns, Sheet resSheet) throws Exception {
+        if(cell.getSTLOriginalValue().toUpperCase().contains("SUM") ||cell.getSTLOriginalValue().toUpperCase().contains("AVERAGE") ){
+            Range range = resSheet.GetRangeByName(getRangeFromOrgValue(cell));
+            if(range == null){
+                throw new Exception("Range "+getRangeFromOrgValue(cell)+ " does not defined");
+            }
+            return range.getRangeCellsCoordinate();
+        }
+        return null;
+    }
+
+    private static String getRangeFromOrgValue(STLCell cell){
+         return cell.getSTLOriginalValue().split(",")[1].replace("}","");
     }
 
     private static List<CanRemoveFromDependsOn> topoligicalConnectionList(List<CanRemoveFromDependsOn> cellsList){

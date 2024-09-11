@@ -72,6 +72,9 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     public int GetRowsHeight() {return rowHeight;}
 
     @Override
+    public Range GetRangeByName(String rangeName) {return ranges.get(rangeName);}
+
+    @Override
     public EffectiveValue GetCellEffectiveValue(Coordinate coordinate) {
         return cells.get(coordinate).GetEffectiveValue();
     }

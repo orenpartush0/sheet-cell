@@ -42,4 +42,5 @@ public interface Sheet extends Cloneable, Serializable {
     Sheet clone();
 
     void removeRange(String rangeName);
+    Range GetRangeByName(String rangeName);
 }

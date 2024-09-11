@@ -39,6 +39,7 @@ public class AppController {
             topComponentController.addVersion();
             sheetComponentController.clearSheet();
             fillSheet();
+            topComponentController.EnableButtons();
         }
         catch (Exception e) {
             topComponentController.setPreviousPath();
