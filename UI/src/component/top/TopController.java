@@ -75,26 +75,6 @@ public class TopController {
         SheetVersionComboBox.disableProperty().bind(isSheetLoaded.not());
         rangesComboBox.disableProperty().bind(isSheetLoaded.not());
         rangesComboBox.setVisibleRowCount(5);
-        rangesComboBox.setCellFactory(param -> new ListCell<HBox>() {
-            @Override
-            protected void updateItem(HBox item, boolean empty) {
-                if (empty || item == null) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(item);
-                }
-            }
-        });
-        rangesComboBox.setButtonCell(new ListCell<HBox>() {
-            @Override
-            protected void updateItem(HBox item, boolean empty) {
-                if (empty || item == null) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(item);
-                }
-            }
-        });
         SheetVersionComboBox.setVisibleRowCount(5);
         plus.disableProperty().bind(isSheetLoaded.not());
         minus.disableProperty().bind(isSheetLoaded.not());
