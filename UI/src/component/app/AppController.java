@@ -93,6 +93,7 @@ public class AppController {
 
     public void addRange(String rangeName,Coordinate startCoordinate,Coordinate endCoordinate){
         connector.AddRange(new Range(rangeName,startCoordinate,endCoordinate));
+        fillSheet();
     }
 
     public Range GetRange(String rangeName) {

@@ -30,7 +30,6 @@ public class RangeDialogController {
             Coordinate startCoordinate = getStartPoint();
             Coordinate endCoordinate = getEndPoint();
             appController.addRange(rangeName, startCoordinate, endCoordinate);
-            topController.addRangeToComboBox(rangeName);
             dialogStage.close();
         }
 

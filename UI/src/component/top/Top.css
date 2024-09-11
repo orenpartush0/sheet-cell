@@ -33,6 +33,9 @@
 #originalValueTextField{
     -fx-pref-width: 100;
 }
+.combo-box .list-cell:focused {
+    -fx-background-color: transparent;
+}
 
 /* Style for ComboBox */
 .combo-box {
