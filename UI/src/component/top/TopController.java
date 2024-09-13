@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class TopController {
@@ -216,19 +217,23 @@ public class TopController {
 
     public void addRangesToComboBox(List<String> ranges) {
         clearRangeComboBox();
-        rangesComboBox.getItems().add("");
+        rangesComboBox.getItems().add("Range");
         ranges.forEach(this::addRangeToComboBox);
 
         rangesComboBox.setOnAction(event -> {
             String selectedRange = rangesComboBox.getSelectionModel().getSelectedItem();
-            if (selectedRange != rangesComboBox.getItems().getFirst()) {
+            if (!Objects.equals(selectedRange, rangesComboBox.getItems().getFirst())) {
                 appController.removePaint();
                 handleRangeSelected(selectedRange);
 
                 minus.setOnMouseClicked(mouseEvent -> {
+                    appController.removePaint();
                     appController.removeRange(selectedRange);
                     rangesComboBox.getItems().remove(selectedRange);
                 });
+            }
+            else {
+                appController.removePaint();
             }
         });
     }
