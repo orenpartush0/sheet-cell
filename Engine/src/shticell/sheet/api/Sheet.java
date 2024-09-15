@@ -41,6 +41,5 @@ public interface Sheet extends Cloneable, Serializable,SheetToFilter {
 
     Sheet clone();
 
-    void removeRange(String rangeName);
-    Range GetRangeByName(String rangeName);
+    void removeRange(String rangeName) throws Exception;
 }

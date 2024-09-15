@@ -1,7 +1,7 @@
 package shticell.expression.impl.LogicalExpressions;
 
 import shticell.expression.api.Expression;
-import shticell.expression.impl.BoolienFuncUnknown;
+import shticell.expression.impl.BooleanFuncUnknown;
 import shticell.sheet.cell.value.EffectiveValue;
 import shticell.sheet.cell.value.EffectiveValueImpl;
 import shticell.sheet.cell.value.ValueType;
@@ -21,7 +21,7 @@ public class BiggerExpression implements Expression {
                     , ValueType.BOOLEAN);
         }
         catch(IllegalArgumentException e){
-            throw new BoolienFuncUnknown();
+            throw new BooleanFuncUnknown();
         }
     }
 }

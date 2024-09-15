@@ -183,7 +183,7 @@ public class SchemBaseJaxb {
 
     private static List<Coordinate> getRangeInCellList(STLCell cell,int rows, int columns, Sheet resSheet) throws Exception {
         if(cell.getSTLOriginalValue().toUpperCase().contains("SUM") ||cell.getSTLOriginalValue().toUpperCase().contains("AVERAGE") ){
-            Range range = resSheet.GetRangeByName(getRangeFromOrgValue(cell));
+            Range range = resSheet.GetRangeDto(getRangeFromOrgValue(cell));
             if(range == null){
                 throw new Exception("Range "+getRangeFromOrgValue(cell)+ " does not defined");
             }

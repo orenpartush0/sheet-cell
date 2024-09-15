@@ -4,6 +4,7 @@ import shticell.sheet.cell.connection.CellConnection;
 import shticell.sheet.cell.value.EffectiveValue;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
+import shticell.sheet.range.Range;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,4 +21,5 @@ public interface Cell extends Serializable ,Cloneable {
     ArrayList<Coordinate> GetDependsOnCoordinates();
     ArrayList<Coordinate> GetInfluenceOnCoordinates();
     Cell clone();
+    void UseRange(Range range);
 }

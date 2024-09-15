@@ -14,5 +14,7 @@ public interface HasSheetData extends Serializable {
     CellConnection GetCellConnections(Coordinate coordinate);
     boolean IsCoordinateInSheet(Coordinate coordinate);
     boolean IsRangeInSheet(String rangeName);
-    Range GetRange(String rangeName);
+    Range GetRangeDto(String rangeName);
+    void UseRange(Coordinate coordinate, Range range);
+    void UnUseRange(Range range);
 }

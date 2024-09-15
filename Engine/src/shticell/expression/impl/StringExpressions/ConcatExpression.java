@@ -12,7 +12,7 @@ public class ConcatExpression implements  Expression {
         StringBuilder strBuilder = new StringBuilder();
 
         if (expressions.length != 2) {
-            throw new UnsupportedOperationException("Concat needs two arguments");
+            throw new IllegalArgumentException("Concat needs two arguments");
         } else {
             EffectiveValue leftVal = expressions[0].eval();
             EffectiveValue rightVal = expressions[1].eval();

@@ -52,10 +52,6 @@ public class Connector {
         return new CellDto(sheet.GetCell(coordinate));
     }
 
-    public List<Integer> GetCountOfChangesPerVersion(){
-        return sheet.GetCountOfChangesPerVersion();
-    }
-
     public SheetDto GetSheetByVersion(int version){
         return new SheetDto(sheet.GetSheetByVersion(version));
     }
@@ -81,15 +77,11 @@ public class Connector {
         return sheet.GetRangeDto(rangeName);
     }
 
-    public Range GetRange(String rangeName) {
-        return sheet.GetRangeDto(rangeName);
-    }
-
     public List<Range> getRanges(){
         return sheet.GetRangesDto();
     }
 
-    public void removeRange(String rangeName){
+    public void removeRange(String rangeName) throws Exception{
         sheet.removeRange(rangeName);
     }
 

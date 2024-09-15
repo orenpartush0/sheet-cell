@@ -5,6 +5,7 @@ import connector.Connector;
 import dto.SheetDto;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
 import component.sheet.SheetController;
@@ -72,25 +73,30 @@ public class AppController {
         topComponentController.addVersion();
     }
 
-    public void updateCell(Coordinate coordinate,String value) throws LoopConnectionException {
+    public void updateCell(Coordinate coordinate,String value) {
         topComponentController.addVersion();
-        connector.UpdateCellByCoordinate(coordinate,value);
+        try {
+            connector.UpdateCellByCoordinate(coordinate, value);
+        }
+        catch (Exception e){
+            showError(e.getMessage());
+        }
     }
 
     public SheetDto GetSheet(){
         return connector.getSheet();
     }
 
-    public void cellClicked(Coordinate coordinate){
-        topComponentController.setOnMouseCoordinate(connector.GetCellByCoordinate(coordinate));
+    public void cellClicked(Coordinate coordinate,String style,Pos pos){
+        topComponentController.setOnMouseCoordinate(connector.GetCellByCoordinate(coordinate),style,pos);
         List<Coordinate> influenceOn = connector.getSheet().cells().get(coordinate).influenceOn();
         List<Coordinate> dependsOn = connector.getSheet().cells().get(coordinate).dependsOn();
-        sheetComponentController.Paint(influenceOn,"Green", PropType.INFLUENCE_ON);
-        sheetComponentController.Paint(dependsOn,"Blue",PropType.DEPENDS_ON);
+        sheetComponentController.PaintCellsBorder(influenceOn,"Green");
+        sheetComponentController.PaintCellsBorder(dependsOn,"Blue");
     }
 
     public void PaintCells(List<Coordinate> coordinates,String color){
-        sheetComponentController.Paint(coordinates,color,PropType.COLOR);
+        sheetComponentController.PaintCellsBorder(coordinates,color);
     }
 
     public void addRange(String rangeName,Coordinate startCoordinate,Coordinate endCoordinate){
@@ -103,7 +109,7 @@ public class AppController {
     }
 
     public void removePaint(){
-        sheetComponentController.removePaint();
+        sheetComponentController.removeBorderPaint();
     }
 
     public SheetDto getSheetByVersion(int version){
@@ -125,7 +131,27 @@ public class AppController {
         return connector.applyFilter(range,filters);
     }
 
-    public void removeRange(String rangeName){
+    public void removeRange(String rangeName) throws Exception{
         connector.removeRange(rangeName);
+    }
+
+    public static void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    public void PaintCellText(Coordinate coordinate, String color){
+        sheetComponentController.PaintCellText(coordinate,color);
+    }
+
+    public void PaintCellBackground(Coordinate coordinate, String color){
+        sheetComponentController.PaintCellBackground(coordinate,color);
+    }
+
+    public void setAlignment(int col, Pos pos){
+        sheetComponentController.setAlignment(col,pos);
     }
 }

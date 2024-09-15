@@ -1,6 +1,6 @@
 package shticell.sheet.cell.impl;
 
-import shticell.expression.impl.BoolienFuncUnknown;
+import shticell.expression.impl.BooleanFuncUnknown;
 import shticell.sheet.cell.connection.CellConnection;
 import shticell.sheet.cell.connection.CellConnectionImpl;
 import shticell.sheet.api.HasSheetData;
@@ -11,6 +11,9 @@ import shticell.sheet.cell.value.ValueType;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.cell.api.Cell;
+import shticell.sheet.range.Range;
+import shticell.sheet.range.RangeWithCounter;
+import shticell.sheet.range.RangeWithCounterImpl;
 
 import java.io.Serializable;
 import java.util.*;
@@ -30,6 +33,7 @@ public class CellImpl implements Cell, Serializable {
     private final TreeMap<Integer, Cell> cellByVersion= new TreeMap<>();
     private int LatestSheetVersionUpdated;
     private CellConnection connections = new CellConnectionImpl(coordinate);
+    private Map<String, RangeWithCounter> usedRanges = new HashMap<>();
 
     public CellImpl(){};
 
@@ -92,31 +96,43 @@ public class CellImpl implements Cell, Serializable {
         return clonedCellImpl;
     }
 
+    private Map<String, RangeWithCounter> clearUsedRanges() {
+        Map<String, RangeWithCounter> preUpdateUsedRanges = new HashMap<>(usedRanges);
+        usedRanges.clear();
+        preUpdateUsedRanges.forEach((key, value) -> sheet.UnUseRange(value.GetRange()));
+        return preUpdateUsedRanges;
+    }
+
+    private void recoverUsedRanges(Map<String, RangeWithCounter> preUpdateUsedRanges){
+        usedRanges.clear();
+        preUpdateUsedRanges.forEach((key,value)->sheet.UseRange(coordinate,value.GetRange()));
+    }
+
     @Override
     public void UpdateCell(String newOriginalValue, int sheetVersion) throws  LoopConnectionException{
         List<CellConnection> removed = new ArrayList<>(connections.ClearDependsOn());
         EffectiveValue preUpdateEffectiveValue = effectiveValue.Clone();
+        Map<String, RangeWithCounter> preUpdateUsedRanges = clearUsedRanges();
+        usedRanges.clear();
 
         try
         {
             effectiveValue = parseEffectiveValue(newOriginalValue);
+            sheet.UpdateDependentCells(connections.GetSortedInfluenceOn().stream().map(CellConnection::GetCellCoordinate).toList());
         }
         catch (ArithmeticException e){
             effectiveValue = new EffectiveValueImpl(NAN, ValueType.NAN);
         }
-        catch (IndexOutOfBoundsException e){
+        catch (IndexOutOfBoundsException | IllegalArgumentException e){
             effectiveValue = new EffectiveValueImpl(UNDEFINED, ValueType.UNDEFINED);
         }
-        catch (BoolienFuncUnknown e){
+        catch (BooleanFuncUnknown e){
             effectiveValue = new EffectiveValueImpl(UNKNOWN, ValueType.UNKNOWN);
         }
-
-        try {
-            sheet.UpdateDependentCells(connections.GetSortedInfluenceOn().stream().map(CellConnection::GetCellCoordinate).toList());
-        }
-        catch (Exception e) {
+        catch (UnsupportedOperationException | LoopConnectionException e){
             connections.recoverDependencies(removed);
             effectiveValue = preUpdateEffectiveValue;
+            recoverUsedRanges(preUpdateUsedRanges);
             throw e;
         }
 
@@ -131,6 +147,17 @@ public class CellImpl implements Cell, Serializable {
                     : EfectiveValueFactory.getEffectiveValue(newOriginalValue,sheet);
 
     }
+
+    @Override
+    public void UseRange(Range range){
+        if(usedRanges.get(range.rangeName()) == null){
+            usedRanges.put(range.rangeName(),new RangeWithCounterImpl(range,1));
+        }
+        else{
+            usedRanges.get(range.rangeName()).AddUsing();
+        }
+    }
+
 
     @Override
     public boolean equals(Object obj) {
