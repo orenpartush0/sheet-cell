@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public interface Sheet extends Cloneable, Serializable {
+public interface Sheet extends Cloneable, Serializable,SheetToFilter {
     String GetSheetName();
 
     int GetVersion();

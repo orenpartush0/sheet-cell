@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import static component.top.TopController.createNewSheetInDifferentWindows;
 
@@ -28,15 +29,29 @@ public class FilterDialogController {
     private AppController appController;
     private int numOfRows;
     private int numOfCols;
+    private boolean needToBeUpdated = true;
 
+    Map<Integer, List<String>> colsValues;
+
+    @FXML public ListView<String> valuesListView;
     @FXML public TextField startPointField;
     @FXML public TextField endPointField;
-    @FXML public TextField KeyColumnFiled;
-    @FXML public ListView<String> valuesListView;
     @FXML private Stage dialogStage;
     @FXML private VBox errorBox;
+    @FXML private ComboBox keyColumnComboBox;
+    @FXML private Button applyButton;
 
-    private final Map<String, SimpleBooleanProperty> checked = new HashMap<>();
+    @FXML
+    public void initialize(){
+        startPointField.textProperty().addListener((observable, oldValue, newValue) -> {
+            needToBeUpdated = true;
+        });
+        endPointField.textProperty().addListener((observable, oldValue, newValue) -> {
+            needToBeUpdated = true;
+        });
+    }
+
+    private final Map<Integer, Map<String, SimpleBooleanProperty>> checked = new HashMap<>();
 
     public void setAppController(AppController appController) {
         this.appController = appController;
@@ -54,8 +69,25 @@ public class FilterDialogController {
         return CoordinateFactory.getCoordinate(endPointField.getText());
     }
 
-    public String getKeyColumn() {
-        return KeyColumnFiled.getText();
+    private int getSelectedColNumber(){return keyColumnComboBox.getSelectionModel().getSelectedIndex() + 1; }
+
+    private String getColLetter(int colNum) { return String.valueOf((char) ('A' + colNum - 1)); }
+
+    public void ApplyFilter() {
+        Map<Integer, List<String>> filters = new HashMap<>();
+
+        checked.forEach((key, map) -> map.forEach((val, isChecked)-> {
+            if(isChecked.getValue()){
+                if(!filters.containsKey(key)){
+                    filters.put(key, new ArrayList<>());
+                }
+
+                filters.get(key).add(val);
+            }
+        }));
+
+        SheetDto sheet = appController.applyFilter(getRange(),filters);
+        createNewSheetInDifferentWindows(sheet);
     }
 
     private boolean isInputValid() {
@@ -90,28 +122,37 @@ public class FilterDialogController {
                 isValid = false;
             }
 
-            if(KeyColumnFiled.getText() == null) {
-                Label errorLabel = new Label("Key column filed is empty!\n");
-                errorLabel.setStyle("-fx-text-fill: red;");
-                errorBox.getChildren().add(errorLabel);
-                isValid = false;
-            }
-            else if(!(KeyColumnFiled.getText().length() == 1) || KeyColumnFiled.getText().toUpperCase().charAt(0) < 'A' || KeyColumnFiled.getText().toUpperCase().charAt(0) >= ('A' + numOfCols)){
-                Label errorLabel = new Label("Invalid key column\n");
+            if(getSelectedColNumber() > getRange().endCellCoordinate().col() || getSelectedColNumber() < getRange().startCellCoordinate().col()){
+                Label errorLabel = new Label("Column not in Range \n");
                 errorLabel.setStyle("-fx-text-fill: red;");
                 errorBox.getChildren().add(errorLabel);
                 isValid = false;
             }
         }
 
+        applyButton.disableProperty().set(!isValid);
         return isValid;
     }
 
-    public void setValuesComboBox(List<String> valuesList) {
+    public void fillData(){
+        IntStream.range(1, numOfCols + 1).forEach(col -> keyColumnComboBox.getItems().add(getColLetter(col)) );
+        IntStream.range(1, numOfRows + 1).forEach(row -> checked.put(row,new HashMap<>()));
+
+        keyColumnComboBox.setOnAction(actionEvent -> {
+            if (isInputValid()) {
+                colsValues = needToBeUpdated
+                        ? appController.getValuesInColumns(getRange())
+                        : colsValues;
+                valuesListView.getItems().clear();
+                setColValue(colsValues.get(getSelectedColNumber()));
+            }
+        });
+    }
+
+    public void setColValue(List<String> valuesList) {
 
         ObservableList<String> observableList = FXCollections.observableArrayList(valuesList);
         valuesListView.setItems(observableList);
-
         valuesListView.setCellFactory(param -> new ListCell<>() {
             private final Label label = new Label();
             private final CheckBox checkBox = new CheckBox();
@@ -119,37 +160,33 @@ public class FilterDialogController {
 
             {
                 hbox.setSpacing(10);
-                hbox.setAlignment(Pos.CENTER_LEFT); // Align items to the left
+                hbox.setAlignment(Pos.CENTER_LEFT);
                 setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
             }
 
             @Override
             protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
                 if (empty || item == null) {
                     setGraphic(null);
                 } else {
                     label.setText(item);
-                    SimpleBooleanProperty selected = new SimpleBooleanProperty();
-                    checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> selected.set(newValue));
-                    checked.put(item, selected);
+                    SimpleBooleanProperty selected = checked.get(getSelectedColNumber()).get(item) == null
+                            ? new SimpleBooleanProperty(false)
+                            : checked.get(getSelectedColNumber()).get(item);
+
+                    checked.get(getSelectedColNumber()).put(item,selected);
+                    checkBox.setSelected(checked.get(getSelectedColNumber()).get(item).getValue());
+
+                    checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                        checked.get(getSelectedColNumber()).put(item,new SimpleBooleanProperty(newValue));
+                    });
+
                     setGraphic(hbox);
                 }
             }
         });
     }
 
-    public void handelOK() {
-        if (isInputValid()) {
-            keyColumnChanged();
-        }
-    }
-
-    @FXML
-    public void keyColumnChanged() {
-        valuesListView.getItems().clear();
-        setValuesComboBox(appController.getValuesInColumn(getRange(),getCol()));
-    }
 
     private Range getRange(){
         Coordinate startPointCoordinate = getStartPoint();
@@ -157,29 +194,12 @@ public class FilterDialogController {
         return new Range("",startPointCoordinate,endPointCoordinate);
     }
 
-    private int getCol(){
-        return getKeyColumn().toLowerCase().charAt(0) - 'a' + 1;
-    }
-
-    public void ApplyFilter() {
-        List<String> filters = new ArrayList<>();
-        checked.forEach((val, checked) -> {
-            if (checked.getValue()) {
-                filters.add(val);
-            }
-        });
-
-        SheetDto sheet = appController.applyFilter(getCol(),getRange(),filters);
-        createNewSheetInDifferentWindows(sheet);
-    }
-
     @FXML
-    public void handeCancel() {
-        dialogStage.close();
-    }
+    public void handeCancel() {dialogStage.close();}
 
     public void setBoundaries(int _numOfRows, int _numOfCols) {
         numOfCols = _numOfCols;
         numOfRows = _numOfRows;
     }
+
 }

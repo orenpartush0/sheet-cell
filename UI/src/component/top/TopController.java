@@ -13,13 +13,11 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -183,6 +181,7 @@ public class TopController {
         FilterDialogController controller = loader.getController();
         controller.setAppController(appController);
         controller.setBoundaries(appController.getNumOfRows(),appController.getNumOfCols());
+        controller.fillData();
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setScene(new Scene(root));
@@ -240,17 +239,6 @@ public class TopController {
 
     private void addRangeToComboBox(String rangeName) {
         rangesComboBox.getItems().add(rangeName);
-    }
-
-    private HBox createRangeHBox(String rangeName) {
-        Label rangeLabel = new Label(rangeName);
-        Button removeButton = new Button("-");
-        HBox rangeBox = new HBox();
-        rangeBox.getChildren().addAll(rangeLabel,removeButton);
-        rangeBox.setSpacing(10);
-        rangeBox.setAlignment(Pos.CENTER_LEFT);
-
-        return rangeBox;
     }
 
     private void clearRangeComboBox() {

@@ -2,6 +2,7 @@ package shticell.sheet.impl;
 
 import shticell.sheet.api.Sheet;
 import shticell.sheet.api.HasSheetData;
+import shticell.sheet.api.SheetToFilter;
 import shticell.sheet.api.SheetToXML;
 import shticell.sheet.cell.connection.CellConnection;
 import shticell.sheet.cell.value.EffectiveValue;

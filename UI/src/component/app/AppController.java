@@ -14,6 +14,7 @@ import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.range.Range;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class AppController {
 
@@ -117,11 +118,11 @@ public class AppController {
         return numOfRows;
     }
 
-    public List<String> getValuesInColumn(Range range ,int col){
-        return connector.getValuesInColumn(range ,col);
+    public Map<Integer, List<String>> getValuesInColumns(Range range ){
+        return connector.getValuesInColumn(range);
     }
-    public SheetDto applyFilter(int col, Range range ,List<String> filters) {
-        return connector.applyFilter(col,range,filters);
+    public SheetDto applyFilter(Range range ,Map<Integer, List<String>> filters) {
+        return connector.applyFilter(range,filters);
     }
 
     public void removeRange(String rangeName){

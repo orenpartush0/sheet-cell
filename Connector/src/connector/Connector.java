@@ -11,6 +11,7 @@ import shticell.sheet.range.Range;
 import shticell.util.Filter;
 import java.io.*;
 import java.util.List;
+import java.util.Map;
 
 public class Connector {
     private Sheet sheet;
@@ -25,12 +26,12 @@ public class Connector {
                 : GetSheetFromBinaryFile(path);
     }
 
-    public List<String> getValuesInColumn(Range range ,int col) {
-        return Filter.getValuesInColumn(sheet.clone(),range,col);
+    public Map<Integer, List<String>> getValuesInColumn(Range range) {
+        return Filter.getValuesInColumn(sheet,range);
     }
 
-    public SheetDto applyFilter(int col, Range range ,List<String> filters) {
-        return Filter.getFilteredSheetDto(sheet.clone(),col,range,filters);
+    public SheetDto applyFilter(Range range , Map<Integer, List<String>> filters) {
+        return Filter.getFilteredSheetDto(sheet,range,filters);
     }
 
     private Sheet GetSheetFromXML(String fileName) throws Exception {
