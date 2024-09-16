@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.IntStream;
 
-import static component.top.TopController.createNewSheetInDifferentWindows;
-
 public class FilterDialogController {
 
     private AppController appController;
@@ -87,7 +85,7 @@ public class FilterDialogController {
         }));
 
         SheetDto sheet = appController.applyFilter(getRange(),filters);
-        createNewSheetInDifferentWindows(sheet);
+        appController.createNewSheetInDifferentWindows(sheet);
     }
 
     private boolean isInputValid() {

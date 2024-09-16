@@ -10,9 +10,12 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import component.app.AppController;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 import shticell.sheet.coordinate.Coordinate;
 import java.text.DecimalFormat;
@@ -32,8 +35,6 @@ public class SheetController {
 
     private final String defaultCellStyle = new TextField().styleProperty().toString();
     private final Map<Coordinate,SimpleStringProperty> sheetData = new HashMap<>();
-    private final SimpleIntegerProperty cellWidth = new SimpleIntegerProperty(100);
-    private final SimpleIntegerProperty cellHeight = new SimpleIntegerProperty(30);
     private final Map<Coordinate,TextField> sheetTextFields = new HashMap<>();
     private final Map<Integer, ObjectProperty<Pos>> alignmentPerCol = new HashMap<>();
 
@@ -41,6 +42,15 @@ public class SheetController {
         upDownScroller.vvalueProperty().addListener((obs, oldVal, newVal) -> gridPaneLeft.setLayoutY(-newVal.doubleValue() * (gridPaneSheet.getHeight() - upDownScroller.getViewportBounds().getHeight())));
         rightLeftScroller.hvalueProperty().addListener((obs, oldVal, newVal) -> gridPaneTop.setLayoutX(Math.max(0, -newVal.doubleValue() * (gridPaneSheet.getWidth() - rightLeftScroller.getViewportBounds().getWidth()))));
     }
+
+    private double xOffset;
+    private double yOffset;
+    private double initialWidth;
+    private double initialHeight;
+
+    private final Map<Integer, SimpleIntegerProperty> colWidth = new HashMap<>();
+    private final Map<Integer, SimpleIntegerProperty> rowHeight = new HashMap<>();
+
 
     public void setAppController(AppController appController) {
         this.appController = appController;
@@ -52,11 +62,11 @@ public class SheetController {
         gridPaneTop.getChildren().clear();
         gridPaneLeft.getChildren().clear();
     }
-    public static void printRowAndColumnsLabels(SheetDto sheet, GridPane gridPaneLeft, GridPane gridPaneTop,int width, int height) {
+    public void printRowAndColumnsLabels(SheetDto sheet, GridPane gridPaneLeft, GridPane gridPaneTop) {
         for (int row = 1; row <= sheet.numberOfRows(); row++) {
             Label rowLabel = new Label(String.valueOf(row));
-            rowLabel.setPrefWidth((double) width /2);
-            rowLabel.setPrefHeight(height);
+            rowLabel.prefWidthProperty().set(30);
+            rowLabel.prefHeightProperty().bind(rowHeight.get(row));
             rowLabel.setAlignment(Pos.CENTER);
             gridPaneLeft.add(rowLabel, 0, row);
             GridPane.setHalignment(rowLabel, HPos.CENTER);
@@ -65,8 +75,11 @@ public class SheetController {
 
         for (int col = 0; col <= sheet.numberOfColumns(); col++) {
             Label colLabel = new Label(Coordinate.getColumnLabel(col));
-            colLabel.setPrefWidth(width);
-            colLabel.setPrefHeight(height);
+            colWidth.computeIfPresent(col + 1, (key, value) -> {
+                colLabel.prefWidthProperty().bind(value);
+                return value;
+            });
+            colLabel.setPrefHeight(30);
             gridPaneTop.add(colLabel, col, 0);
             GridPane.setHalignment(colLabel, HPos.CENTER);
             GridPane.setValignment(colLabel, VPos.CENTER);
@@ -74,8 +87,6 @@ public class SheetController {
     }
 
     public void fillSheet(SheetDto sheet) {
-        cellWidth.set(sheet.colsWidth());
-        cellHeight.set(sheet.rowsHeight());
         if (isSheetLoaded) {
             fillExistSheetWithData(sheet);
         } else {
@@ -112,15 +123,36 @@ public class SheetController {
     }
 
     private void createNewSheet(SheetDto sheet){
-
         for (int i = 1; i <= sheet.numberOfColumns(); i++) {
             alignmentPerCol.put(i, new SimpleObjectProperty<>(Pos.CENTER_LEFT));
+            colWidth.put(i,new SimpleIntegerProperty(100));
+        }
+
+        for (int i = 1; i <= sheet.numberOfRows(); i++) {
+            rowHeight.put(i,new SimpleIntegerProperty(30));
         }
 
         sheet.cells().forEach((coordinate, cell) -> {
             TextField cellField = new TextField(cell.effectiveValue().toString());
-            cellField.prefWidthProperty().bind(cellWidth);
-            cellField.prefHeightProperty().bind(cellHeight);
+            cellField.prefWidthProperty().bindBidirectional(colWidth.get(coordinate.col()));
+            cellField.prefHeightProperty().bindBidirectional(rowHeight.get(coordinate.row()));
+
+            cellField.setOnMousePressed(event -> {
+                xOffset = event.getSceneX();
+                yOffset = event.getSceneY();
+                initialWidth = cellField.getWidth();
+                initialHeight = cellField.getHeight();
+            });
+
+            cellField.setOnMouseDragged(event -> {
+                double newWidth = initialWidth + (event.getSceneX() - xOffset);
+                cellField.setPrefWidth(newWidth > 50 ? newWidth : 50);
+
+                double newHeight = initialHeight + (event.getSceneY() - yOffset);
+                cellField.setPrefHeight(newHeight > 20 ? newHeight : 20);
+            });
+
+
             sheetData.put(coordinate,new SimpleStringProperty(cell.effectiveValue().toString()));
             sheetTextFields.put(coordinate,cellField);
             cellField.alignmentProperty().bind(alignmentPerCol.get(coordinate.col()));
@@ -136,16 +168,15 @@ public class SheetController {
             gridPaneSheet.add(cellField, coordinate.col() , coordinate.row());
         });
 
-        printRowAndColumnsLabels(sheet, gridPaneLeft, gridPaneTop,cellWidth.get(),cellHeight.get());
+        printRowAndColumnsLabels(sheet, gridPaneLeft, gridPaneTop);
     }
 
     private void handleCellAction(TextField cellField, Coordinate coordinate) {
-
         appController.updateCell(coordinate, cellField.getText());
         fillSheet(appController.GetSheet());
     }
 
-    private void cellClicked(Coordinate coordinate){
+    private void cellClicked(Coordinate coordinate) {
         appController.cellClicked(coordinate,sheetTextFields.get(coordinate).getStyle(),alignmentPerCol.get(coordinate.col()).getValue());
     }
 
@@ -210,6 +241,30 @@ public class SheetController {
 
     public void setAlignment(int col, Pos pos){
         alignmentPerCol.get(col).set(pos);
+    }
+
+    public void createNewSheetInDifferentWindows(SheetDto sheet) {
+        GridPane tempSheetGridPane = new GridPane();
+
+        sheet.cells().forEach((coordinate, cell) -> {
+            TextField cellField = new TextField(cell.effectiveValue().toString());
+            cellField.styleProperty().bind(sheetTextFields.get(coordinate).styleProperty());
+            cellField.alignmentProperty().bind(sheetTextFields.get(coordinate).alignmentProperty());
+            cellField.prefHeightProperty().bind(sheetTextFields.get(coordinate).prefHeightProperty());
+            cellField.prefWidthProperty().bind(sheetTextFields.get(coordinate).prefWidthProperty());
+            tempSheetGridPane.add(cellField, coordinate.col(), coordinate.row());
+        });
+
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(tempSheetGridPane);
+        borderPane.setLeft(gridPaneLeft);
+        borderPane.setTop(gridPaneTop);
+
+        Stage newStage = new Stage();
+
+        Scene scene = new Scene(borderPane, 800, 600);
+        newStage.setScene(scene);
+        newStage.show();
     }
 
 }

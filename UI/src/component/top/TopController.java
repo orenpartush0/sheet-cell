@@ -1,7 +1,6 @@
 package component.top;
 
 import component.app.AppController;
-import component.sheet.SheetController;
 import component.top.dialog.filter.FilterDialogController;
 import component.top.dialog.sheet.SheetDialogController;
 import component.top.dialog.range.RangeDialogController;
@@ -17,15 +16,11 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 
 import java.io.File;
@@ -334,35 +329,7 @@ public class TopController {
 
     private void handleVersionSelected(String selectedItem) {
         SheetDto sheetByVersionVersion = appController.getSheetByVersion(Integer.parseInt(selectedItem));
-        createNewSheetInDifferentWindows(sheetByVersionVersion);
-    }
-
-    public static void createNewSheetInDifferentWindows(SheetDto sheet) {
-        GridPane gridPaneSheet = new GridPane();
-        GridPane gridPaneLeft = new GridPane();
-        GridPane gridPaneTop = new GridPane();
-
-
-        sheet.cells().forEach((coordinate, cell) -> {
-            TextField cellField = new TextField(cell.effectiveValue().toString());
-            cellField.setPrefWidth(100);
-            cellField.setPrefHeight(30);
-            cellField.setId(coordinate.toString());
-            gridPaneSheet.add(cellField, coordinate.col(), coordinate.row());
-        });
-
-        SheetController.printRowAndColumnsLabels(sheet, gridPaneLeft, gridPaneTop,100,30);
-
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(gridPaneSheet);
-        borderPane.setLeft(gridPaneLeft);
-        borderPane.setTop(gridPaneTop);
-
-        Stage newStage = new Stage();
-
-        Scene scene = new Scene(borderPane, 800, 600);
-        newStage.setScene(scene);
-        newStage.show();
+        appController.createNewSheetInDifferentWindows(sheetByVersionVersion);
     }
 }
 

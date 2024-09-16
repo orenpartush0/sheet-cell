@@ -154,4 +154,8 @@ public class AppController {
     public void setAlignment(int col, Pos pos){
         sheetComponentController.setAlignment(col,pos);
     }
+
+    public void createNewSheetInDifferentWindows(SheetDto sheet){
+        sheetComponentController.createNewSheetInDifferentWindows(sheet);
+    }
 }
