@@ -21,6 +21,7 @@ import shticell.sheet.coordinate.Coordinate;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.*;
+import java.util.stream.IntStream;
 
 public class SheetController {
 
@@ -73,13 +74,18 @@ public class SheetController {
             GridPane.setValignment(rowLabel, VPos.CENTER);
         }
 
-        for (int col = 0; col <= sheet.numberOfColumns(); col++) {
+        Label leftTopTextField = new Label("");
+        leftTopTextField.prefWidthProperty().set(30);
+        gridPaneTop.add(leftTopTextField, 0, 0);
+
+        for (int col = 1; col <= sheet.numberOfColumns(); col++) {
             Label colLabel = new Label(Coordinate.getColumnLabel(col));
-            colWidth.computeIfPresent(col + 1, (key, value) -> {
+            colWidth.computeIfPresent(col, (key, value) -> {
                 colLabel.prefWidthProperty().bind(value);
                 return value;
             });
             colLabel.setPrefHeight(30);
+            colLabel.setAlignment(Pos.CENTER);
             gridPaneTop.add(colLabel, col, 0);
             GridPane.setHalignment(colLabel, HPos.CENTER);
             GridPane.setValignment(colLabel, VPos.CENTER);
@@ -245,6 +251,10 @@ public class SheetController {
 
     public void createNewSheetInDifferentWindows(SheetDto sheet) {
         GridPane tempSheetGridPane = new GridPane();
+        GridPane tempLeftGridPane = new GridPane();
+        GridPane tempTopGridPane = new GridPane();
+        BorderPane borderPane = new BorderPane();
+
 
         sheet.cells().forEach((coordinate, cell) -> {
             TextField cellField = new TextField(cell.effectiveValue().toString());
@@ -255,10 +265,29 @@ public class SheetController {
             tempSheetGridPane.add(cellField, coordinate.col(), coordinate.row());
         });
 
-        BorderPane borderPane = new BorderPane();
+        IntStream.range(0,sheet.numberOfRows()).forEach(i->{
+            Label currentRowLabel = ((Label)gridPaneLeft.getChildren().get(i));
+            Label rowLabel = new Label(currentRowLabel.getText());
+            rowLabel.setStyle(currentRowLabel.getStyle());
+            rowLabel.setAlignment(currentRowLabel.getAlignment());
+            rowLabel.setPrefHeight(currentRowLabel.getPrefHeight());
+            rowLabel.setPrefWidth(currentRowLabel.getPrefWidth());
+            tempLeftGridPane.add(rowLabel,0,i);
+        });
+
+        IntStream.range(0,sheet.numberOfColumns() + 1).forEach(i -> {
+            Label currentColLabel = ((Label)gridPaneTop.getChildren().get(i));
+            Label colLabel = new Label(currentColLabel.getText());
+            colLabel.setStyle(currentColLabel.getStyle());
+            colLabel.setAlignment(currentColLabel.getAlignment());
+            colLabel.setPrefHeight(currentColLabel.getPrefHeight());
+            colLabel.setPrefWidth(currentColLabel.getPrefWidth());
+            tempTopGridPane.add(colLabel,i,0);
+        });
+
         borderPane.setCenter(tempSheetGridPane);
-        borderPane.setLeft(gridPaneLeft);
-        borderPane.setTop(gridPaneTop);
+        borderPane.setLeft(tempLeftGridPane);
+        borderPane.setTop(tempTopGridPane);
 
         Stage newStage = new Stage();
 
