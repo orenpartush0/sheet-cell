@@ -22,9 +22,10 @@ public interface Sort {
         Sheet sheetInRange = new SheetImpl("", sheet.GetNumberOfRows(), sheet.GetNumberOfColumns(), sheet.GetRowsHeight(), sheet.GetColsWidth());
 
         List<Integer> lst = creteListOfRowsInRange(sheet, range);
-
-        sortLst(lst, sheet, cols);
-
+        Queue<String> colsCopy = new LinkedList<>(cols);
+        List<Integer> empteis = getEmpties(lst,colsCopy.poll(),sheet);
+        lst = sortLst(lst, sheet, cols);
+        lst.addAll(empteis);
         for (int newRowIndex = 0; newRowIndex < lst.size(); newRowIndex++) {
             int oldRowIndex = lst.get(newRowIndex);
             for (int col = 0; col < sheet.GetNumberOfColumns(); col++) {
@@ -39,26 +40,34 @@ public interface Sort {
         return new SheetDto(sheetInRange);
     }
 
-    private static void sortLst(List<Integer> lst, SheetToFilter sheet, Queue<String> cols) {
-        lst.sort((row1, row2) -> {
+    private static List<Integer> getEmpties(List<Integer> lst,String colL,SheetToFilter sheet) {
+        List<Integer> empties = new ArrayList<>();
+        int col = columnLabelToNumber(colL);
+        for(int row:lst){
+            EffectiveValue effectiveValue = sheet.GetCell(CoordinateFactory.getCoordinate(row, col)).GetEffectiveValue();
+            if(effectiveValue.getValueType() != ValueType.NUMERIC){
+                empties.add(row);
+            }
+        }
+        lst.removeAll(empties);
+        return empties;
+    }
+
+    private static List<Integer> sortLst(List<Integer> lst, SheetToFilter sheet, Queue<String> cols) {
+        return lst.stream().sorted((row1, row2) -> {
             int compare = 0;
             Queue<String> colsCopy = new LinkedList<>(cols);
             while (!colsCopy.isEmpty()) {
                 int col = columnLabelToNumber(colsCopy.poll());
                 EffectiveValue effectiveValue1 = sheet.GetCell(CoordinateFactory.getCoordinate(row1, col)).GetEffectiveValue();
                 EffectiveValue effectiveValue2 = sheet.GetCell(CoordinateFactory.getCoordinate(row2, col)).GetEffectiveValue();
-
-                if (effectiveValue1.getValueType() != ValueType.NUMERIC || effectiveValue2.getValueType() != ValueType.NUMERIC) {
-                    return 0;
-                } else {
-                    compare = Integer.compare(effectiveValue1.getValueWithExpectation(Integer.class), effectiveValue2.getValueWithExpectation(Integer.class));
-                    if (compare != 0) {
-                        return compare;
-                    }
+                compare = Double.compare(effectiveValue1.getValueWithExpectation(Double.class), effectiveValue2.getValueWithExpectation(Double.class));
+                if (compare != 0) {
+                    return compare;
                 }
             }
             return compare;
-        });
+        }).collect(Collectors.toList());
     }
 
     private static List<Integer> creteListOfRowsInRange(SheetToFilter sheet, Range range) {

@@ -34,7 +34,7 @@
     </ScrollPane>
 
     <HBox spacing="10" GridPane.columnIndex="0" GridPane.rowIndex="3" GridPane.columnSpan="3" alignment="center">
-        <Button fx:id="applyButton" disable="true" text="Apply Filter" onAction="#ApplySort"/>
+        <Button fx:id="applyButton" disable="true" text="Apply Sort" onAction="#ApplySort"/>
         <Button text="Cancel" onAction="#handeCancel"/>
     </HBox>
 
