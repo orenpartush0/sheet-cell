@@ -295,5 +295,9 @@ public class SheetController {
         newStage.show();
     }
 
+    public void setDefaultStyle(Coordinate coordinate){
+        sheetTextFields.get(coordinate).styleProperty().setValue(defaultCellStyle);
+    }
+
 }
 

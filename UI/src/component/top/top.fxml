@@ -70,7 +70,9 @@
                 <ColorPicker fx:id="backgroundColorPicker" disable="true"/>
             </VBox>
 
-            <ComboBox fx:id="alignmentComboBox" promptText="Alignment" disable="true" prefWidth="150.0">
+            <VBox>
+                <Label text="Alignment"/>
+                <ComboBox fx:id="alignmentComboBox"  disable="true" prefWidth="150.0">
                 <items>
                     <FXCollections fx:factory="observableArrayList">
                         <String fx:value="Center"/>
@@ -79,6 +81,10 @@
                     </FXCollections>
                 </items>
             </ComboBox>
+            </VBox>
+            <VBox alignment="CENTER">
+            <Button fx:id="defaultStyleButton" disable="true" text="Default Style" onAction="#onDefaultStyle"/>
+            </VBox>
         </HBox>
     </VBox>
 

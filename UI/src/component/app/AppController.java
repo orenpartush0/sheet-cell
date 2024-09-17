@@ -11,6 +11,7 @@ import javafx.scene.layout.BorderPane;
 import component.sheet.SheetController;
 import component.top.TopController;
 import shticell.sheet.coordinate.Coordinate;
+import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.range.Range;
 import java.io.IOException;
@@ -162,5 +163,9 @@ public class AppController {
 
     public SheetDto applySort(Queue<String> cols,Range range){
         return connector.applySort(cols,range);
+    }
+
+    public void setDefaultStyle(Coordinate coordinate){
+        sheetComponentController.setDefaultStyle(coordinate);
     }
 }

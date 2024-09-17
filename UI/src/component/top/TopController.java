@@ -64,6 +64,8 @@ public class TopController {
     private ColorPicker backgroundColorPicker;
     @FXML
     private ComboBox<String> alignmentComboBox;
+    @FXML
+    private Button defaultStyleButton;
 
 
 
@@ -228,6 +230,7 @@ public class TopController {
         originalValue.set(cell.originalValue());
         lastUpdate.set(cell.LatestSheetVersionUpdated());
         textColorPicker.disableProperty().set(false);
+        defaultStyleButton.disableProperty().set(false);
         backgroundColorPicker.disableProperty().set(false);
         alignmentComboBox.disableProperty().set(false);
         Color textColor = extractColorFromStyle(style, "-fx-text-fill");
@@ -349,6 +352,10 @@ public class TopController {
     private void handleVersionSelected(String selectedItem) {
         SheetDto sheetByVersionVersion = appController.getSheetByVersion(Integer.parseInt(selectedItem));
         appController.createNewSheetInDifferentWindows(sheetByVersionVersion);
+    }
+
+    public void onDefaultStyle(){
+        appController.setDefaultStyle(CoordinateFactory.getCoordinate(cellId.get()));
     }
 }
 

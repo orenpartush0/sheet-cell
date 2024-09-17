@@ -72,7 +72,6 @@ public interface Sort {
                 .collect(Collectors.toCollection(ArrayList::new)); // Use ArrayList here
     }
 
-
     private static int columnLabelToNumber(String label) {
         int result = 0;
         for (int i = 0; i < label.length(); i++) {
