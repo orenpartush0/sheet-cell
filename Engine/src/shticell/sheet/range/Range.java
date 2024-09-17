@@ -37,4 +37,9 @@ public record Range(String rangeName, Coordinate startCellCoordinate, Coordinate
     public boolean containRow(int row){
         return startCellCoordinate.row() <= row && endCellCoordinate.row() >= row;
     }
+
+    public boolean containCol(int col){
+        return startCellCoordinate.col() <= col && endCellCoordinate.col() >= col;
+    }
+
 }

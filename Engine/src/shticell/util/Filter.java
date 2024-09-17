@@ -53,8 +53,10 @@ public interface Filter {
                         IntStream.
                                 range(1, sheet.GetNumberOfColumns() + 1).
                                 forEach(col -> {
-                                    sheetInRange.GetCell(CoordinateFactory.getCoordinate(row, col)).
-                                            GetEffectiveValue().setValue(sheet.GetCell(CoordinateFactory.getCoordinate(row, col)).GetEffectiveValue().getValue().toString(), ValueType.STRING);
+                                    if(range.containCol(col)) {
+                                        sheetInRange.GetCell(CoordinateFactory.getCoordinate(row, col)).
+                                                GetEffectiveValue().setValue(sheet.GetCell(CoordinateFactory.getCoordinate(row, col)).GetEffectiveValue().getValue().toString(), ValueType.STRING);
+                                    }
                                 });
                     }
                 });

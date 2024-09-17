@@ -71,7 +71,6 @@ public class TopController {
     private Button functionButton;
 
 
-
     private final SimpleBooleanProperty isSheetLoaded = new SimpleBooleanProperty(false);
     private final SimpleStringProperty originalValue = new SimpleStringProperty("");
     private final SimpleIntegerProperty lastUpdate = new SimpleIntegerProperty(0);
@@ -102,30 +101,30 @@ public class TopController {
             }
         });
 
-        textColorPicker.setOnAction(event->{
+        textColorPicker.setOnAction(event -> {
             Color selectedColor = textColorPicker.getValue();
             String colorAsHex = String.format("#%02X%02X%02X",
                     (int) (selectedColor.getRed() * 255),
                     (int) (selectedColor.getGreen() * 255),
                     (int) (selectedColor.getBlue() * 255));
 
-            appController.PaintCellText(CoordinateFactory.getCoordinate(cellId.get()),colorAsHex);
+            appController.PaintCellText(CoordinateFactory.getCoordinate(cellId.get()), colorAsHex);
         });
 
-        backgroundColorPicker.setOnAction(event->{
+        backgroundColorPicker.setOnAction(event -> {
             Color selectedColor = backgroundColorPicker.getValue();
             String colorAsHex = String.format("#%02X%02X%02X",
                     (int) (selectedColor.getRed() * 255),
                     (int) (selectedColor.getGreen() * 255),
                     (int) (selectedColor.getBlue() * 255));
 
-            appController.PaintCellBackground(CoordinateFactory.getCoordinate(cellId.get()),colorAsHex);
+            appController.PaintCellBackground(CoordinateFactory.getCoordinate(cellId.get()), colorAsHex);
         });
 
-        alignmentComboBox.setOnAction(event->{
+        alignmentComboBox.setOnAction(event -> {
             String selectedAlignment = alignmentComboBox.getSelectionModel().getSelectedItem();
             Pos selectedPos = convertToPos(selectedAlignment);
-            appController.setAlignment(CoordinateFactory.getCoordinate(cellId.getValue()).col(),selectedPos);
+            appController.setAlignment(CoordinateFactory.getCoordinate(cellId.getValue()).col(), selectedPos);
         });
 
     }
@@ -201,7 +200,7 @@ public class TopController {
         controller.setAppController(appController);
         Stage dialogStage = new Stage();
         dialogStage.setTitle("Sheet Details");
-        dialogStage.initModality(Modality.WINDOW_MODAL);
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setScene(new Scene(root));
 
         dialogStage.setHeight(240);
@@ -210,7 +209,7 @@ public class TopController {
         dialogStage.showAndWait();
     }
 
-    public void EnableButtons(){
+    public void EnableButtons() {
         isSheetLoaded.set(true);
     }
 
@@ -228,7 +227,7 @@ public class TopController {
         return Color.TRANSPARENT;
     }
 
-    public void setOnMouseCoordinate(CellDto cell,String style,Pos pos) {
+    public void setOnMouseCoordinate(CellDto cell, String style, Pos pos) {
         cellId.set(cell.coordinate().toString());
         originalValue.set(cell.originalValue());
         lastUpdate.set(cell.LatestSheetVersionUpdated());
@@ -259,7 +258,7 @@ public class TopController {
         controller.setAppController(appController);
         controller.setBoundaries(appController.getNumOfCols(), appController.getNumOfRows());
         Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.WINDOW_MODAL);
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setScene(new Scene(root));
         dialogStage.setTitle("Sort");
         controller.setDialogStage(dialogStage);
@@ -274,10 +273,10 @@ public class TopController {
         Parent root = loader.load();
         FilterDialogController controller = loader.getController();
         controller.setAppController(appController);
-        controller.setBoundaries(appController.getNumOfRows(),appController.getNumOfCols());
+        controller.setBoundaries(appController.getNumOfRows(), appController.getNumOfCols());
         controller.fillData();
         Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.WINDOW_MODAL);
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setScene(new Scene(root));
         dialogStage.setTitle("Filter");
         controller.setDialogStage(dialogStage);
@@ -291,12 +290,12 @@ public class TopController {
         Parent root = loader.load();
 
         RangeDialogController controller = loader.getController();
-        controller.setBoundaries(appController.getNumOfRows(),appController.getNumOfCols());
+        controller.setBoundaries(appController.getNumOfRows(), appController.getNumOfCols());
         controller.setAppController(appController);
         controller.setTopController(this);
         Stage dialogStage = new Stage();
         dialogStage.setTitle("Range Details");
-        dialogStage.initModality(Modality.WINDOW_MODAL);
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
         dialogStage.setScene(new Scene(root));
         dialogStage.setHeight(240);
         dialogStage.setWidth(350);
@@ -324,13 +323,11 @@ public class TopController {
                     try {
                         appController.removeRange(selectedRange);
                         rangesComboBox.getItems().remove(selectedRange);
-                    }
-                    catch(Exception e){
+                    } catch (Exception e) {
                         AppController.showError(e.getMessage());
                     }
                 });
-            }
-            else {
+            } else {
                 appController.removePaint();
             }
         });
@@ -359,7 +356,7 @@ public class TopController {
     }
 
     @FXML
-    public void onDefaultStyle(){
+    public void onDefaultStyle() {
         appController.setDefaultStyle(CoordinateFactory.getCoordinate(cellId.get()));
     }
 
@@ -378,9 +375,10 @@ public class TopController {
         dialogStage.setHeight(240);
         dialogStage.setWidth(450);
         dialogStage.showAndWait();
-        if(controller.isClick){
-            appController.createFunc(function,CoordinateFactory.getCoordinate(cellId.get()));
+        if (controller.isClick) {
+            appController.createFunc(function, CoordinateFactory.getCoordinate(cellId.get()));
         }
     }
 }
+
 

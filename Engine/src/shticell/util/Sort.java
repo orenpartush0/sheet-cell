@@ -78,7 +78,7 @@ public interface Sort {
                 .filter(cell -> cell.col() == range.startCellCoordinate().col())
                 .mapToInt(Coordinate::row)
                 .boxed()
-                .collect(Collectors.toCollection(ArrayList::new)); // Use ArrayList here
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private static int columnLabelToNumber(String label) {

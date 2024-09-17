@@ -296,7 +296,7 @@ public class SheetController {
     }
 
     public void setDefaultStyle(Coordinate coordinate){
-        sheetTextFields.get(coordinate).styleProperty().setValue(defaultCellStyle);
+        sheetTextFields.get(coordinate).styleProperty().set(defaultCellStyle);
     }
 
     public void createFunc(SimpleStringProperty func, Coordinate coordinate){
