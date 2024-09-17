@@ -5,6 +5,7 @@ import shticell.sheet.api.Sheet;
 import shticell.sheet.cell.api.Cell;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
+import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.impl.SheetImpl;
 import shticell.sheet.range.Range;
 
@@ -40,19 +41,47 @@ public interface Sort {
                         return 1;
                 }
         }
-        public static SheetDto getSortedSheetDTO(Sheet sheet, String from, String to, String...keyColumns) {
+        public static SheetDto SortRange(Sheet sheet, String from, String to, String...keyColumns) throws LoopConnectionException {
                 Coordinate start = CoordinateFactory.getCoordinate(from);
                 Coordinate end = CoordinateFactory.getCoordinate(to);
                 List<keyColInfo> toSortList = new ArrayList<>();
                 for(int i = start.row(); i<=end.row(); i++){
-                        toSortList.add(new keyColInfo(i, sheet.GetCell(CoordinateFactory.getCoordinate(keyColumns[0]+i)).GetEffectiveValue().getValueWithExpectation(Double.class)));
+                        if(sheet.GetCell(CoordinateFactory.getCoordinate(keyColumns[0]+i)).GetOriginalValue()!= ""){
+
+                                toSortList.add(new keyColInfo(i, sheet.GetCell(CoordinateFactory.getCoordinate(keyColumns[0]+i)).GetEffectiveValue().getValueWithExpectation(Double.class)));
+                        }
+                        else{
+                                toSortList.add(new keyColInfo(i, Double.POSITIVE_INFINITY));
+                        }
                 }
                 recursiveSort(toSortList,sheet,0,keyColumns);
                 Map<Coordinate, Cell> cellsRes = new HashMap<>();
                 List<Coordinate> coordinatesInRange = new Range("",start,end).getRangeCellsCoordinate();
-                return null;
+                return cumputeSheetDTO(toSortList,sheet,mapRows(coordinatesInRange));
         }
-        public static void recursiveSort(List <keyColInfo> toSortList,Sheet sheet, int keyind,String ... keyColums){
+
+        private static SheetDto cumputeSheetDTO(List<keyColInfo> sortedlist, Sheet sheet, Map<Integer,List<Coordinate>> mapRows) throws LoopConnectionException {
+                Sheet tempSheet = new SheetImpl("",sortedlist.size(), sheet.GetNumberOfColumns(), sheet.GetRowsHeight(), sheet.GetColsWidth());
+                int counter = 1;
+                for(keyColInfo i : sortedlist){
+                        List<Coordinate> coordinates = mapRows.get(i.getRow());
+                        for(Coordinate c : coordinates){
+                                tempSheet.UpdateCellByCoordinate(CoordinateFactory.getCoordinate(counter,c.col()),sheet.GetCell(c).GetOriginalValue());
+
+                        }
+                        counter +=1;
+                }
+                return new SheetDto(tempSheet);
+        }
+
+        private static Map<Integer,List<Coordinate>> mapRows(List<Coordinate> inRange){
+                Map<Integer,List<Coordinate>> map = new HashMap<>();
+                for(Coordinate coordinate : inRange){
+                        map.computeIfAbsent(coordinate.row(), k -> new ArrayList<>()).add(coordinate);
+                }
+                return map;
+        }
+        private static void recursiveSort(List <keyColInfo> toSortList,Sheet sheet, int keyind,String ... keyColums){
                 toSortList = toSortList.stream().sorted((c1,c2)->c1.compare(c1,c2)).collect(Collectors.toList());
                 List<String> buckets = listOfReapts(toSortList);
                 if(keyind < keyColums.length-1) {
@@ -67,13 +96,9 @@ public interface Sort {
                                 recursiveSort(subSort,sheet,keyind+1,keyColums);
                         }
                 }
-
-
-
-
         }
 
-        public static  List<String>  listOfReapts(List<keyColInfo> checklist){
+        private static  List<String>  listOfReapts(List<keyColInfo> checklist){
                 boolean flag = false;
                 Double startval = checklist.getFirst().getValue();
                 List<String> res = new ArrayList<>();
