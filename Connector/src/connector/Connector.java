@@ -9,9 +9,12 @@ import shticell.sheet.impl.SheetImpl;
 import dto.SheetDto;
 import shticell.sheet.range.Range;
 import shticell.util.Filter;
+import shticell.util.Sort;
+
 import java.io.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 public class Connector {
     private Sheet sheet;
@@ -83,6 +86,10 @@ public class Connector {
 
     public void removeRange(String rangeName) throws Exception{
         sheet.removeRange(rangeName);
+    }
+
+    public SheetDto applySort(Queue<String> cols,Range range){
+        return Sort.SortRange(sheet,cols,range);
     }
 
 }

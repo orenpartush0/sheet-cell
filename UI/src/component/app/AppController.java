@@ -16,6 +16,7 @@ import shticell.sheet.range.Range;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 public class AppController {
 
@@ -157,5 +158,9 @@ public class AppController {
 
     public void createNewSheetInDifferentWindows(SheetDto sheet){
         sheetComponentController.createNewSheetInDifferentWindows(sheet);
+    }
+
+    public SheetDto applySort(Queue<String> cols,Range range){
+        return connector.applySort(cols,range);
     }
 }

@@ -4,6 +4,7 @@ import component.app.AppController;
 import component.top.dialog.filter.FilterDialogController;
 import component.top.dialog.sheet.SheetDialogController;
 import component.top.dialog.range.RangeDialogController;
+import component.top.dialog.sort.SortDialogController;
 import dto.CellDto;
 import dto.SheetDto;
 import javafx.beans.binding.Bindings;
@@ -54,7 +55,9 @@ public class TopController {
     @FXML
     private Button minus;
     @FXML
-    private Button addFilter;
+    private Button filterButton;
+    @FXML
+    private Button sortButton;
     @FXML
     private ColorPicker textColorPicker;
     @FXML
@@ -83,7 +86,8 @@ public class TopController {
         SheetVersionComboBox.setVisibleRowCount(5);
         plus.disableProperty().bind(isSheetLoaded.not());
         minus.disableProperty().bind(isSheetLoaded.not());
-        addFilter.disableProperty().bind(isSheetLoaded.not());
+        filterButton.disableProperty().bind(isSheetLoaded.not());
+        sortButton.disableProperty().bind(isSheetLoaded.not());
         pathTextField.styleProperty().unbind();
         SheetVersionComboBox.getItems().add("Version");
         SheetVersionComboBox.setOnAction(event -> {
@@ -241,9 +245,24 @@ public class TopController {
         };
     }
 
+    public void onSort() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/component/top/dialog/sort/createSortDialog.fxml"));
+        Parent root = loader.load();
+        SortDialogController controller = loader.getController();
+        controller.setAppController(appController);
+        controller.setBoundaries(appController.getNumOfCols(), appController.getNumOfRows());
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.WINDOW_MODAL);
+        dialogStage.setScene(new Scene(root));
+        dialogStage.setTitle("Sort");
+        controller.setDialogStage(dialogStage);
+        controller.setAppController(appController);
+        dialogStage.showAndWait();
+    }
+
 
     @FXML
-    public void addFilter() throws IOException {
+    public void onFilter() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/component/top/dialog/filter/createFilterDialog.fxml"));
         Parent root = loader.load();
         FilterDialogController controller = loader.getController();

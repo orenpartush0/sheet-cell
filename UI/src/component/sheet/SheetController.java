@@ -255,7 +255,6 @@ public class SheetController {
         GridPane tempTopGridPane = new GridPane();
         BorderPane borderPane = new BorderPane();
 
-
         sheet.cells().forEach((coordinate, cell) -> {
             TextField cellField = new TextField(cell.effectiveValue().toString());
             cellField.styleProperty().bind(sheetTextFields.get(coordinate).styleProperty());
