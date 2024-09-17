@@ -11,6 +11,9 @@ import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.cell.api.Cell;
 import shticell.sheet.cell.impl.CellImpl;
 import shticell.sheet.range.Range;
+import shticell.sheet.range.RangeWithCounter;
+import shticell.sheet.range.RangeWithCounterImpl;
+
 import java.io.Serializable;
 import java.util.*;
 import java.util.stream.IntStream;
@@ -20,7 +23,7 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     private final String sheetName;
     private int version = INITIAL_VERSION;
     Map<Coordinate, Cell> cells = new HashMap<>();
-    Map<String, Range> ranges = new HashMap<>();
+    Map<String, RangeWithCounter> ranges = new HashMap<>();
     private final int numberOfRows;
     private final int numberOfColumns;
     private final int rowHeight;
@@ -72,9 +75,6 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     public int GetRowsHeight() {return rowHeight;}
 
     @Override
-    public Range GetRangeByName(String rangeName) {return ranges.get(rangeName);}
-
-    @Override
     public EffectiveValue GetCellEffectiveValue(Coordinate coordinate) {
         return cells.get(coordinate).GetEffectiveValue();
     }
@@ -82,12 +82,12 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     @Override
     public void UpdateCellByCoordinateWithOutVersionUpdate(Coordinate coordinate, String newValue) throws LoopConnectionException {
         try{cells.get(coordinate).UpdateCell(newValue,version);}
-        catch (LoopConnectionException | RuntimeException e){throw e;};
+        catch (LoopConnectionException | RuntimeException e){throw e;}
     }
 
     public void UpdateCellByCoordinate(Coordinate coordinate, String newValue) throws LoopConnectionException {
         try{cells.get(coordinate).UpdateCell(newValue,++version);}
-        catch (LoopConnectionException | RuntimeException e){version--; throw e;};
+        catch (LoopConnectionException | RuntimeException e){version--; throw e;}
     }
 
     @Override
@@ -150,7 +150,7 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
 
     @Override
     public void AddRange(Range rangeDto){
-        if(ranges.containsKey(rangeDto.rangeName()) || ranges.values().stream().anyMatch(range->range.equals(rangeDto))){
+        if(ranges.containsKey(rangeDto.rangeName()) || ranges.values().stream().map(RangeWithCounter::GetRange).anyMatch(range->range.equals(rangeDto))){
             throw new RuntimeException("Range already exists");
         }
         else if(!cells.containsKey(rangeDto.endCellCoordinate()) || !cells.containsKey(rangeDto.startCellCoordinate())){
@@ -158,34 +158,45 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
         }
 
 
-        ranges.put(rangeDto.rangeName(),new Range(rangeDto.rangeName(),rangeDto.startCellCoordinate(),rangeDto.endCellCoordinate()));
+        ranges.put(rangeDto.rangeName(),new RangeWithCounterImpl(new Range(rangeDto.rangeName(),rangeDto.startCellCoordinate(),rangeDto.endCellCoordinate()),0));
     }
 
     @Override
     public Range GetRangeDto(String rangeName){
-        return new Range(rangeName,ranges.get(rangeName).startCellCoordinate(),ranges.get(rangeName).endCellCoordinate());
+        return ranges.get(rangeName).GetRange();
     }
 
     @Override
-    public Range GetRange(String rangeName) {
-        return ranges.get(rangeName);
+    public void UseRange(Coordinate coordinate,Range range) {
+        cells.get(coordinate).UseRange(range);
+        ranges.get(range.rangeName()).AddUsing();
     }
 
     @Override
     public List<Range> GetRangesDto(){
-        return ranges.values().stream().toList();
+        return ranges.values().stream().map(RangeWithCounter::GetRange).toList();
+    }
+
+    @Override
+    public void UnUseRange(Range range){
+        ranges.get(range.rangeName()).RemoveUsing();
     }
 
     @Override
     public Sheet clone(){
         Sheet clone = new SheetImpl(sheetName,numberOfRows,numberOfColumns,rowHeight,columnWidth);
         cells.forEach((key, value) -> clone.GetCells().put(key, value.clone()));
-        ranges.forEach((key, value) ->clone.AddRange(new Range(key,value.startCellCoordinate(),value.endCellCoordinate())));
+        ranges.forEach((key, value) ->clone.AddRange(new Range(key,value.GetRange().startCellCoordinate(),value.GetRange().endCellCoordinate())));
         return clone;
     }
 
-    public void removeRange(String rangeName){
+    public void removeRange(String rangeName) {
+        if(ranges.get(rangeName).GetCounter() != 0){
+            throw new RuntimeException("Range in use");
+        }
+
         ranges.remove(rangeName);
+
     }
 }
 

@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public interface Sheet extends Cloneable, Serializable {
+public interface Sheet extends Cloneable, Serializable,SheetToFilter {
     String GetSheetName();
 
     int GetVersion();
@@ -41,6 +41,5 @@ public interface Sheet extends Cloneable, Serializable {
 
     Sheet clone();
 
-    void removeRange(String rangeName);
-    Range GetRangeByName(String rangeName);
+    void removeRange(String rangeName) throws Exception;
 }

@@ -7,8 +7,6 @@
 
 .label {
     -fx-font-size: 14px;
-    -fx-text-fill: #333333;
-    -fx-background-color: lightgray;
     -fx-padding: 5 10;
     -fx-border-radius: 5;
     -fx-background-radius: 10;

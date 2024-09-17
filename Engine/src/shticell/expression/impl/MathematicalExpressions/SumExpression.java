@@ -35,6 +35,7 @@ public class SumExpression  implements Expression {
                     mapToDouble(coordinate->hasSheetData.GetCellEffectiveValue(coordinate).getValueWithExpectation(Double.class)).
                     sum();
 
+            hasSheetData.UseRange(connections.GetCellCoordinate(),range);
 
             range.getRangeCellsCoordinate().
                     forEach(coordinate -> {

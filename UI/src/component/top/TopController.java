@@ -1,10 +1,10 @@
 package component.top;
 
 import component.app.AppController;
-import component.sheet.SheetController;
 import component.top.dialog.filter.FilterDialogController;
 import component.top.dialog.sheet.SheetDialogController;
 import component.top.dialog.range.RangeDialogController;
+import component.top.dialog.sort.SortDialogController;
 import dto.CellDto;
 import dto.SheetDto;
 import javafx.beans.binding.Bindings;
@@ -17,23 +17,23 @@ import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import shticell.sheet.coordinate.CoordinateFactory;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TopController {
 
     private AppController appController;
-
     String previousPath;
 
     @FXML
@@ -55,7 +55,15 @@ public class TopController {
     @FXML
     private Button minus;
     @FXML
-    private Button addFilter;
+    private Button filterButton;
+    @FXML
+    private Button sortButton;
+    @FXML
+    private ColorPicker textColorPicker;
+    @FXML
+    private ColorPicker backgroundColorPicker;
+    @FXML
+    private ComboBox<String> alignmentComboBox;
 
 
 
@@ -78,7 +86,8 @@ public class TopController {
         SheetVersionComboBox.setVisibleRowCount(5);
         plus.disableProperty().bind(isSheetLoaded.not());
         minus.disableProperty().bind(isSheetLoaded.not());
-        addFilter.disableProperty().bind(isSheetLoaded.not());
+        filterButton.disableProperty().bind(isSheetLoaded.not());
+        sortButton.disableProperty().bind(isSheetLoaded.not());
         pathTextField.styleProperty().unbind();
         SheetVersionComboBox.getItems().add("Version");
         SheetVersionComboBox.setOnAction(event -> {
@@ -87,6 +96,41 @@ public class TopController {
                 SheetVersionComboBox.setValue("Version");
             }
         });
+
+        textColorPicker.setOnAction(event->{
+            Color selectedColor = textColorPicker.getValue();
+            String colorAsHex = String.format("#%02X%02X%02X",
+                    (int) (selectedColor.getRed() * 255),
+                    (int) (selectedColor.getGreen() * 255),
+                    (int) (selectedColor.getBlue() * 255));
+
+            appController.PaintCellText(CoordinateFactory.getCoordinate(cellId.get()),colorAsHex);
+        });
+
+        backgroundColorPicker.setOnAction(event->{
+            Color selectedColor = backgroundColorPicker.getValue();
+            String colorAsHex = String.format("#%02X%02X%02X",
+                    (int) (selectedColor.getRed() * 255),
+                    (int) (selectedColor.getGreen() * 255),
+                    (int) (selectedColor.getBlue() * 255));
+
+            appController.PaintCellBackground(CoordinateFactory.getCoordinate(cellId.get()),colorAsHex);
+        });
+
+        alignmentComboBox.setOnAction(event->{
+            String selectedAlignment = alignmentComboBox.getSelectionModel().getSelectedItem();
+            Pos selectedPos = convertToPos(selectedAlignment);
+            appController.setAlignment(CoordinateFactory.getCoordinate(cellId.getValue()).col(),selectedPos);
+        });
+
+    }
+
+    private Pos convertToPos(String alignment) {
+        return switch (alignment) {
+            case "Left" -> Pos.CENTER_LEFT;
+            case "Right" -> Pos.CENTER_RIGHT;
+            default -> Pos.CENTER;
+        };
     }
 
 
@@ -169,19 +213,62 @@ public class TopController {
         path.set(previousPath);
     }
 
-    public void setOnMouseCoordinate(CellDto cell) {
+    private Color extractColorFromStyle(String style, String colorProperty) {
+        Pattern pattern = Pattern.compile(colorProperty + ":\\s*([^;]+)");
+        Matcher matcher = pattern.matcher(style);
+        if (matcher.find()) {
+            String colorValue = matcher.group(1);
+            return Color.web(colorValue);
+        }
+        return Color.TRANSPARENT;
+    }
+
+    public void setOnMouseCoordinate(CellDto cell,String style,Pos pos) {
         cellId.set(cell.coordinate().toString());
         originalValue.set(cell.originalValue());
         lastUpdate.set(cell.LatestSheetVersionUpdated());
+        textColorPicker.disableProperty().set(false);
+        backgroundColorPicker.disableProperty().set(false);
+        alignmentComboBox.disableProperty().set(false);
+        Color textColor = extractColorFromStyle(style, "-fx-text-fill");
+        Color backgroundColor = extractColorFromStyle(style, "-fx-background-color");
+        textColorPicker.setValue(textColor);
+        backgroundColorPicker.setValue(backgroundColor);
+        alignmentComboBox.setValue(convertFromPos(pos));
     }
 
+    private String convertFromPos(Pos pos) {
+        return switch (pos) {
+            case CENTER_LEFT -> "Left";
+            case CENTER_RIGHT -> "Right";
+            default -> "Center";
+        };
+    }
+
+    public void onSort() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/component/top/dialog/sort/createSortDialog.fxml"));
+        Parent root = loader.load();
+        SortDialogController controller = loader.getController();
+        controller.setAppController(appController);
+        controller.setBoundaries(appController.getNumOfCols(), appController.getNumOfRows());
+        Stage dialogStage = new Stage();
+        dialogStage.initModality(Modality.WINDOW_MODAL);
+        dialogStage.setScene(new Scene(root));
+        dialogStage.setTitle("Sort");
+        controller.setDialogStage(dialogStage);
+        controller.setAppController(appController);
+        dialogStage.showAndWait();
+    }
+
+
     @FXML
-    public void addFilter() throws IOException {
+    public void onFilter() throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/component/top/dialog/filter/createFilterDialog.fxml"));
         Parent root = loader.load();
         FilterDialogController controller = loader.getController();
         controller.setAppController(appController);
         controller.setBoundaries(appController.getNumOfRows(),appController.getNumOfCols());
+        controller.fillData();
         Stage dialogStage = new Stage();
         dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setScene(new Scene(root));
@@ -216,36 +303,34 @@ public class TopController {
 
     public void addRangesToComboBox(List<String> ranges) {
         clearRangeComboBox();
-        rangesComboBox.getItems().add("");
+        rangesComboBox.getItems().add("Range");
         ranges.forEach(this::addRangeToComboBox);
 
         rangesComboBox.setOnAction(event -> {
             String selectedRange = rangesComboBox.getSelectionModel().getSelectedItem();
-            if (selectedRange != rangesComboBox.getItems().getFirst()) {
+            if (!Objects.equals(selectedRange, rangesComboBox.getItems().getFirst())) {
                 appController.removePaint();
                 handleRangeSelected(selectedRange);
 
                 minus.setOnMouseClicked(mouseEvent -> {
-                    appController.removeRange(selectedRange);
-                    rangesComboBox.getItems().remove(selectedRange);
+                    appController.removePaint();
+                    try {
+                        appController.removeRange(selectedRange);
+                        rangesComboBox.getItems().remove(selectedRange);
+                    }
+                    catch(Exception e){
+                        AppController.showError(e.getMessage());
+                    }
                 });
+            }
+            else {
+                appController.removePaint();
             }
         });
     }
 
     private void addRangeToComboBox(String rangeName) {
         rangesComboBox.getItems().add(rangeName);
-    }
-
-    private HBox createRangeHBox(String rangeName) {
-        Label rangeLabel = new Label(rangeName);
-        Button removeButton = new Button("-");
-        HBox rangeBox = new HBox();
-        rangeBox.getChildren().addAll(rangeLabel,removeButton);
-        rangeBox.setSpacing(10);
-        rangeBox.setAlignment(Pos.CENTER_LEFT);
-
-        return rangeBox;
     }
 
     private void clearRangeComboBox() {
@@ -263,35 +348,7 @@ public class TopController {
 
     private void handleVersionSelected(String selectedItem) {
         SheetDto sheetByVersionVersion = appController.getSheetByVersion(Integer.parseInt(selectedItem));
-        createNewSheetInDifferentWindows(sheetByVersionVersion);
-    }
-
-    public static void createNewSheetInDifferentWindows(SheetDto sheet) {
-        GridPane gridPaneSheet = new GridPane();
-        GridPane gridPaneLeft = new GridPane();
-        GridPane gridPaneTop = new GridPane();
-
-
-        sheet.cells().forEach((coordinate, cell) -> {
-            TextField cellField = new TextField(cell.effectiveValue().toString());
-            cellField.setPrefWidth(100);
-            cellField.setPrefHeight(30);
-            cellField.setId(coordinate.toString());
-            gridPaneSheet.add(cellField, coordinate.col(), coordinate.row());
-        });
-
-        SheetController.printRowAndColumnsLabels(sheet, gridPaneLeft, gridPaneTop,100,30);
-
-        BorderPane borderPane = new BorderPane();
-        borderPane.setCenter(gridPaneSheet);
-        borderPane.setLeft(gridPaneLeft);
-        borderPane.setTop(gridPaneTop);
-
-        Stage newStage = new Stage();
-
-        Scene scene = new Scene(borderPane, 800, 600);
-        newStage.setScene(scene);
-        newStage.show();
+        appController.createNewSheetInDifferentWindows(sheetByVersionVersion);
     }
 }
 

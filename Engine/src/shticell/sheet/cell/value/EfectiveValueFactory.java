@@ -12,7 +12,7 @@ public interface EfectiveValueFactory {
             return new EffectiveValueImpl(Double.parseDouble(value),ValueType.NUMERIC);
         }
         else if(hasSheetData.IsRangeInSheet(value)){
-            return new EffectiveValueImpl(hasSheetData.GetRange(value),ValueType.RANGE);
+            return new EffectiveValueImpl(hasSheetData.GetRangeDto(value),ValueType.RANGE);
         }
         else{
             return new EffectiveValueImpl(value,ValueType.STRING);

@@ -9,7 +9,7 @@ public class SubExpression implements Expression {
     @Override
     public EffectiveValue eval(Expression... expressions) {
         if(expressions.length != 3){
-            throw new UnsupportedOperationException("Sub needs two arguments");
+            throw new IllegalArgumentException("Sub needs two arguments");
         }
 
         String sourceValue = expressions[0].eval().getValueWithExpectation(String.class);

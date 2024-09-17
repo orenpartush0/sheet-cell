@@ -37,6 +37,8 @@ public class AverageExpression  implements Expression {
                     mapToDouble(coordinate->hasSheetData.GetCellEffectiveValue(coordinate).getValueWithExpectation(Double.class)).
                     average();
 
+            hasSheetData.UseRange(connections.GetCellCoordinate(),range);
+
             range.getRangeCellsCoordinate().
                     forEach(coordinate -> {
                         hasSheetData.GetCellConnections(coordinate).AddToInfluenceOn(connections);

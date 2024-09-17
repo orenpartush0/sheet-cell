@@ -73,6 +73,13 @@ public class RangeDialogController {
             isValid = false;
         }
 
+        if (!CoordinateFactory.isValidCoordinate(endPointField.getText())) {
+            Label errorLabel = new Label("No valid end point!\n");
+            errorLabel.setStyle("-fx-text-fill: red;");
+            errorBox.getChildren().add(errorLabel);
+            isValid = false;
+        }
+
         if (CoordinateFactory.isValidCoordinate(startPointField.getText()) && CoordinateFactory.isValidCoordinate(endPointField.getText())) {
             if (!isRangeValid(startPointField.getText(), endPointField.getText())) {
                 Label errorLabel = new Label("Start point should be less than or equal to end point!\n");

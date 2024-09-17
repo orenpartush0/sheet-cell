@@ -10,6 +10,10 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
 <VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="component.top.TopController" stylesheets="@Top.css">
 
     <HBox id="box" spacing="10">
@@ -25,7 +29,6 @@
         <TextField fx:id="pathTextField" prefWidth="275" editable="false"/>
     </HBox>
 
-    <!-- Action line section -->
     <HBox spacing="10" > <!-- Corrected padding -->
         <Label text="Selected Cell ID" style="-fx-background-color: lightgray;" />
 
@@ -45,11 +48,38 @@
 
         <Button fx:id= "minus" text="-" style="-fx-background-color:  #FFA07A;" />
 
-        <Button fx:id="addFilter" text="Add Filter" onAction="#addFilter" style="-fx-background-color: lightgray;"  />
+        <Button fx:id="filterButton" text="Filter" onAction="#onFilter" style="-fx-background-color: lightgray;"  />
+
+        <Button fx:id="sortButton" text="Sort" onAction="#onSort" style="-fx-background-color: lightgray;"  />
+
 
         <Region HBox.hgrow="ALWAYS" />
 
         <ComboBox fx:id="SheetVersionComboBox" promptText="Sheet Version" />
     </HBox>
+
+    <VBox>
+        <Separator/>
+        <HBox>
+            <VBox>
+                <Label text="Text color"/>
+                <ColorPicker fx:id="textColorPicker" disable="true" promptText="Text Color"/>
+            </VBox>
+            <VBox>
+                <Label text="BackGround color"/>
+                <ColorPicker fx:id="backgroundColorPicker" disable="true"/>
+            </VBox>
+
+            <ComboBox fx:id="alignmentComboBox" promptText="Alignment" disable="true" prefWidth="150.0">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="Center"/>
+                        <String fx:value="Left"/>
+                        <String fx:value="Right"/>
+                    </FXCollections>
+                </items>
+            </ComboBox>
+        </HBox>
+    </VBox>
 
 </VBox>

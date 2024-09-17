@@ -9,8 +9,12 @@ import shticell.sheet.impl.SheetImpl;
 import dto.SheetDto;
 import shticell.sheet.range.Range;
 import shticell.util.Filter;
+import shticell.util.Sort;
+
 import java.io.*;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
 public class Connector {
     private Sheet sheet;
@@ -25,12 +29,12 @@ public class Connector {
                 : GetSheetFromBinaryFile(path);
     }
 
-    public List<String> getValuesInColumn(Range range ,int col) {
-        return Filter.getValuesInColumn(sheet.clone(),range,col);
+    public Map<Integer, List<String>> getValuesInColumn(Range range) {
+        return Filter.getValuesInColumn(sheet,range);
     }
 
-    public SheetDto applyFilter(int col, Range range ,List<String> filters) {
-        return Filter.getFilteredSheetDto(sheet.clone(),col,range,filters);
+    public SheetDto applyFilter(Range range , Map<Integer, List<String>> filters) {
+        return Filter.getFilteredSheetDto(sheet,range,filters);
     }
 
     private Sheet GetSheetFromXML(String fileName) throws Exception {
@@ -49,10 +53,6 @@ public class Connector {
 
     public CellDto GetCellByCoordinate(Coordinate coordinate){
         return new CellDto(sheet.GetCell(coordinate));
-    }
-
-    public List<Integer> GetCountOfChangesPerVersion(){
-        return sheet.GetCountOfChangesPerVersion();
     }
 
     public SheetDto GetSheetByVersion(int version){
@@ -80,16 +80,16 @@ public class Connector {
         return sheet.GetRangeDto(rangeName);
     }
 
-    public Range GetRange(String rangeName) {
-        return sheet.GetRangeDto(rangeName);
-    }
-
     public List<Range> getRanges(){
         return sheet.GetRangesDto();
     }
 
-    public void removeRange(String rangeName){
+    public void removeRange(String rangeName) throws Exception{
         sheet.removeRange(rangeName);
+    }
+
+    public SheetDto applySort(Queue<String> cols,Range range){
+        return Sort.SortRange(sheet,cols,range);
     }
 
 }
