@@ -85,6 +85,11 @@
             <VBox alignment="CENTER">
             <Button fx:id="defaultStyleButton" disable="true" text="Default Style" onAction="#onDefaultStyle"/>
             </VBox>
+
+            <VBox alignment="CENTER">
+                <Button fx:id="functionButton" disable="true" text="Default Style" onAction="#onFunction"/>
+            </VBox>
+
         </HBox>
     </VBox>
 

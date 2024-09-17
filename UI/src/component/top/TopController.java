@@ -66,6 +66,8 @@ public class TopController {
     private ComboBox<String> alignmentComboBox;
     @FXML
     private Button defaultStyleButton;
+    @FXML
+    private Button onFunctionButton;
 
 
 
@@ -354,8 +356,14 @@ public class TopController {
         appController.createNewSheetInDifferentWindows(sheetByVersionVersion);
     }
 
+    @FXML
     public void onDefaultStyle(){
         appController.setDefaultStyle(CoordinateFactory.getCoordinate(cellId.get()));
+    }
+
+    @FXML
+    public void onFunction(){
+
     }
 }
 
