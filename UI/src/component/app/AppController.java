@@ -4,6 +4,7 @@ import component.sheet.Enum.PropType;
 import connector.Connector;
 import dto.SheetDto;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
@@ -76,9 +77,9 @@ public class AppController {
     }
 
     public void updateCell(Coordinate coordinate,String value) {
-        topComponentController.addVersion();
         try {
             connector.UpdateCellByCoordinate(coordinate, value);
+            topComponentController.addVersion();
         }
         catch (Exception e){
             showError(e.getMessage());
@@ -167,5 +168,9 @@ public class AppController {
 
     public void setDefaultStyle(Coordinate coordinate){
         sheetComponentController.setDefaultStyle(coordinate);
+    }
+
+    public void createFunc(SimpleStringProperty func, Coordinate coordinate){
+        sheetComponentController.createFunc(func,coordinate);
     }
 }

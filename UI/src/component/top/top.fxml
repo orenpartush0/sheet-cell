@@ -1,93 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.control.Separator?>
-<?import javafx.scene.control.ColorPicker?>
-<?import javafx.collections.FXCollections?>
 <?import java.lang.String?>
-<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="component.top.TopController" stylesheets="@Top.css">
+<?import javafx.collections.FXCollections?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ColorPicker?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox stylesheets="@Top.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="component.top.TopController">
 
     <HBox id="box" spacing="10">
-        <MenuBar id="menuBar">
+        <MenuBar id="menuBar" prefHeight="38.0" prefWidth="79.0">
             <Menu id="menu" text="File">
-                <MenuItem  id="new" text="New" onAction="#handleCreateNewSheet"/>
-                <MenuItem  fx:id ="saveButton" text="Save" disable="true" onAction="#HandleSaveFile"/>
-                <MenuItem  id = "load" text="Load" onAction="#handleLoadFile"/>
+                <MenuItem id="new" onAction="#handleCreateNewSheet" text="New" />
+                <MenuItem fx:id="saveButton" disable="true" onAction="#HandleSaveFile" text="Save" />
+                <MenuItem id="load" onAction="#handleLoadFile" text="Load" />
             </Menu>
+         <padding>
+            <Insets left="10.0" right="10.0" />
+         </padding>
         </MenuBar>
 
-        <Label text="Currently Loaded File path:"/>
-        <TextField fx:id="pathTextField" prefWidth="275" editable="false"/>
+        <Label text="Currently Loaded File path:" />
+        <TextField fx:id="pathTextField" editable="false" prefHeight="34.0" prefWidth="196.0">
+         <HBox.margin>
+            <Insets />
+         </HBox.margin></TextField>
     </HBox>
 
-    <HBox spacing="10" > <!-- Corrected padding -->
-        <Label text="Selected Cell ID" style="-fx-background-color: lightgray;" />
+    <HBox spacing="10"> <!-- Corrected padding -->
+        <Label style="-fx-background-color: lightgray;" text="Selected Cell ID:">
+         <HBox.margin>
+            <Insets left="5.0" />
+         </HBox.margin></Label>
 
         <TextField fx:id="cellIdTextField" disable="true" prefWidth="35" />
 
-        <Label text="Last update cell version" style="-fx-background-color: lightgray;" />
+        <Label style="-fx-background-color: lightgray;" text="Last update cell version:" />
 
-        <TextField fx:id="lastUpdateTextField" disable="true" prefWidth="35"/>
+        <TextField fx:id="lastUpdateTextField" disable="true" prefHeight="0.0" prefWidth="35" />
 
-        <Label text="Original Cell Value" style="-fx-background-color: lightgray;" />
+        <Label prefWidth="138.0" style="-fx-background-color: lightgray;" text="Original Cell Value:" />
 
-        <TextField fx:id="originalValueTextField" editable="false" prefWidth="100" />
+        <TextField fx:id="originalValueTextField" editable="false" />
 
         <ComboBox fx:id="rangesComboBox" promptText="Range" />
 
-        <Button fx:id= "plus" text="+" onAction="#addRangeAction" style="-fx-background-color: lightblue;" />
+        <Button fx:id="plus" onAction="#addRangeAction" style="-fx-background-color: lightblue;" text="+" />
 
-        <Button fx:id= "minus" text="-" style="-fx-background-color:  #FFA07A;" />
+        <Button fx:id="minus" style="-fx-background-color:  #FFA07A;" text="-" />
 
-        <Button fx:id="filterButton" text="Filter" onAction="#onFilter" style="-fx-background-color: lightgray;"  />
+        <Button fx:id="filterButton" onAction="#onFilter" style="-fx-background-color: lightgray;" text="Filter" />
 
-        <Button fx:id="sortButton" text="Sort" onAction="#onSort" style="-fx-background-color: lightgray;"  />
+        <Button fx:id="sortButton" onAction="#onSort" style="-fx-background-color: lightgray;" text="Sort" />
 
 
         <Region HBox.hgrow="ALWAYS" />
 
-        <ComboBox fx:id="SheetVersionComboBox" promptText="Sheet Version" />
+        <ComboBox fx:id="SheetVersionComboBox" promptText="Sheet Version">
+         <HBox.margin>
+            <Insets right="5.0" />
+         </HBox.margin></ComboBox>
     </HBox>
 
     <VBox>
-        <Separator/>
+        <Separator>
+         <padding>
+            <Insets top="12.0" />
+         </padding></Separator>
         <HBox>
             <VBox>
-                <Label text="Text color"/>
-                <ColorPicker fx:id="textColorPicker" disable="true" promptText="Text Color"/>
+                <Label text="Text color" />
+                <ColorPicker fx:id="textColorPicker" disable="true" promptText="Text Color">
+               <VBox.margin>
+                  <Insets right="10.0" />
+               </VBox.margin></ColorPicker>
+            <HBox.margin>
+               <Insets left="5.0" />
+            </HBox.margin>
             </VBox>
             <VBox>
-                <Label text="BackGround color"/>
-                <ColorPicker fx:id="backgroundColorPicker" disable="true"/>
+                <Label text="Background color" />
+                <ColorPicker fx:id="backgroundColorPicker" disable="true">
+               <VBox.margin>
+                  <Insets right="10.0" />
+               </VBox.margin></ColorPicker>
             </VBox>
 
             <VBox>
-                <Label text="Alignment"/>
-                <ComboBox fx:id="alignmentComboBox"  disable="true" prefWidth="150.0">
+                <Label text="Alignment" />
+                <ComboBox fx:id="alignmentComboBox" disable="true" prefWidth="150.0">
                 <items>
                     <FXCollections fx:factory="observableArrayList">
-                        <String fx:value="Center"/>
-                        <String fx:value="Left"/>
-                        <String fx:value="Right"/>
+                        <String fx:value="Center" />
+                        <String fx:value="Left" />
+                        <String fx:value="Right" />
                     </FXCollections>
                 </items>
             </ComboBox>
+            <HBox.margin>
+               <Insets bottom="10.0" />
+            </HBox.margin>
             </VBox>
             <VBox alignment="CENTER">
-            <Button fx:id="defaultStyleButton" disable="true" text="Default Style" onAction="#onDefaultStyle"/>
+            <Button fx:id="defaultStyleButton" disable="true" onAction="#onDefaultStyle" text="Default Style">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="30.0" />
+               </VBox.margin></Button>
             </VBox>
 
             <VBox alignment="CENTER">
-                <Button fx:id="functionButton" disable="true" text="Default Style" onAction="#onFunction"/>
+                <Button fx:id="functionButton" disable="true" onAction="#onFunction" text="Create Function">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="17.0" />
+               </VBox.margin></Button>
             </VBox>
 
         </HBox>

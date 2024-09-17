@@ -299,5 +299,9 @@ public class SheetController {
         sheetTextFields.get(coordinate).styleProperty().setValue(defaultCellStyle);
     }
 
+    public void createFunc(SimpleStringProperty func, Coordinate coordinate){
+        sheetTextFields.get(coordinate).textProperty().set(func.get());
+    }
+
 }
 

@@ -2,6 +2,7 @@ package component.top;
 
 import component.app.AppController;
 import component.top.dialog.filter.FilterDialogController;
+import component.top.dialog.function.FunctionDialogController;
 import component.top.dialog.sheet.SheetDialogController;
 import component.top.dialog.range.RangeDialogController;
 import component.top.dialog.sort.SortDialogController;
@@ -67,7 +68,7 @@ public class TopController {
     @FXML
     private Button defaultStyleButton;
     @FXML
-    private Button onFunctionButton;
+    private Button functionButton;
 
 
 
@@ -233,6 +234,7 @@ public class TopController {
         lastUpdate.set(cell.LatestSheetVersionUpdated());
         textColorPicker.disableProperty().set(false);
         defaultStyleButton.disableProperty().set(false);
+        functionButton.disableProperty().set(false);
         backgroundColorPicker.disableProperty().set(false);
         alignmentComboBox.disableProperty().set(false);
         Color textColor = extractColorFromStyle(style, "-fx-text-fill");
@@ -362,8 +364,23 @@ public class TopController {
     }
 
     @FXML
-    public void onFunction(){
-
+    public void onFunction() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/component/top/dialog/function/createFunctionDialog.fxml"));
+        Parent root = loader.load();
+        SimpleStringProperty function = new SimpleStringProperty();
+        FunctionDialogController controller = loader.getController();
+        controller.setFunction(function);
+        Stage dialogStage = new Stage();
+        controller.setDialogStage(dialogStage);
+        dialogStage.setTitle("Function Details");
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setScene(new Scene(root));
+        dialogStage.setHeight(240);
+        dialogStage.setWidth(450);
+        dialogStage.showAndWait();
+        if(controller.isClick){
+            appController.createFunc(function,CoordinateFactory.getCoordinate(cellId.get()));
+        }
     }
 }
 

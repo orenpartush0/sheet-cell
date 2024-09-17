@@ -2,11 +2,13 @@ package component.top.dialog.sheet;
 
 import component.app.AppController;
 import component.top.TopController;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import shticell.sheet.coordinate.Coordinate;
 
 public class SheetDialogController {
 
@@ -109,6 +111,7 @@ public class SheetDialogController {
     public void setTopController(TopController _topController){
         topController = _topController;
     }
+
 }
 
 
