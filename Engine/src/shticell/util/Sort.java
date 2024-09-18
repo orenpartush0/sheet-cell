@@ -22,15 +22,12 @@ public interface Sort {
         Sheet sheetInRange = new SheetImpl("", sheet.GetNumberOfRows(), sheet.GetNumberOfColumns(), sheet.GetRowsHeight(), sheet.GetColsWidth());
 
         List<Integer> lst = creteListOfRowsInRange(sheet, range);
-        Queue<String> colsCopy = new LinkedList<>(cols);
-        List<Integer> empteis = getEmpties(lst,colsCopy.poll(),sheet);
         lst = sortLst(lst, sheet, cols);
-        lst.addAll(empteis);
         for (int newRowIndex = 0; newRowIndex < lst.size(); newRowIndex++) {
             int oldRowIndex = lst.get(newRowIndex);
-            for (int col = 0; col < sheet.GetNumberOfColumns(); col++) {
+            for (int col = 1; col <= sheet.GetNumberOfColumns(); col++) {
                 Coordinate oldCoordinate = CoordinateFactory.getCoordinate(oldRowIndex, col);
-                Coordinate newCoordinate = CoordinateFactory.getCoordinate(newRowIndex, col);
+                Coordinate newCoordinate = CoordinateFactory.getCoordinate(newRowIndex+1, col);
                 try{sheetInRange.UpdateCellByCoordinate(newCoordinate, sheet.GetCell(oldCoordinate).GetEffectiveValue().getValue().toString());}
                 catch (Exception ignored){};
 
@@ -61,6 +58,12 @@ public interface Sort {
                 int col = columnLabelToNumber(colsCopy.poll());
                 EffectiveValue effectiveValue1 = sheet.GetCell(CoordinateFactory.getCoordinate(row1, col)).GetEffectiveValue();
                 EffectiveValue effectiveValue2 = sheet.GetCell(CoordinateFactory.getCoordinate(row2, col)).GetEffectiveValue();
+                if(effectiveValue1.getValueType() != ValueType.NUMERIC){
+                    return 1;
+                }
+                if(effectiveValue2.getValueType() != ValueType.NUMERIC){
+                    return -1;
+                }
                 compare = Double.compare(effectiveValue1.getValueWithExpectation(Double.class), effectiveValue2.getValueWithExpectation(Double.class));
                 if (compare != 0) {
                     return compare;
