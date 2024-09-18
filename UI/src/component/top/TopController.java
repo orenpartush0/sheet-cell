@@ -415,17 +415,20 @@ public class TopController {
 
 
     public void clickOnIncrementButton() {
-        int from = Integer.parseInt(fromTextField.getText());
-        int to = Integer.parseInt(toTextField.getText());
-        int step = Integer.parseInt(stepTextField.getText());
+        if(!fromTextField.getText().isEmpty() && !toTextField.getText().isEmpty() && !stepTextField.getText().isEmpty()) {
+            int from = Integer.parseInt(fromTextField.getText());
+            int to = Integer.parseInt(toTextField.getText());
+            int step = Integer.parseInt(stepTextField.getText());
 
-        if(from > to || to - from < step){
-            AppController.showError("invalid increment");
-        }
-        else{
-            String toCalc = String.valueOf((from + step*counter) % to );
-            appController.applyDynamicCalculate(CoordinateFactory.getCoordinate(cellId.getValue()), toCalc);
-            counter++;
+            if(from > to || to - from < step){
+                AppController.showError("Invalid increment");
+            }
+            else{
+                counter = step * counter > to ?  0 : counter;
+                String toCalc = String.valueOf(from + step * counter );
+                appController.applyDynamicCalculate(CoordinateFactory.getCoordinate(cellId.getValue()), toCalc);
+                counter++;
+            }
         }
     }
 }
