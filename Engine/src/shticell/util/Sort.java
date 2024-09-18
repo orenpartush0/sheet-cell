@@ -49,7 +49,7 @@ public interface Sort {
         lst.removeAll(empties);
         return empties;
     }
-
+//
     private static List<Integer> sortLst(List<Integer> lst, SheetToFilter sheet, Queue<String> cols) {
         return lst.stream().sorted((row1, row2) -> {
             int compare = 0;
