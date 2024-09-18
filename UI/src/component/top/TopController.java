@@ -424,7 +424,7 @@ public class TopController {
                 AppController.showError("Invalid increment");
             }
             else{
-                counter = step * counter > to ?  0 : counter;
+                counter = (from + step * counter) > to ?  0 : counter;
                 String toCalc = String.valueOf(from + step * counter );
                 appController.applyDynamicCalculate(CoordinateFactory.getCoordinate(cellId.getValue()), toCalc);
                 counter++;
