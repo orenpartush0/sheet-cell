@@ -145,7 +145,7 @@
                   <HBox.margin>
                      <Insets bottom="5.0" />
                   </HBox.margin></TextField>
-                    <Label text="step:">
+                    <Label text="Step:">
                   <HBox.margin>
                      <Insets bottom="5.0" />
                   </HBox.margin></Label>
