@@ -173,4 +173,9 @@ public class AppController {
     public void createFunc(SimpleStringProperty func, Coordinate coordinate){
         sheetComponentController.createFunc(func,coordinate);
     }
+
+    public void applyDynamicCalculate(Coordinate coordinate, String numStr){
+        SheetDto sheetDto = connector.applyDynamicCalculate(coordinate, numStr);
+        sheetComponentController.fillSheet(sheetDto);
+    }
 }

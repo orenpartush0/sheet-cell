@@ -12,6 +12,9 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -33,9 +36,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TopController {
-
     private AppController appController;
-    String previousPath;
+
+    private String previousPath;
+    private int counter = 0;
 
     @FXML
     public MenuItem saveButton;
@@ -69,6 +73,14 @@ public class TopController {
     private Button defaultStyleButton;
     @FXML
     private Button functionButton;
+    @FXML
+    public TextField fromTextField;
+    @FXML
+    public TextField toTextField;
+    @FXML
+    public TextField stepTextField;
+    @FXML
+    public Button incrementButton;
 
 
     private final SimpleBooleanProperty isSheetLoaded = new SimpleBooleanProperty(false);
@@ -127,6 +139,22 @@ public class TopController {
             appController.setAlignment(CoordinateFactory.getCoordinate(cellId.getValue()).col(), selectedPos);
         });
 
+        makeNumericOnly(toTextField);
+        makeNumericOnly(fromTextField);
+        makeNumericOnly(stepTextField);
+    }
+
+    private void makeNumericOnly(TextField textField) {
+        textField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                if (!newValue.matches("\\d*")) {
+                    textField.setText(newValue.replaceAll("[^\\d]", ""));
+                }
+            }
+        });
+
+        textField.setOnMouseClicked(e-> counter = 0);
     }
 
     private Pos convertToPos(String alignment) {
@@ -234,6 +262,10 @@ public class TopController {
         textColorPicker.disableProperty().set(false);
         defaultStyleButton.disableProperty().set(false);
         functionButton.disableProperty().set(false);
+        incrementButton.disableProperty().set(false);
+        toTextField.disableProperty().set(false);
+        fromTextField.disableProperty().set(false);
+        stepTextField.disableProperty().set(false);
         backgroundColorPicker.disableProperty().set(false);
         alignmentComboBox.disableProperty().set(false);
         Color textColor = extractColorFromStyle(style, "-fx-text-fill");
@@ -241,6 +273,7 @@ public class TopController {
         textColorPicker.setValue(textColor);
         backgroundColorPicker.setValue(backgroundColor);
         alignmentComboBox.setValue(convertFromPos(pos));
+        counter = 0;
     }
 
     private String convertFromPos(Pos pos) {
@@ -377,6 +410,22 @@ public class TopController {
         dialogStage.showAndWait();
         if (controller.isClick) {
             appController.createFunc(function, CoordinateFactory.getCoordinate(cellId.get()));
+        }
+    }
+
+
+    public void clickOnIncrementButton() {
+        int from = Integer.parseInt(fromTextField.getText());
+        int to = Integer.parseInt(toTextField.getText());
+        int step = Integer.parseInt(stepTextField.getText());
+
+        if(from > to || to - from < step){
+            AppController.showError("invalid increment");
+        }
+        else{
+            String toCalc = String.valueOf((from + step*counter) % to );
+            appController.applyDynamicCalculate(CoordinateFactory.getCoordinate(cellId.getValue()), toCalc);
+            counter++;
         }
     }
 }

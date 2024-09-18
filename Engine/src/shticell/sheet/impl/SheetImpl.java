@@ -190,13 +190,23 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
         return clone;
     }
 
-    public void removeRange(String rangeName) {
+    @Override
+    public void RemoveRange(String rangeName) {
         if(ranges.get(rangeName).GetCounter() != 0){
             throw new RuntimeException("Range in use");
         }
 
         ranges.remove(rangeName);
+    }
 
+    @Override
+    public String GetOriginalValue(Coordinate coordinate){
+        return cells.get(coordinate).GetOriginalValue();
+    }
+
+    @Override
+    public void applyDynamicCalculate(Coordinate coordinate, String numStr){
+        try{cells.get(coordinate).UpdateCell(numStr,version);} catch (Exception ignored){}
     }
 }
 

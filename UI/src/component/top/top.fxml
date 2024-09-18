@@ -12,6 +12,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
@@ -80,7 +81,7 @@
         <HBox>
             <VBox>
                 <Label text="Text color" />
-                <ColorPicker fx:id="textColorPicker" disable="true" promptText="Text Color">
+                <ColorPicker fx:id="textColorPicker" disable="true" prefHeight="30.0" prefWidth="120.0" promptText="Text Color">
                <VBox.margin>
                   <Insets right="10.0" />
                </VBox.margin></ColorPicker>
@@ -90,7 +91,7 @@
             </VBox>
             <VBox>
                 <Label text="Background color" />
-                <ColorPicker fx:id="backgroundColorPicker" disable="true">
+                <ColorPicker fx:id="backgroundColorPicker" disable="true" prefHeight="30.0" prefWidth="120.0">
                <VBox.margin>
                   <Insets right="10.0" />
                </VBox.margin></ColorPicker>
@@ -114,7 +115,7 @@
             <VBox alignment="CENTER">
             <Button fx:id="defaultStyleButton" disable="true" onAction="#onDefaultStyle" text="Default Style">
                <VBox.margin>
-                  <Insets bottom="5.0" left="30.0" />
+                  <Insets bottom="5.0" left="50.0" />
                </VBox.margin></Button>
             </VBox>
 
@@ -125,6 +126,42 @@
                </VBox.margin></Button>
             </VBox>
 
+
+            <VBox alignment="CENTER">
+                <HBox alignment="CENTER" prefHeight="18.0" prefWidth="442.0" AnchorPane.topAnchor="10.0">
+                    <Label text="From:">
+                  <HBox.margin>
+                     <Insets bottom="5.0" />
+                  </HBox.margin></Label>
+                    <TextField fx:id="fromTextField" disable="true" prefHeight="33.0" prefWidth="50.0">
+                  <HBox.margin>
+                     <Insets bottom="5.0" />
+                  </HBox.margin></TextField>
+                    <Label text="To:">
+                  <HBox.margin>
+                     <Insets bottom="5.0" />
+                  </HBox.margin></Label>
+                    <TextField fx:id="toTextField" disable="true" prefHeight="33.0" prefWidth="50.0">
+                  <HBox.margin>
+                     <Insets bottom="5.0" />
+                  </HBox.margin></TextField>
+                    <Label text="step:">
+                  <HBox.margin>
+                     <Insets bottom="5.0" />
+                  </HBox.margin></Label>
+                    <TextField fx:id="stepTextField" disable="true" prefHeight="33.0" prefWidth="50.0">
+                  <HBox.margin>
+                     <Insets bottom="5.0" right="10.0" />
+                  </HBox.margin></TextField>
+                    <Button fx:id="incrementButton"  onAction="#clickOnIncrementButton" disable="true" prefHeight="16.0" prefWidth="94.0" text="Increment">
+                  <HBox.margin>
+                     <Insets bottom="5.0" />
+                  </HBox.margin></Button>
+               <VBox.margin>
+                  <Insets left="40.0" />
+               </VBox.margin>
+                </HBox>
+            </VBox>
         </HBox>
     </VBox>
 

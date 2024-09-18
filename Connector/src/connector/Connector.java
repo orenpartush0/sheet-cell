@@ -85,11 +85,19 @@ public class Connector {
     }
 
     public void removeRange(String rangeName) throws Exception{
-        sheet.removeRange(rangeName);
+        sheet.RemoveRange(rangeName);
     }
 
     public SheetDto applySort(Queue<String> cols,Range range){
         return Sort.SortRange(sheet,cols,range);
     }
 
+    public SheetDto applyDynamicCalculate(Coordinate coordinate , String numStr){
+        String currentOriginalValue = sheet.GetOriginalValue(coordinate);
+        sheet.applyDynamicCalculate(coordinate,numStr);
+        SheetDto newSheetDto = new SheetDto(sheet);
+        sheet.applyDynamicCalculate(coordinate,currentOriginalValue);
+
+        return newSheetDto;
+    }
 }

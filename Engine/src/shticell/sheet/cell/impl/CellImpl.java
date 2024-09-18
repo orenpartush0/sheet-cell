@@ -167,6 +167,5 @@ public class CellImpl implements Cell, Serializable {
 
         return false;
     }
-
 }
 

@@ -41,5 +41,9 @@ public interface Sheet extends Cloneable, Serializable,SheetToFilter {
 
     Sheet clone();
 
-    void removeRange(String rangeName) throws Exception;
+    void RemoveRange(String rangeName) throws Exception;
+
+    String GetOriginalValue(Coordinate coordinate);
+
+    void applyDynamicCalculate(Coordinate coordinate, String numStr);
 }
