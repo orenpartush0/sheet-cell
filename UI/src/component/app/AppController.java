@@ -28,8 +28,7 @@ public class AppController {
     @FXML private TopController topComponentController;
     @FXML private SheetController sheetComponentController;
 
-    private int numOfCols;
-    private int numOfRows;
+    public SheetDto sheet;
 
     @FXML
     public void initialize() {
@@ -57,9 +56,7 @@ public class AppController {
     }
 
     private void fillSheet(){
-        SheetDto sheet = connector.getSheet();
-        numOfCols = sheet.numberOfColumns();
-        numOfRows = sheet.numberOfRows();
+        sheet = connector.getSheet();
         sheetComponentController.fillSheet(sheet);
         topComponentController.addRangesToComboBox(connector.getRanges().stream().map(Range::rangeName).toList());
     }
@@ -120,11 +117,11 @@ public class AppController {
     }
 
     public int getNumOfCols(){
-        return numOfCols;
+        return sheet.numberOfColumns();
     }
 
     public int getNumOfRows(){
-        return numOfRows;
+        return sheet.numberOfRows();
     }
 
     public Map<Integer, List<String>> getValuesInColumns(Range range ){
