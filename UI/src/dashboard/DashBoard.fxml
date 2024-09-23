@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="sheetpage.app.DashBoard">
+
+    <top>
+        <VBox>
+            <Label text="User: " fx:id="user"/>
+        <HBox spacing="10" alignment="CENTER">
+            <Button text="View Sheet" fx:id="viewSheetButton"/>
+            <Button text="Request Permission" fx:id="requestPermissionButton"/>
+            <Button text="Ack/Deny Permission" fx:id="ackDenyPermissionButton"/>
+        </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <VBox spacing="10">
+
+            <Label text="Available Sheet Table" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+            <TableView fx:id="permissionTable">
+                <columns>
+                    <TableColumn text="Owner" fx:id="ownerColumn"/>
+                    <TableColumn text="Sheet Name" fx:id="sheetNameColumn"/>
+                    <TableColumn text="size" fx:id="sizeColumn"/>
+                    <TableColumn text="Permission Type" fx:id="permissionCol"/>
+                </columns>
+            </TableView>
+
+            <Label text="Permission Table" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
+
+            <TableView fx:id="sheetsTable">
+                <columns>
+                    <TableColumn text="User" fx:id="userColumn"/>
+                    <TableColumn text="Permission" fx:id="permissionColumn"/>
+                    <TableColumn text="Status" fx:id="statusColumn"/>
+                </columns>
+            </TableView>
+
+        </VBox>
+    </center>
+
+</BorderPane>

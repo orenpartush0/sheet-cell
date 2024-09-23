@@ -24,9 +24,7 @@ public class Connector {
     }
 
     public void SetSheet(String path) throws Exception {
-        sheet = path.endsWith(".xml")
-                ? GetSheetFromXML(path)
-                : GetSheetFromBinaryFile(path);
+        sheet = GetSheetFromXML(path);
     }
 
     public Map<Integer, List<String>> getValuesInColumn(Range range) {
@@ -57,19 +55,6 @@ public class Connector {
 
     public SheetDto GetSheetByVersion(int version){
         return new SheetDto(sheet.GetSheetByVersion(version));
-    }
-
-    public void InsertSheetToBinaryFile(String filePath) throws IOException {
-        FileOutputStream fileOut = new FileOutputStream(filePath);
-        ObjectOutputStream out = new ObjectOutputStream(fileOut);
-        out.writeObject(sheet);
-        out.close();
-    }
-
-    private Sheet GetSheetFromBinaryFile(String filePath) throws IOException, ClassNotFoundException {
-        FileInputStream fileIn = new FileInputStream(filePath);
-        ObjectInputStream in = new ObjectInputStream(fileIn);
-        return (Sheet) in.readObject();
     }
 
     public void AddRange(Range rangeDto){

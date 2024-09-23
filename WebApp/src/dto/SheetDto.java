@@ -11,6 +11,7 @@ public record SheetDto(String Name, int version, int numberOfRows, int numberOfC
                        int colsWidth,int rowsHeight,
                        Map<Coordinate, CellDto> cells)
 {
+
     public SheetDto(Sheet sheet) {
         this(sheet.GetSheetName(), sheet.GetVersion(), sheet.GetNumberOfRows(), sheet.GetNumberOfColumns(),
         sheet.GetColsWidth(), sheet.GetRowsHeight(),

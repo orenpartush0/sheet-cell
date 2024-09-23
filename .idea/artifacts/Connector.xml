@@ -1,5 +1,5 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="Connector">
+  <artifact type="jar" build-on-make="true" name="Connector">
     <output-path>$PROJECT_DIR$/out/artifacts/Connector</output-path>
     <root id="archive" name="Connector.jar">
       <element id="directory" name="META-INF">

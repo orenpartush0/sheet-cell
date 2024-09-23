@@ -12,7 +12,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/component/app/app.fxml")));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/sheetpage/app/app.fxml")));
         primaryStage.setTitle("Sheet Cell");
         Scene scene = new Scene(root,1200,700);
         primaryStage.setScene(scene);
