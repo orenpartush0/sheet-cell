@@ -1,9 +1,12 @@
 package shticell.manager;
 
 import dto.CellDto;
+import dto.SheetDataDto;
 import dto.SheetDto;
+import shticell.manager.enums.PermissionStatus;
 import shticell.manager.enums.PermissionType;
-import shticell.manager.sheetWithPermission.SheetWithPermission;
+import shticell.manager.sheetWithPermission.SheetPermissionData;
+import shticell.manager.sheetWithPermission.SheetPermissionDataImpl;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
@@ -15,8 +18,8 @@ import java.util.*;
 
 public class Manager {
     Set<String> users = new HashSet<>();
-    private final Map<String, List<SheetWithPermission>> userToSheetMap = new HashMap<>();
-    //private final List<PermissionRequest>
+    private final Map<String, Sheet> sheets = new HashMap<>();
+    private final Map<String, SheetPermissionData> sheetPermissionDataMap = new HashMap<>();
 
     public void addUser(String user){
         if (!users.add(user)) {
@@ -26,70 +29,52 @@ public class Manager {
 
     public void SetSheet(String userName, SheetDto sheetDto) {
         Sheet sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns(),sheetDto.rowsHeight(),sheetDto.colsWidth());
-        userToSheetMap.computeIfAbsent(userName,v -> new ArrayList<>()).add(new SheetWithPermission(sheet, PermissionType.OWNER));
+        if(sheets.containsKey(sheet.GetSheetName())) {
+            throw new RuntimeException("Sheet already exists");
+        }
+        sheets.put(sheetDto.Name(), sheet);
+        sheetPermissionDataMap.put(sheetDto.Name(),new SheetPermissionDataImpl());
+        sheetPermissionDataMap.get(sheetDto.Name()).AddPermission(userName,PermissionType.OWNER);
     }
 
-    private Sheet getSheetFromMap(String userName,String sheetName){
-        return userToSheetMap.
-                get(userName).
-                stream().
-                filter(v->v.getSheet().GetSheetName().equals(sheetName)).
-                findFirst().get().getSheet();
+    public void UpdateCellByCoordinate(String sheetName,Coordinate coordinate, String newValue) throws LoopConnectionException {
+        sheets.get(sheetName).UpdateCellByCoordinate(coordinate,newValue);
     }
 
-    public void UpdateCellByCoordinate(String userName,String sheetName,Coordinate coordinate, String newValue) {
-        userToSheetMap.
-                get(userName).
-                stream().
-                filter(v->v.getSheet().GetSheetName().equals(sheetName)).
-                findFirst().
-                ifPresent(v->
-                {try { v.getSheet().UpdateCellByCoordinate(coordinate,newValue); } catch (LoopConnectionException e) {throw new RuntimeException(e);}
-        });
+    public SheetDto getSheet(String sheetName){
+        return new SheetDto(sheets.get(sheetName));
     }
 
-    public SheetDto getSheet(String userName,String sheetName){
-        Sheet sheet = getSheetFromMap(userName,sheetName);
-        return new SheetDto(sheet);
+    public CellDto GetCellByCoordinate(String sheetName,Coordinate coordinate){
+        return new CellDto(sheets.get(sheetName).GetCell(coordinate));
     }
 
-    public CellDto GetCellByCoordinate(String userName,String sheetName,Coordinate coordinate){
-        Sheet sheet = getSheetFromMap(userName,sheetName);
-        return new CellDto(sheet.GetCell(coordinate));
+    public SheetDto GetSheetByVersion(String sheetName,int version){
+        return new SheetDto(sheets.get(sheetName).GetSheetByVersion(version));
     }
 
-    public SheetDto GetSheetByVersion(String userName,String sheetName,int version){
-        Sheet sheet = getSheetFromMap(userName,sheetName);
-        return new SheetDto(sheet.GetSheetByVersion(version));
+    public void AddRange(String sheetName,Range rangeDto){
+        sheets.get(sheetName).AddRange(rangeDto);
     }
 
-    public void AddRange(String userName,String sheetName,Range rangeDto){
-        Sheet sheet = getSheetFromMap(userName,sheetName);
-        sheet.AddRange(rangeDto);
+    public Range GetRangeDto(String sheetName,String rangeName){
+        return sheets.get(sheetName).GetRangeDto(rangeName);
     }
 
-    public Range GetRangeDto(String userName,String sheetName,String rangeName){
-        Sheet sheet = getSheetFromMap(userName,sheetName);
-        return sheet.GetRangeDto(rangeName);
+    public List<Range> GetRanges(String sheetName){
+        return sheets.get(sheetName).GetRangesDto();
     }
 
-    public List<Range> getRanges(String userName,String sheetName){
-        Sheet sheet = getSheetFromMap(userName,sheetName);
-        return sheet.GetRangesDto();
+    public void removeRange(String sheetName, String rangeName) throws Exception{
+        sheets.get(sheetName).RemoveRange(rangeName);
     }
 
-    public void removeRange(String userName,String sheetName,String rangeName) throws Exception{
-        Sheet sheet = getSheetFromMap(userName,sheetName);
-        sheet.RemoveRange(rangeName);
+    public SheetDto applySort(String sheetName,Queue<String> cols,Range range){
+        return Sort.SortRange(sheets.get(sheetName),cols,range);
     }
 
-    public SheetDto applySort(String userName,String sheetName,Queue<String> cols,Range range){
-        Sheet sheet = getSheetFromMap(userName,sheetName);
-        return Sort.SortRange(sheet,cols,range);
-    }
-
-    public SheetDto applyDynamicCalculate(String userName,String sheetName,Coordinate coordinate , String numStr){
-        Sheet sheet = getSheetFromMap(userName,sheetName);
+    public SheetDto applyDynamicCalculate(String sheetName,Coordinate coordinate , String numStr){
+        Sheet sheet = sheets.get(sheetName);
         String currentOriginalValue = sheet.GetOriginalValue(coordinate);
         sheet.applyDynamicCalculate(coordinate,numStr);
         SheetDto newSheetDto = new SheetDto(sheet);
@@ -98,10 +83,24 @@ public class Manager {
         return newSheetDto;
     }
 
-//    public void addToPending(String ownerName, String userName, String sheetName){
-//        Sheet sheet = getSheetFromMap(ownerName,sheetName);
-//        userToSheetMap.computeIfAbsent(userName,v->new ArrayList<>()).add(new SheetWithPermission(sheet, PermissionType.);
-//    }
+    public List<SheetDataDto> GetSheetsDashBoard(String user){
+        return sheets.keySet().stream().map(sheetName ->{
+            PermissionType permissionType = sheetPermissionDataMap.get(sheetName).getPermission(user);
+            String sheetSize = sheets.get(sheetName).GetNumberOfRows() + "X" + sheets.get(sheetName).GetNumberOfColumns();
+            String owner = sheetPermissionDataMap.get(sheetName).GetOwner();
+            return new SheetDataDto(owner,sheetName,sheetSize,permissionType);
+        }).toList();
+    }
 
+    public List<SheetPermissionDataImpl.PermissionRequestDto> GetRequestDashBoard(String sheetName){
+        return sheetPermissionDataMap.get(sheetName).GetPermissionRequests();
+    }
 
+    public void AddRequestPermission(String sheetName, String userName, PermissionType permissionType){
+        sheetPermissionDataMap.get(sheetName).AddPermissionRequest(new SheetPermissionDataImpl.PermissionRequestDto(userName, permissionType, PermissionStatus.PENDING));
+    }
+
+    public void UpdateRequestStatus(String sheetName,String user, Boolean accept){
+        sheetPermissionDataMap.get(sheetName).UpdateRequestStatus(user,accept);
+    }
 }

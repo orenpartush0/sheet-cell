@@ -2,9 +2,10 @@ package servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import deserializer.AuthDtoDeserializer;
-import dto.AuthDto;
+import deserializer.CoordinateDeserializer;
+import deserializer.UpdateCellDtoDeserializer;
 import dto.CellDto;
+import dto.UpdateCellDto;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import shticell.manager.Manager;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
+import shticell.sheet.exception.LoopConnectionException;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,14 +32,14 @@ public class CellServlet extends HttpServlet {
             getServletContext().setAttribute(MANAGER, manager);
         }
 
-        Coordinate coordinate = CoordinateFactory.getCoordinate(req.getParameter("coordinate"));
-        String newValue = req.getParameter("newValue");
+        String sheetName = req.getParameter("sheetName");
         BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
         GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
-        builder.registerTypeAdapter(AuthDto.class, new AuthDtoDeserializer());
+        builder.registerTypeAdapter(UpdateCellDto.class, new UpdateCellDtoDeserializer());
         Gson gson = builder.create();
-        AuthDto authDto = gson.fromJson(reader, AuthDto.class);
-        manager.UpdateCellByCoordinate(authDto.userName(),authDto.SheetName(),coordinate,newValue);
+        UpdateCellDto updateCellDto = gson.fromJson(reader, UpdateCellDto.class);
+        try {manager.UpdateCellByCoordinate(sheetName,updateCellDto.coordinate(),updateCellDto.newValue());}
+        catch (LoopConnectionException e) { throw new RuntimeException(e);}
     }
 
     @Override
@@ -47,13 +50,13 @@ public class CellServlet extends HttpServlet {
             getServletContext().setAttribute(MANAGER, manager);
         }
 
-        Coordinate coordinate = CoordinateFactory.getCoordinate(req.getParameter("coordinate"));
+        String sheetName = req.getParameter("sheetName");
         BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
         GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
-        builder.registerTypeAdapter(AuthDto.class, new AuthDtoDeserializer());
+        builder.registerTypeAdapter(Coordinate.class, new CoordinateDeserializer());
         Gson gson = builder.create();
-        AuthDto authDto = gson.fromJson(reader, AuthDto.class);
-        resp.getWriter().write(gson.toJson(manager.GetCellByCoordinate(authDto.userName(),authDto.SheetName(),coordinate),CellDto.class));
+        Coordinate coordinate = gson.fromJson(reader, Coordinate.class);
+        resp.getWriter().write(gson.toJson(manager.GetCellByCoordinate(sheetName,coordinate)));
     }
 }
 

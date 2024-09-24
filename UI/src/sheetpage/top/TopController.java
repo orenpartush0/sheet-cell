@@ -3,7 +3,7 @@ package sheetpage.top;
 import sheetpage.app.AppController;
 import sheetpage.top.dialog.filter.FilterDialogController;
 import sheetpage.top.dialog.function.FunctionDialogController;
-import sheetpage.top.dialog.sheet.SheetDialogController;
+import dashboard.dialog.sheet.SheetDialogController;
 import sheetpage.top.dialog.range.RangeDialogController;
 import sheetpage.top.dialog.sort.SortDialogController;
 import dto.CellDto;
@@ -21,14 +21,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import shticell.sheet.coordinate.CoordinateFactory;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -169,41 +167,6 @@ public class TopController {
         this.appController = appController;
     }
 
-    @FXML
-    private void handleLoadFile() {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Open Resource File");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML or BIN Files", "*.xml", "*.bin"));
-        File initialDirectory = new File(System.getProperty("user.home"));
-        fileChooser.setInitialDirectory(initialDirectory);
-        File selectedFile = fileChooser.showOpenDialog(null);
-
-        if (selectedFile != null) {
-            String filePath = selectedFile.getAbsolutePath();
-            previousPath = path.get();
-            path.set(filePath);
-            appController.importFile(filePath);
-        }
-    }
-
-    @FXML
-    public void handleCreateNewSheet() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/sheetpage/top/dialog/sheet/createSheetDialog.fxml"));
-        Parent root = loader.load();
-
-        SheetDialogController controller = loader.getController();
-        controller.setTopController(this);
-        controller.setAppController(appController);
-        Stage dialogStage = new Stage();
-        dialogStage.setTitle("Sheet Details");
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setScene(new Scene(root));
-
-        dialogStage.setHeight(240);
-
-        controller.setDialogStage(dialogStage);
-        dialogStage.showAndWait();
-    }
 
     public void EnableButtons() {
         isSheetLoaded.set(true);
@@ -325,7 +288,7 @@ public class TopController {
                         appController.removeRange(selectedRange);
                         rangesComboBox.getItems().remove(selectedRange);
                     } catch (Exception e) {
-                        DashBoard.showError(e.getMessage());
+                        AppController.showError(e.getMessage());
                     }
                 });
             } else {
@@ -389,7 +352,7 @@ public class TopController {
             int step = Integer.parseInt(stepTextField.getText());
 
             if(from > to || to - from < step){
-                DashBoard.showError("Invalid increment");
+                AppController.showError("Invalid increment");
             }
             else{
                 counter = (from + step * counter) > to ?  0 : counter;

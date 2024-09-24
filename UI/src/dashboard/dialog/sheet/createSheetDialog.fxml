@@ -8,7 +8,7 @@
 
 <?import javafx.scene.layout.VBox?>
 <GridPane xmlns:fx="http://javafx.com/fxml/1"
-          fx:controller="sheetpage.top.dialog.sheet.SheetDialogController"
+          fx:controller="dashboard.dialog.sheet.SheetDialogController"
           hgap="10" vgap="10" alignment="center">
     <!-- Aligning labels and fields in the center of the grid -->
     <Label text="Sheet Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" alignment="center_right" />

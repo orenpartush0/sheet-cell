@@ -23,7 +23,7 @@
                 <Button text="Submit" fx:id="submitButton"/>
 
                 <!-- Error message label for displaying errors in red -->
-                <Label fx:id="errorMessage" text="" style="-fx-text-fill: red;" visible="false"/>
+                <Label fx:id="errorMessage" style="-fx-text-fill: red;" visible="false"/>
 
             </children>
         </VBox>

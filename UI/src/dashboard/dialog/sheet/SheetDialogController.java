@@ -1,5 +1,7 @@
-package sheetpage.top.dialog.sheet;
+package dashboard.dialog.sheet;
 
+import Connector.Connector;
+import dto.SheetDto;
 import sheetpage.app.AppController;
 import sheetpage.top.TopController;
 import javafx.fxml.FXML;
@@ -8,27 +10,31 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class SheetDialogController {
+import java.io.IOException;
 
-    private AppController appController;
-    private TopController topController;
+public class SheetDialogController {
 
     @FXML private TextField sheetNameField;
     @FXML private TextField numColumnsField;
     @FXML private TextField numRowsField;
     @FXML private VBox errorBox;
 
+    private String user;
     private Stage dialogStage;
 
     @FXML
-    private void handleOk() {
+    private void handleOk() throws IOException {
         if (isInputValid()) {
             String sheetName = getSheetName();
             int numColumns = getNumColumns();
             int numRows = getNumRows();
-            appController.createNewSheet(sheetName, numColumns, numRows);
-            topController.EnableButtons();
-            dialogStage.close();
+            if(Connector.setNewSheet(new SheetDto(sheetName,1,numColumns,numRows,100,30),user)){
+                dialogStage.close();
+            };
+
+            Label errorLabel = new Label("Sheet name already exists");
+            errorLabel.setStyle("-fx-text-fill: red;");
+            errorBox.getChildren().add(errorLabel);
         }
     }
 
@@ -40,6 +46,8 @@ public class SheetDialogController {
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
     }
+
+    public void setUser(String _user) {_user = _user;}
 
     public String getSheetName() {
         return sheetNameField.getText();
@@ -100,14 +108,6 @@ public class SheetDialogController {
         }
 
         return isValid;
-    }
-
-    public void setAppController(AppController _appController){
-        appController = _appController;
-    }
-
-    public void setTopController(TopController _topController){
-        topController = _topController;
     }
 
 }

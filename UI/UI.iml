@@ -7,8 +7,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="Connector" exported="" />
     <orderEntry type="library" exported="" name="javafx-swt" level="project" />
     <orderEntry type="library" exported="" name="gson-2.1-javadoc" level="project" />
+    <orderEntry type="library" exported="" name="okio-2.8.0" level="project" />
+    <orderEntry type="module" module-name="WebApp" exported="" />
+    <orderEntry type="module" module-name="Engine" />
   </component>
 </module>

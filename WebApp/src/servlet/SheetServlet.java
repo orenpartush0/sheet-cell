@@ -2,9 +2,7 @@ package servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import deserializer.AuthDtoDeserializer;
 import deserializer.SheetDtoDeserializer;
-import dto.AuthDto;
 import dto.SheetDto;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -44,12 +42,8 @@ public class SheetServlet extends HttpServlet {
             manager = new Manager();
         }
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
-        GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
-        builder.registerTypeAdapter(AuthDto.class, new AuthDtoDeserializer());
-        Gson gson = builder.create();
-        AuthDto authDto = gson.fromJson(reader, AuthDto.class);
-        resp.getWriter().write(gson.toJson(manager.getSheet(authDto.userName(), authDto.SheetName()),SheetDto.class));
+        String sheetName = req.getParameter("sheetName");
+        Gson gson  = new Gson();
+        resp.getWriter().write(gson.toJson(manager.getSheet(sheetName)));
     }
-
 }

@@ -23,7 +23,6 @@
         <MenuBar id="menuBar" prefHeight="38.0" prefWidth="79.0">
             <Menu id="menu" text="File">
                 <MenuItem id="new" onAction="#handleCreateNewSheet" text="New" />
-                <MenuItem fx:id="saveButton" disable="true" onAction="#HandleSaveFile" text="Save" />
                 <MenuItem id="load" onAction="#handleLoadFile" text="Load" />
             </Menu>
          <padding>

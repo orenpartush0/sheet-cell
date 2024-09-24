@@ -1,8 +1,10 @@
 package servlet;
 
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import dto.SheetDto;
+import deserializer.UpdateCellDtoDeserializer;
+import dto.UpdateCellDto;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,8 +14,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-@WebServlet(urlPatterns = "/version")
-public class VersionServlet extends HttpServlet {
+@WebServlet("/dynamicCalculate")
+public class DynamicCalculateServlet extends HttpServlet {
+
     private final String MANAGER = "manager";
 
     @Override
@@ -24,9 +27,12 @@ public class VersionServlet extends HttpServlet {
             getServletContext().setAttribute(MANAGER, manager);
         }
 
-        int version = Integer.parseInt(req.getParameter("version"));
         String sheetName = req.getParameter("sheetName");
-        Gson gson  = new Gson();
-        resp.getWriter().write(gson.toJson(manager.GetSheetByVersion(sheetName,version), SheetDto.class));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
+        GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
+        builder.registerTypeAdapter(UpdateCellDto.class, new UpdateCellDtoDeserializer());
+        Gson gson = builder.create();
+        UpdateCellDto updateCellDto = gson.fromJson(reader, UpdateCellDto.class);
+        resp.getWriter().write(gson.toJson(manager.applyDynamicCalculate(sheetName, updateCellDto.coordinate(), updateCellDto.newValue())));
     }
 }

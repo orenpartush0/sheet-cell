@@ -9,6 +9,7 @@ public class SheetDtoDeserializer implements JsonDeserializer<SheetDto> {
     public SheetDto deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject jsonObject = json.getAsJsonObject();
 
+        // Deserialize SheetDto
         String name = jsonObject.get("Name").getAsString();
         int version = jsonObject.get("version").getAsInt();
         int numberOfRows = jsonObject.get("numberOfRows").getAsInt();

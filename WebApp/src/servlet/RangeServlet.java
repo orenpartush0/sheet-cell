@@ -2,15 +2,13 @@ package servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import deserializer.PutRangeDtoDeserializer;
-import deserializer.RemoveAndGetRangeDeserializer;
-import dto.PutRangeDto;
-import dto.RemoveAndGetRangeDto;
+import deserializer.RangeDeserializer;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import shticell.manager.Manager;
+import shticell.sheet.range.Range;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,12 +27,13 @@ public class RangeServlet extends HttpServlet {
             getServletContext().setAttribute(MANAGER, manager);
        }
 
+        String sheetName = req.getParameter("sheetName");
         BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
         GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
-        builder.registerTypeAdapter(PutRangeDto.class, new PutRangeDtoDeserializer());
+        builder.registerTypeAdapter(Range.class, new RangeDeserializer());
         Gson gson = builder.create();
-        PutRangeDto putRangeDto = gson.fromJson(reader, PutRangeDto.class);
-        manager.AddRange(putRangeDto.authDto().userName(), putRangeDto.authDto().SheetName(), putRangeDto.range());
+        Range range = gson.fromJson(reader, Range.class);
+        manager.AddRange(sheetName,range);
     }
 
     @Override
@@ -45,13 +44,12 @@ public class RangeServlet extends HttpServlet {
             getServletContext().setAttribute(MANAGER, manager);
         }
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
-        GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
-        builder.registerTypeAdapter(RemoveAndGetRangeDto.class, new RemoveAndGetRangeDeserializer());
-        Gson gson = builder.create();
-        RemoveAndGetRangeDto removeAndGetRange = gson.fromJson(reader, RemoveAndGetRangeDto.class);
-        resp.getWriter().write(gson.toJson(manager.GetRangeDto(removeAndGetRange.auth().userName(),
-                removeAndGetRange.auth().SheetName(), removeAndGetRange.rangeName())));
+
+        String sheetName = req.getParameter("sheetName");
+        String rangeName = req.getParameter("rangeName");
+        Gson gson  = new Gson();
+
+        resp.getWriter().write(gson.toJson(manager.GetRangeDto(sheetName,rangeName)));
     }
 
     @Override
@@ -63,14 +61,12 @@ public class RangeServlet extends HttpServlet {
         }
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
-        GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
-        builder.registerTypeAdapter(RemoveAndGetRangeDto.class, new RemoveAndGetRangeDeserializer());
-        Gson gson = builder.create();
-        RemoveAndGetRangeDto removeAndGetRange = gson.fromJson(reader, RemoveAndGetRangeDto.class);
-        try {manager.removeRange(removeAndGetRange.auth().userName(),
-                removeAndGetRange.auth().SheetName(),
-                removeAndGetRange.rangeName());}
-        catch (Exception e) {throw new RuntimeException(e);}
+        String sheetName = req.getParameter("sheetName");
+        String rangeName = req.getParameter("rangeName");
+        Gson gson  = new Gson();
+
+        try {manager.removeRange(sheetName,rangeName);
+        } catch (Exception e) { throw new RuntimeException(e);}
     }
 
 }

@@ -1,45 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.control.*?>
 
-<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="sheetpage.app.DashBoard">
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane fx:id="root" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="dashboard.DashBoardController">
 
     <top>
-        <VBox>
-            <Label text="User: " fx:id="user"/>
-        <HBox spacing="10" alignment="CENTER">
-            <Button text="View Sheet" fx:id="viewSheetButton"/>
-            <Button text="Request Permission" fx:id="requestPermissionButton"/>
-            <Button text="Ack/Deny Permission" fx:id="ackDenyPermissionButton"/>
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <MenuBar prefHeight="26.0" prefWidth="574.0">
+                <Menu mnemonicParsing="false" text="File">
+                    <MenuItem onAction="#handleCreateNewSheet" mnemonicParsing="false" text="New File" />
+                    <MenuItem onAction="#handleLoadFile" mnemonicParsing="false" text="Load File" />
+                </Menu>
+            </MenuBar>
+         <BorderPane.margin>
+            <Insets bottom="10.0" />
+         </BorderPane.margin>
         </HBox>
-        </VBox>
     </top>
 
     <center>
-        <VBox spacing="10">
+        <HBox alignment="CENTER">
+            <VBox alignment="CENTER" spacing="10">
+                <Label style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Available Sheet Table" />
+                <TableView fx:id="sheetsTable" prefHeight="324.0" prefWidth="310.0">
+                    <columns>
+                        <TableColumn fx:id="ownerColumn" text="Owner" />
+                        <TableColumn fx:id="sheetNameColumn" text="Sheet Name" />
+                        <TableColumn fx:id="sizeColumn" text="Size" />
+                        <TableColumn fx:id="permissionCol" text="Permission Type" />
+                    </columns>
+                    <VBox.margin>
+                        <Insets right="10.0" />
+                    </VBox.margin>
+                </TableView>
+            </VBox>
 
-            <Label text="Available Sheet Table" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
-
-            <TableView fx:id="permissionTable">
-                <columns>
-                    <TableColumn text="Owner" fx:id="ownerColumn"/>
-                    <TableColumn text="Sheet Name" fx:id="sheetNameColumn"/>
-                    <TableColumn text="size" fx:id="sizeColumn"/>
-                    <TableColumn text="Permission Type" fx:id="permissionCol"/>
-                </columns>
-            </TableView>
-
-            <Label text="Permission Table" style="-fx-font-size: 14px; -fx-font-weight: bold;"/>
-
-            <TableView fx:id="sheetsTable">
-                <columns>
-                    <TableColumn text="User" fx:id="userColumn"/>
-                    <TableColumn text="Permission" fx:id="permissionColumn"/>
-                    <TableColumn text="Status" fx:id="statusColumn"/>
-                </columns>
-            </TableView>
-
-        </VBox>
+            <VBox alignment="CENTER">
+                <Label prefWidth="112.0" style="-fx-font-size: 14px; -fx-font-weight: bold;" text="Permission Table">
+                    <VBox.margin>
+                        <Insets bottom="12.0" />
+                    </VBox.margin></Label>
+                <AnchorPane prefHeight="0.0" prefWidth="254.0" />
+                <TableView fx:id="requestTable" layoutX="200.0" prefHeight="183.0" prefWidth="240.0">
+                    <columns>
+                        <TableColumn fx:id="userColumn" text="User" />
+                        <TableColumn fx:id="permissionColumn" text="Permission" />
+                        <TableColumn fx:id="statusColumn" text="Status" />
+                    </columns>
+                    <VBox.margin>
+                        <Insets left="10.0" right="3.0" />
+                    </VBox.margin>
+                </TableView>
+                <AnchorPane prefHeight="142.0" prefWidth="254.0">
+                    <Button fx:id="ackDenyPermissionButton" layoutX="63.0" layoutY="8.0" prefHeight="15.0" prefWidth="128.0" text="Ack/Deny Permission" />
+                    <Button fx:id="requestPermissionButton" layoutX="63.0" layoutY="45.0" prefHeight="15.0" prefWidth="128.0" text="Request Permission" />
+                    <Button fx:id="viewSheetButton" layoutX="173.0" layoutY="102.0" text="View Sheet" />
+               <Label layoutY="106.0" text="Selected Sheet: " />
+               <TextField fx:id="selectedSheet" editable="false" layoutX="84.0" layoutY="101.0" prefHeight="26.0" prefWidth="76.0" />
+                </AnchorPane>
+            </VBox>
+        </HBox>
     </center>
+   <bottom>
+       <HBox prefHeight="2.0" prefWidth="575.0" BorderPane.alignment="CENTER">
+           <Label text="Welcome, " />
+           <Label fx:id="userNameLabel" prefHeight="18.0" prefWidth="107.0" />
+       </HBox>
+   </bottom>
 
 </BorderPane>

@@ -1,6 +1,6 @@
 package sheetpage.app;
 
-import connector.Connector;
+import Connector.Connector;
 import dto.SheetDto;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -12,7 +12,7 @@ import sheetpage.sheet.SheetController;
 import sheetpage.top.TopController;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.range.Range;
-import java.io.IOException;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -20,8 +20,6 @@ import java.util.Queue;
 public class AppController {
 
     public BorderPane root;
-    private final Connector connector = new Connector();
-
     @FXML private TopController topComponentController;
     @FXML private SheetController sheetComponentController;
 
@@ -35,7 +33,7 @@ public class AppController {
 
     public void importFile(String path) {
         try {
-            connector.SetSheet(path);
+            Connector.SetSheet(path);
             topComponentController.clearVersion();
             topComponentController.addVersion();
             sheetComponentController.clearSheet();
@@ -53,22 +51,22 @@ public class AppController {
     }
 
     private void fillSheet(){
-        sheet = connector.getSheet();
+        sheet = Connector.getSheet();
         sheetComponentController.fillSheet(sheet);
-        topComponentController.addRangesToComboBox(connector.getRanges().stream().map(Range::rangeName).toList());
+        topComponentController.addRangesToComboBox(Connector.getRanges().stream().map(Range::rangeName).toList());
     }
 
     public void createNewSheet(String sheetName, int numColumns, int numRows){
-        connector.SetSheet(new SheetDto(sheetName,1,numColumns,numRows,100,30));
+        //Connector.SetSheet(new SheetDto(sheetName,1,numColumns,numRows,100,30));
         sheetComponentController.clearSheet();
         fillSheet();
         topComponentController.clearVersion();
         topComponentController.addVersion();
     }
 
-    public void updateCell(Coordinate coordinate,String value) {
+    public void updateCell(Coordinate coordinate, String value) {
         try {
-            connector.UpdateCellByCoordinate(coordinate, value);
+            Connector.UpdateCellByCoordinate(coordinate, value);
             topComponentController.addVersion();
         }
         catch (Exception e){
@@ -77,13 +75,13 @@ public class AppController {
     }
 
     public SheetDto GetSheet(){
-        return connector.getSheet();
+        return Connector.getSheet();
     }
 
     public void cellClicked(Coordinate coordinate,String style,Pos pos){
-        topComponentController.setOnMouseCoordinate(connector.GetCellByCoordinate(coordinate),style,pos);
-        List<Coordinate> influenceOn = connector.getSheet().cells().get(coordinate).influenceOn();
-        List<Coordinate> dependsOn = connector.getSheet().cells().get(coordinate).dependsOn();
+        topComponentController.setOnMouseCoordinate(Connector.GetCellByCoordinate(coordinate),style,pos);
+        List<Coordinate> influenceOn = Connector.getSheet().cells().get(coordinate).influenceOn();
+        List<Coordinate> dependsOn = Connector.getSheet().cells().get(coordinate).dependsOn();
         sheetComponentController.PaintCellsBorder(influenceOn,"Green");
         sheetComponentController.PaintCellsBorder(dependsOn,"Blue");
     }
@@ -93,12 +91,12 @@ public class AppController {
     }
 
     public void addRange(String rangeName,Coordinate startCoordinate,Coordinate endCoordinate){
-        connector.AddRange(new Range(rangeName,startCoordinate,endCoordinate));
+        Connector.AddRange(new Range(rangeName,startCoordinate,endCoordinate));
         fillSheet();
     }
 
     public Range GetRange(String rangeName) {
-        return connector.GetRangeDto(rangeName);
+        return Connector.GetRangeDto(rangeName);
     }
 
     public void removePaint(){
@@ -106,7 +104,7 @@ public class AppController {
     }
 
     public SheetDto getSheetByVersion(int version){
-        return connector.GetSheetByVersion(version);
+        return Connector.GetSheetByVersion(version);
     }
 
     public int getNumOfCols(){
@@ -118,14 +116,14 @@ public class AppController {
     }
 
     public Map<Integer, List<String>> getValuesInColumns(Range range ){
-        return connector.getValuesInColumn(range);
+        return Connector.getValuesInColumn(range);
     }
     public SheetDto applyFilter(Range range ,Map<Integer, List<String>> filters) {
-        return connector.applyFilter(range,filters);
+        return Connector.applyFilter(range,filters);
     }
 
     public void removeRange(String rangeName) throws Exception{
-        connector.removeRange(rangeName);
+        Connector.removeRange(rangeName);
     }
 
     public static void showError(String message) {
@@ -153,7 +151,7 @@ public class AppController {
     }
 
     public SheetDto applySort(Queue<String> cols,Range range){
-        return connector.applySort(cols,range);
+        return Connector.applySort(cols,range);
     }
 
     public void setDefaultStyle(Coordinate coordinate){
@@ -165,7 +163,7 @@ public class AppController {
     }
 
     public void applyDynamicCalculate(Coordinate coordinate, String numStr){
-        SheetDto sheetDto = connector.applyDynamicCalculate(coordinate, numStr);
+        SheetDto sheetDto = Connector.applyDynamicCalculate(coordinate, numStr);
         sheetComponentController.fillSheet(sheetDto);
     }
 }
