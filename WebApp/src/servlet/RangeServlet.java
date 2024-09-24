@@ -7,7 +7,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import shticell.manager.Manager;
+import shticell.manager.sheet.SheetManager;
 import shticell.sheet.range.Range;
 
 import java.io.BufferedReader;
@@ -21,10 +21,10 @@ public class RangeServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Manager manager = (Manager) getServletContext().getAttribute(MANAGER);
-        if (manager == null) {
-            manager = new Manager();
-            getServletContext().setAttribute(MANAGER, manager);
+        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
+        if (sheetManager == null) {
+            sheetManager = new SheetManager();
+            getServletContext().setAttribute(MANAGER, sheetManager);
        }
 
         String sheetName = req.getParameter("sheetName");
@@ -33,15 +33,15 @@ public class RangeServlet extends HttpServlet {
         builder.registerTypeAdapter(Range.class, new RangeDeserializer());
         Gson gson = builder.create();
         Range range = gson.fromJson(reader, Range.class);
-        manager.AddRange(sheetName,range);
+        sheetManager.AddRange(sheetName,range);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Manager manager = (Manager) getServletContext().getAttribute(MANAGER);
-        if (manager == null) {
-            manager = new Manager();
-            getServletContext().setAttribute(MANAGER, manager);
+        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
+        if (sheetManager == null) {
+            sheetManager = new SheetManager();
+            getServletContext().setAttribute(MANAGER, sheetManager);
         }
 
 
@@ -49,15 +49,15 @@ public class RangeServlet extends HttpServlet {
         String rangeName = req.getParameter("rangeName");
         Gson gson  = new Gson();
 
-        resp.getWriter().write(gson.toJson(manager.GetRangeDto(sheetName,rangeName)));
+        resp.getWriter().write(gson.toJson(sheetManager.GetRangeDto(sheetName,rangeName)));
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Manager manager = (Manager) getServletContext().getAttribute(MANAGER);
-        if (manager == null) {
-            manager = new Manager();
-            getServletContext().setAttribute(MANAGER, manager);
+        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
+        if (sheetManager == null) {
+            sheetManager = new SheetManager();
+            getServletContext().setAttribute(MANAGER, sheetManager);
         }
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
@@ -65,7 +65,8 @@ public class RangeServlet extends HttpServlet {
         String rangeName = req.getParameter("rangeName");
         Gson gson  = new Gson();
 
-        try {manager.removeRange(sheetName,rangeName);
+        try {
+            sheetManager.removeRange(sheetName,rangeName);
         } catch (Exception e) { throw new RuntimeException(e);}
     }
 

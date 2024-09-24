@@ -5,7 +5,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import shticell.manager.Manager;
+import shticell.manager.sheet.SheetManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,10 +18,10 @@ public class UpdateRequestStatusServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Manager manager = (Manager) getServletContext().getAttribute(MANAGER);
-        if (manager == null) {
-            manager = new Manager();
-            getServletContext().setAttribute(MANAGER, manager);
+        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
+        if (sheetManager == null) {
+            sheetManager = new SheetManager();
+            getServletContext().setAttribute(MANAGER, sheetManager);
         }
 
         String sheetName = req.getParameter("sheetName");
@@ -29,6 +29,6 @@ public class UpdateRequestStatusServlet extends HttpServlet {
         BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
         Gson gson = new Gson();
         boolean accept = gson.fromJson(reader, Boolean.class);
-        manager.UpdateRequestStatus(sheetName, userName, accept);
+        sheetManager.UpdateRequestStatus(sheetName, userName, accept);
     }
 }

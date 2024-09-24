@@ -8,7 +8,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import shticell.manager.Manager;
+import shticell.manager.sheet.SheetManager;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,10 +20,10 @@ public class SortServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Manager manager = (Manager) getServletContext().getAttribute(MANAGER);
-        if (manager == null) {
-            manager = new Manager();
-            getServletContext().setAttribute(MANAGER, manager);
+        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
+        if (sheetManager == null) {
+            sheetManager = new SheetManager();
+            getServletContext().setAttribute(MANAGER, sheetManager);
         }
 
         String sheetName = req.getParameter("sheetName");
@@ -32,6 +32,6 @@ public class SortServlet extends HttpServlet {
         builder.registerTypeAdapter(SortDto.class, new SortDtoDeserializer());
         Gson gson = builder.create();
         SortDto sortDto = gson.fromJson(reader, SortDto.class);
-        resp.getWriter().write(gson.toJson(manager.applySort(sheetName,sortDto.cols(),sortDto.range())));
+        resp.getWriter().write(gson.toJson(sheetManager.applySort(sheetName,sortDto.cols(),sortDto.range())));
     }
 }

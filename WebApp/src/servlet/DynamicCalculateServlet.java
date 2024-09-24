@@ -9,7 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import shticell.manager.Manager;
+import shticell.manager.sheet.SheetManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -21,10 +21,10 @@ public class DynamicCalculateServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Manager manager = (Manager) getServletContext().getAttribute(MANAGER);
-        if (manager == null) {
-            manager = new Manager();
-            getServletContext().setAttribute(MANAGER, manager);
+        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
+        if (sheetManager == null) {
+            sheetManager = new SheetManager();
+            getServletContext().setAttribute(MANAGER, sheetManager);
         }
 
         String sheetName = req.getParameter("sheetName");
@@ -33,6 +33,6 @@ public class DynamicCalculateServlet extends HttpServlet {
         builder.registerTypeAdapter(UpdateCellDto.class, new UpdateCellDtoDeserializer());
         Gson gson = builder.create();
         UpdateCellDto updateCellDto = gson.fromJson(reader, UpdateCellDto.class);
-        resp.getWriter().write(gson.toJson(manager.applyDynamicCalculate(sheetName, updateCellDto.coordinate(), updateCellDto.newValue())));
+        resp.getWriter().write(gson.toJson(sheetManager.applyDynamicCalculate(sheetName, updateCellDto.coordinate(), updateCellDto.newValue())));
     }
 }

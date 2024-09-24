@@ -6,7 +6,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import shticell.manager.Manager;
+import shticell.manager.sheet.SheetManager;
 import shticell.manager.enums.PermissionType;
 
 import java.io.BufferedReader;
@@ -20,10 +20,10 @@ public class AddRequestServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Manager manager = (Manager) getServletContext().getAttribute(MANAGER);
-        if (manager == null) {
-            manager = new Manager();
-            getServletContext().setAttribute(MANAGER, manager);
+        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
+        if (sheetManager == null) {
+            sheetManager = new SheetManager();
+            getServletContext().setAttribute(MANAGER, sheetManager);
         }
 
         String sheetName = req.getParameter("sheetName");
@@ -31,6 +31,6 @@ public class AddRequestServlet extends HttpServlet {
         BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
         Gson gson = new Gson();
         PermissionType permissionType = gson.fromJson(reader, PermissionType.class);
-        manager.AddRequestPermission(sheetName, userName,permissionType);
+        sheetManager.AddRequestPermission(sheetName, userName,permissionType);
     }
 }

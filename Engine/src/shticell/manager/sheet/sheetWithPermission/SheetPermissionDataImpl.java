@@ -1,4 +1,4 @@
-package shticell.manager.sheetWithPermission;
+package shticell.manager.sheet.sheetWithPermission;
 
 
 import shticell.manager.enums.PermissionStatus;
@@ -51,6 +51,12 @@ public class SheetPermissionDataImpl implements SheetPermissionData {
     @Override
     public List<PermissionRequestDto> GetPermissionRequests(){
         return new ArrayList<>(permissionRequests.values());
+    }
+
+
+    @Override
+    public boolean isPermit(String userName, PermissionType permissionType){
+        return permissions.getOrDefault(userName,PermissionType.DONT_HAVE).getPermissionLevel() >= permissionType.getPermissionLevel();
     }
 
     public record PermissionRequestDto(String user, PermissionType permissionType, PermissionStatus permissionStatus){};

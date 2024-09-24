@@ -8,7 +8,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import shticell.manager.Manager;
+import shticell.manager.sheet.SheetManager;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -20,10 +20,10 @@ public class SheetServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Manager manager = (Manager) getServletContext().getAttribute(MANAGER);
-        if( manager == null) {
-            manager = new Manager();
-            getServletContext().setAttribute(MANAGER, manager);
+        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
+        if( sheetManager == null) {
+            sheetManager = new SheetManager();
+            getServletContext().setAttribute(MANAGER, sheetManager);
         }
 
         String userName = req.getParameter("userName");
@@ -32,18 +32,18 @@ public class SheetServlet extends HttpServlet {
         builder.registerTypeAdapter(SheetDto.class, new SheetDtoDeserializer());
         Gson gson = builder.create();
         SheetDto sheet = gson.fromJson(reader, SheetDto.class);
-        manager.SetSheet(userName,sheet);
+        sheetManager.SetSheet(userName,sheet);
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        Manager manager = (Manager) getServletContext().getAttribute(MANAGER);
-        if(manager == null) {
-            manager = new Manager();
+        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
+        if(sheetManager == null) {
+            sheetManager = new SheetManager();
         }
 
         String sheetName = req.getParameter("sheetName");
         Gson gson  = new Gson();
-        resp.getWriter().write(gson.toJson(manager.getSheet(sheetName)));
+        resp.getWriter().write(gson.toJson(sheetManager.getSheet(sheetName)));
     }
 }

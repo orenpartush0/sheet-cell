@@ -1,4 +1,4 @@
-package shticell.manager.sheetWithPermission;
+package shticell.manager.sheet.sheetWithPermission;
 
 import shticell.manager.enums.PermissionType;
 
@@ -17,4 +17,6 @@ public interface SheetPermissionData {
     String GetOwner();
 
     List<SheetPermissionDataImpl.PermissionRequestDto> GetPermissionRequests();
+
+    boolean isPermit(String userName, PermissionType permissionType);
 }

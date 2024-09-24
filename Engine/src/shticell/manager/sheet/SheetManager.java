@@ -1,12 +1,12 @@
-package shticell.manager;
+package shticell.manager.sheet;
 
 import dto.CellDto;
 import dto.SheetDataDto;
 import dto.SheetDto;
 import shticell.manager.enums.PermissionStatus;
 import shticell.manager.enums.PermissionType;
-import shticell.manager.sheetWithPermission.SheetPermissionData;
-import shticell.manager.sheetWithPermission.SheetPermissionDataImpl;
+import shticell.manager.sheet.sheetWithPermission.SheetPermissionData;
+import shticell.manager.sheet.sheetWithPermission.SheetPermissionDataImpl;
 import shticell.sheet.api.Sheet;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
@@ -16,16 +16,9 @@ import shticell.util.Sort;
 
 import java.util.*;
 
-public class Manager {
-    Set<String> users = new HashSet<>();
+public class SheetManager {
     private final Map<String, Sheet> sheets = new HashMap<>();
     private final Map<String, SheetPermissionData> sheetPermissionDataMap = new HashMap<>();
-
-    public void addUser(String user){
-        if (!users.add(user)) {
-            throw new RuntimeException("User already exists");
-        }
-    }
 
     public void SetSheet(String userName, SheetDto sheetDto) {
         Sheet sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns(),sheetDto.rowsHeight(),sheetDto.colsWidth());
@@ -102,5 +95,9 @@ public class Manager {
 
     public void UpdateRequestStatus(String sheetName,String user, Boolean accept){
         sheetPermissionDataMap.get(sheetName).UpdateRequestStatus(user,accept);
+    }
+
+    public boolean isPermit(String sheetName, String user, PermissionType permissionType){
+        return sheetPermissionDataMap.get(sheetName).isPermit(user,permissionType);
     }
 }
