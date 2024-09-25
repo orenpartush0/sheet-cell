@@ -11,7 +11,7 @@ import java.util.Map;
 
 public class SheetPermissionDataImpl implements SheetPermissionData {
     private final Map<String, PermissionType> permissions = new HashMap<String, PermissionType>();
-    private final Map<String, PermissionRequestDto> permissionRequests = new HashMap<>();
+    private final Map<Integer, PermissionRequestDto> permissionRequests = new HashMap<>();
 
     @Override
     public void AddPermission(String user, PermissionType permission) {
@@ -20,7 +20,7 @@ public class SheetPermissionDataImpl implements SheetPermissionData {
 
     @Override
     public void AddPermissionRequest(PermissionRequestDto permissionRequestDto) {
-        permissionRequests.put(permissionRequestDto.user, permissionRequestDto);
+        permissionRequests.put(permissionRequests.keySet().size() , permissionRequestDto);
     }
 
     @Override
@@ -29,12 +29,12 @@ public class SheetPermissionDataImpl implements SheetPermissionData {
     }
 
     @Override
-    public void UpdateRequestStatus (String user, Boolean accept){
-        permissionRequests.computeIfPresent(user,
+    public void UpdateRequestStatus (String user,int reqId, Boolean accept){
+        permissionRequests.computeIfPresent(reqId,
                 (k, request) -> new PermissionRequestDto(user, request.permissionType,
                         accept ? PermissionStatus.APPROVED : PermissionStatus.REJECTED));
 
-        if(accept){
+        if(permissionRequests.containsKey(reqId) && accept && permissionRequests.get(reqId).user.equals(user)){
             AddPermission(user,permissionRequests.get(user).permissionType);
         }
     }
@@ -45,12 +45,13 @@ public class SheetPermissionDataImpl implements SheetPermissionData {
                 entrySet().
                 stream().
                 filter(entry-> entry.getValue().equals(PermissionType.OWNER)).
-                map(Map.Entry::getKey).findFirst().orElse("");
+                map(Map.Entry::getKey).
+                findFirst().
+                orElse("");
     }
 
     @Override
     public List<PermissionRequestDto> GetPermissionRequests(){
-        System.out.println(permissionRequests.values().size());
         return new ArrayList<>(permissionRequests.values());
     }
 

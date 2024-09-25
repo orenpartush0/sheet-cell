@@ -44,9 +44,6 @@ public class HttpClientUtil {
 
         // Build the request
         Request request = requestBuilder.build();
-
-        System.out.println(BASE_URL + endPointsAndParameters);
-
         Call call = HttpClientUtil.HTTP_CLIENT.newCall(request);
         call.enqueue(callback);
     }

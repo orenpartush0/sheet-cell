@@ -1,7 +1,6 @@
 package servlet;
 
 import SessionUtils.SessionUtils;
-import com.google.gson.Gson;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +10,7 @@ import shticell.manager.sheet.SheetManager;
 
 import java.io.IOException;
 
-import static servlet.constant.Constants.GSON;
+import static constant.Constants.GSON;
 
 @WebServlet("/sheetDashBoard")
 public class SheetDashBoardServlet extends HttpServlet {

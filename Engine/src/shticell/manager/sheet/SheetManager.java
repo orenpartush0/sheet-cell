@@ -85,6 +85,10 @@ public class SheetManager {
         }).toList();
     }
 
+    public String getSheetOwner(String sheetName){
+        return sheetPermissionDataMap.get(sheetName).GetOwner();
+    }
+
     public List<SheetPermissionDataImpl.PermissionRequestDto> GetRequestDashBoard(String sheetName){
         return sheetPermissionDataMap.get(sheetName).GetPermissionRequests();
     }
@@ -93,8 +97,8 @@ public class SheetManager {
         sheetPermissionDataMap.get(sheetName).AddPermissionRequest(new SheetPermissionDataImpl.PermissionRequestDto(userName, permissionType, PermissionStatus.PENDING));
     }
 
-    public void UpdateRequestStatus(String sheetName,String user, Boolean accept){
-        sheetPermissionDataMap.get(sheetName).UpdateRequestStatus(user,accept);
+    public void UpdateRequestStatus(String sheetName,String user,int reqId, Boolean accept){
+        sheetPermissionDataMap.get(sheetName).UpdateRequestStatus(user,reqId,accept);
     }
 
     public boolean isPermit(String sheetName, String user, PermissionType permissionType){

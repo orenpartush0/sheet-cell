@@ -12,7 +12,7 @@ public interface SheetPermissionData {
 
     PermissionType getPermission(String user);
 
-    void UpdateRequestStatus (String user, Boolean answer);
+    void UpdateRequestStatus (String user,int reqId, Boolean answer);
 
     String GetOwner();
 

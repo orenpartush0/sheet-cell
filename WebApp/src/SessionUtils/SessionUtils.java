@@ -2,7 +2,7 @@ package SessionUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import servlet.constant.Constants;
+import constant.Constants;
 
 public class SessionUtils {
     public static String GetUserName(HttpServletRequest request) {

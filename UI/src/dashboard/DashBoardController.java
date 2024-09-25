@@ -3,6 +3,7 @@ package dashboard;
 import Connector.Connector;
 import dashboard.dialog.sheet.SheetDialogController;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
@@ -16,11 +17,17 @@ import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 import shticell.manager.enums.PermissionStatus;
 import shticell.manager.enums.PermissionType;
+import util.HttpClientUtil;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -38,6 +45,9 @@ public class DashBoardController {
 
     @FXML
     public TextField selectedSheet;
+
+    @FXML
+    public ComboBox permissionComboBox;
 
     @FXML
     private Button viewSheetButton;
@@ -79,8 +89,18 @@ public class DashBoardController {
     private StringProperty userNameProp = new SimpleStringProperty();
     private Timer timer = new Timer();
 
+    private SimpleBooleanProperty viewSheetEnableProp = new SimpleBooleanProperty(false);
+    private SimpleBooleanProperty requestPermissionEnableProp = new SimpleBooleanProperty(false);
+    private SimpleBooleanProperty comboBoxEnableProp = new SimpleBooleanProperty(false);
+    private SimpleBooleanProperty ackDenyEnableProp = new SimpleBooleanProperty(false);
+    private SimpleStringProperty selectedSheetTextProp = new SimpleStringProperty("");
+
     @FXML
     public void initialize() {
+        permissionComboBox.disableProperty().bind(comboBoxEnableProp.not());
+        requestPermissionButton.disableProperty().bind(requestPermissionEnableProp.not());
+        viewSheetButton.disableProperty().bind(viewSheetEnableProp.not());
+        selectedSheet.textProperty().bind(selectedSheetTextProp);
         ownerColumn.setCellValueFactory(new PropertyValueFactory<>("owner"));
         sheetNameColumn.setCellValueFactory(new PropertyValueFactory<>("sheetName"));
         sizeColumn.setCellValueFactory(new PropertyValueFactory<>("size"));
@@ -94,11 +114,26 @@ public class DashBoardController {
         ackDenyPermissionButton.setOnAction(e -> ackDenyPermission());
         sheetsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             SheetData sheetData = sheetsTable.getSelectionModel().getSelectedItem();
-            if (sheetData != null) {  // Add a null check here
+            if (sheetData != null) {
                 clickOnSheetHandle(sheetData.sheetName);
+                viewSheetEnableProp.set(sheetData.permissionType.getPermissionLevel() >= PermissionType.READER.getPermissionLevel());
+                comboBoxEnableProp.set(sheetData.permissionType != PermissionType.OWNER);
+                selectedSheetTextProp.set(sheetData.sheetName);
+
+                if(comboBoxEnableProp.get()) {
+                    permissionComboBox.getItems().clear();
+                    Arrays.stream(PermissionType.values()).
+                            filter(permissionType -> permissionType != sheetData.permissionType).
+                            filter(permissionType -> permissionType != PermissionType.OWNER).
+                            forEach(permissionType ->permissionComboBox.getItems().add(permissionType) );
+                }else{
+                    requestPermissionEnableProp.set(false);
+                }
             }
         });
         setSheetListRefresher();
+
+        permissionComboBox.setOnAction(e-> requestPermissionEnableProp.set(true));
     }
 
     public void setStage(Stage _stage) {
@@ -114,7 +149,20 @@ public class DashBoardController {
     }
 
     private void requestPermission() {
+        SheetData sheetData = sheetsTable.getSelectionModel().getSelectedItem();
+        PermissionType permissionType = PermissionType.valueOf(permissionComboBox.getSelectionModel().getSelectedItem().toString());
+        if (sheetData != null) {
+            HttpClientUtil.runAsync("/addRequest?sheetName=" + sheetData.sheetName,
+                    "PUT", permissionType, new Callback() {
+                @Override
+                public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                }
 
+                @Override
+                public void onResponse(@NotNull Call call, @NotNull Response response){
+                }
+            });
+        }
     }
 
     private void ackDenyPermission() {
