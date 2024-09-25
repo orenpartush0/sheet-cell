@@ -22,7 +22,7 @@ public class SheetManager {
 
     public void SetSheet(String userName, SheetDto sheetDto) {
         Sheet sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns(),sheetDto.rowsHeight(),sheetDto.colsWidth());
-        if(sheets.containsKey(sheet.GetSheetName())) {
+        if(sheets.containsKey(sheetDto.Name())) {
             throw new RuntimeException("Sheet already exists");
         }
         sheets.put(sheetDto.Name(), sheet);

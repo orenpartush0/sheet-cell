@@ -1,6 +1,5 @@
 package login;
 
-import Connector.Connector;
 import dashboard.DashBoardController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,8 +10,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import okhttp3.*;
+import util.HttpClientUtil;
 
 import java.io.IOException;
+
 
 public class LoginController {
 
@@ -31,7 +33,8 @@ public class LoginController {
     public void initialize() {
         submitButton.setOnAction(e -> {
             try { handleLogin(); } catch (IOException ex) {
-                throw new RuntimeException(ex);}
+                displayError("Unexpected error occurred. Please try again.");
+            }
         });
     }
 
@@ -40,29 +43,30 @@ public class LoginController {
     }
 
     private void handleLogin() throws IOException {
+        submitButton.setDisable(true);
         String userName = usernameField.getText();
-            if (userName.isEmpty()) {
-                displayError("Username cannot be empty");
-            } else {
-                if(Connector.Login(userName)){
-                    this.stage.close();
-                    submitButton.disableProperty().set(true);
+        if (userName.isEmpty()) {
+            displayError("Username cannot be empty");
+        } else {
+            Response response =HttpClientUtil.runSync("/user?userName=" + userName, "PUT",null);
+            if (!response.isSuccessful()) {
+                submitButton.setDisable(false);
+                clearError();
+                displayError("Login failed. User already exist.");
+            }else{
+                stage.close();
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/dashboard/DashBoard.fxml"));
                     Parent root = loader.load();
                     DashBoardController dashBoardcontroller = loader.getController();
-                    Stage stage = new Stage();
-                    stage.setTitle("DashBoard");
-                    stage.initModality(Modality.APPLICATION_MODAL);
-                    stage.setScene(new Scene(root));
-                    dashBoardcontroller.setStage(stage);
-                    dashBoardcontroller.setName(userName);
-                    stage.showAndWait();
-                }
-                else{
-                    clearError();
-                    displayError("User already exists");
-                }
+                    Stage dashboardStage = new Stage();
+                    dashboardStage.setTitle("DashBoard");
+                    dashboardStage.initModality(Modality.APPLICATION_MODAL);
+                    dashboardStage.setScene(new Scene(root));
+                    dashBoardcontroller.setStage(dashboardStage);
+                    dashBoardcontroller.setName(usernameField.getText());
+                    dashboardStage.showAndWait();
             }
+        }
     }
 
     private void displayError(String message) {

@@ -50,6 +50,7 @@ public class SheetPermissionDataImpl implements SheetPermissionData {
 
     @Override
     public List<PermissionRequestDto> GetPermissionRequests(){
+        System.out.println(permissionRequests.values().size());
         return new ArrayList<>(permissionRequests.values());
     }
 

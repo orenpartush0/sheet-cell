@@ -10,7 +10,7 @@ import shticell.manager.user.UserManager;
 public class ServletUtils {
 
     public final static Object userLock = new Object();
-    public final static Object sheetManager = new Object();
+    public final static Object sheetLock = new Object();
 
     public static UserManager GetUserManager(ServletContext servletContext){
         synchronized (userLock){
@@ -23,9 +23,9 @@ public class ServletUtils {
     }
 
     public static SheetManager GetSheetManager(ServletContext servletContext){
-        synchronized (sheetManager){
+        synchronized (sheetLock){
             if(servletContext.getAttribute(Constants.SHEET_MANAGER) == null){
-                servletContext.setAttribute(Constants.SHEET_MANAGER, new UserManager());
+                servletContext.setAttribute(Constants.SHEET_MANAGER, new SheetManager());
             }
         }
 

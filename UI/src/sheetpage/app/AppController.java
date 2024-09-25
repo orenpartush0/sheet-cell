@@ -79,7 +79,7 @@ public class AppController {
     }
 
     public void cellClicked(Coordinate coordinate,String style,Pos pos){
-        topComponentController.setOnMouseCoordinate(Connector.GetCellByCoordinate(coordinate),style,pos);
+        topComponentController.setOnMouseCoordinate(Connector.GetCellByCoordinate(coordinate),style,pos);//need to improve
         List<Coordinate> influenceOn = Connector.getSheet().cells().get(coordinate).influenceOn();
         List<Coordinate> dependsOn = Connector.getSheet().cells().get(coordinate).dependsOn();
         sheetComponentController.PaintCellsBorder(influenceOn,"Green");

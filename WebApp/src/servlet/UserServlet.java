@@ -17,11 +17,11 @@ import java.io.IOException;
 public class UserServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        System.out.println("User try to login");
         UserManager userManager = ServletUtils.GetUserManager(getServletContext());
         String userFromSession = SessionUtils.GetUserName(req);
-
         if(userFromSession == null) {
-            String userName = SessionUtils.GetUserName(req);
+            String userName = req.getParameter(Constants.USER);
             if(userName == null || userName.isEmpty()) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }else{
@@ -29,10 +29,12 @@ public class UserServlet extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     resp.getOutputStream().print("User already exists");
                 }else {
-                    req.getSession(true).setAttribute(Constants.USER, userManager);
+                    req.getSession(true).setAttribute(Constants.USER, userName);
                 }
             }
         }
+
+        System.out.println(SessionUtils.GetUserName(req) + " successfully logged in");
     }
 }
 

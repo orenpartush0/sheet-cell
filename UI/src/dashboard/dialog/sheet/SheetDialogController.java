@@ -2,6 +2,10 @@ package dashboard.dialog.sheet;
 
 import Connector.Connector;
 import dto.SheetDto;
+import okhttp3.MediaType;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 import sheetpage.app.AppController;
 import sheetpage.top.TopController;
 import javafx.fxml.FXML;
@@ -9,6 +13,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import util.HttpClientUtil;
 
 import java.io.IOException;
 
@@ -19,7 +24,6 @@ public class SheetDialogController {
     @FXML private TextField numRowsField;
     @FXML private VBox errorBox;
 
-    private String user;
     private Stage dialogStage;
 
     @FXML
@@ -28,7 +32,11 @@ public class SheetDialogController {
             String sheetName = getSheetName();
             int numColumns = getNumColumns();
             int numRows = getNumRows();
-            if(Connector.setNewSheet(new SheetDto(sheetName,1,numColumns,numRows,100,30),user)){
+
+            boolean isSuccessful = HttpClientUtil.runSync("/sheet","PUT",
+                    new SheetDto(sheetName,1,numColumns,numRows,100,30)).isSuccessful();
+
+            if(isSuccessful){
                 dialogStage.close();
             };
 
@@ -46,8 +54,6 @@ public class SheetDialogController {
     public void setDialogStage(Stage dialogStage) {
         this.dialogStage = dialogStage;
     }
-
-    public void setUser(String _user) {_user = _user;}
 
     public String getSheetName() {
         return sheetNameField.getText();
