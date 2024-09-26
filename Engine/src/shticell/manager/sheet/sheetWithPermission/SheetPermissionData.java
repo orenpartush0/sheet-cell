@@ -12,11 +12,13 @@ public interface SheetPermissionData {
 
     PermissionType getPermission(String user);
 
-    void UpdateRequestStatus (String user,int reqId, Boolean answer);
+    void UpdateRequestStatus(int reqId, Boolean accept);
 
     String GetOwner();
 
     List<SheetPermissionDataImpl.PermissionRequestDto> GetPermissionRequests();
 
     boolean isPermit(String userName, PermissionType permissionType);
+
+    boolean isPending(int reqId);
 }

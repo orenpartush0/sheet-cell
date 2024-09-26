@@ -13,9 +13,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import static constant.Constants.GSON;
+import static constant.Constants.*;
 
-@WebServlet(urlPatterns = "/sheet")
+@WebServlet(urlPatterns = SHEET)
 public class SheetServlet extends HttpServlet {
 
     @Override
@@ -41,8 +41,7 @@ public class SheetServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         SheetManager sheetManager = ServletUtils.GetSheetManager(getServletContext());
-        String sheetName = req.getParameter("sheetName");
-        Gson gson  = new Gson();
-        resp.getWriter().write(gson.toJson(sheetManager.getSheet(sheetName)));
+        String sheetName = req.getParameter(SHEET_NAME);
+        resp.getWriter().write(GSON.toJson(sheetManager.getSheet(sheetName)));
     }
 }

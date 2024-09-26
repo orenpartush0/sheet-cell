@@ -53,18 +53,18 @@ public class LoginController {
                 submitButton.setDisable(false);
                 clearError();
                 displayError("Login failed. User already exist.");
-            }else{
+            }else {
                 stage.close();
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/dashboard/DashBoard.fxml"));
-                    Parent root = loader.load();
-                    DashBoardController dashBoardcontroller = loader.getController();
-                    Stage dashboardStage = new Stage();
-                    dashboardStage.setTitle("DashBoard");
-                    dashboardStage.initModality(Modality.APPLICATION_MODAL);
-                    dashboardStage.setScene(new Scene(root));
-                    dashBoardcontroller.setStage(dashboardStage);
-                    dashBoardcontroller.setName(usernameField.getText());
-                    dashboardStage.showAndWait();
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/dashboard/DashBoard.fxml"));
+                Parent root = loader.load();
+                DashBoardController dashBoardcontroller = loader.getController();
+                Stage dashboardStage = new Stage();
+                dashboardStage.setTitle("DashBoard");
+                dashboardStage.initModality(Modality.APPLICATION_MODAL);
+                dashboardStage.setScene(new Scene(root));
+                dashBoardcontroller.setStage(dashboardStage);
+                dashBoardcontroller.setName(usernameField.getText());
+                dashboardStage.showAndWait();
             }
         }
     }

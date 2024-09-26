@@ -1,5 +1,6 @@
 package sheetpage.top;
 
+import javafx.event.ActionEvent;
 import sheetpage.app.AppController;
 import sheetpage.top.dialog.filter.FilterDialogController;
 import sheetpage.top.dialog.function.FunctionDialogController;
@@ -35,13 +36,8 @@ import java.util.regex.Pattern;
 public class TopController {
     private AppController appController;
 
-    private String previousPath;
     private int counter = 0;
 
-    @FXML
-    public MenuItem saveButton;
-    @FXML
-    private TextField pathTextField;
     @FXML
     private TextField originalValueTextField;
     @FXML
@@ -84,15 +80,12 @@ public class TopController {
     private final SimpleStringProperty originalValue = new SimpleStringProperty("");
     private final SimpleIntegerProperty lastUpdate = new SimpleIntegerProperty(0);
     private final SimpleStringProperty cellId = new SimpleStringProperty("");
-    private final SimpleStringProperty path = new SimpleStringProperty("");
 
     @FXML
     public void initialize() {
-        pathTextField.textProperty().bind(path);
         originalValueTextField.textProperty().bind(originalValue);
         lastUpdateTextField.textProperty().bind(Bindings.format("%d", lastUpdate));
         cellIdTextField.textProperty().bind(cellId);
-        saveButton.disableProperty().bind(isSheetLoaded.not());
         SheetVersionComboBox.disableProperty().bind(isSheetLoaded.not());
         rangesComboBox.disableProperty().bind(isSheetLoaded.not());
         rangesComboBox.setVisibleRowCount(5);
@@ -101,7 +94,6 @@ public class TopController {
         minus.disableProperty().bind(isSheetLoaded.not());
         filterButton.disableProperty().bind(isSheetLoaded.not());
         sortButton.disableProperty().bind(isSheetLoaded.not());
-        pathTextField.styleProperty().unbind();
         SheetVersionComboBox.getItems().add("Version");
         SheetVersionComboBox.setOnAction(event -> {
             if (!SheetVersionComboBox.getValue().equals("Version")) {
@@ -168,13 +160,9 @@ public class TopController {
     }
 
 
-    public void EnableButtons() {
-        isSheetLoaded.set(true);
-    }
-
-    public void setPreviousPath() {
-        path.set(previousPath);
-    }
+//    public void EnableButtons() {
+//        isSheetLoaded.set(true);
+//    }
 
     private Color extractColorFromStyle(String style, String colorProperty) {
         Pattern pattern = Pattern.compile(colorProperty + ":\\s*([^;]+)");
@@ -361,6 +349,10 @@ public class TopController {
                 counter++;
             }
         }
+    }
+
+    public void onBackHandler(ActionEvent event) {
+
     }
 }
 

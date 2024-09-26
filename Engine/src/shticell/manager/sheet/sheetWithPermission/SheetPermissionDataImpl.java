@@ -27,13 +27,16 @@ public class SheetPermissionDataImpl implements SheetPermissionData {
     }
 
     @Override
-    public void UpdateRequestStatus (String user,int reqId, Boolean accept){
+    public void UpdateRequestStatus(int reqId, Boolean accept){
+
         permissionRequests.computeIfPresent(reqId,
-                (k, request) -> new PermissionRequestDto(user, request.permissionType,
+                (k, val) -> new PermissionRequestDto(val.reqId, val.user, val.permissionType,
                         accept ? PermissionStatus.APPROVED : PermissionStatus.REJECTED));
 
-        if(permissionRequests.containsKey(reqId) && accept && permissionRequests.get(reqId).user.equals(user)){
-            AddPermission(user,permissionRequests.get(user).permissionType);
+
+        if(permissionRequests.containsKey(reqId) && accept){
+            String userAskPermission = permissionRequests.get(reqId).user;
+            AddPermission(userAskPermission,permissionRequests.get(reqId).permissionType);
         }
     }
 
@@ -64,6 +67,11 @@ public class SheetPermissionDataImpl implements SheetPermissionData {
         return permissions.getOrDefault(userName,PermissionType.DONT_HAVE).getPermissionLevel() >= permissionType.getPermissionLevel();
     }
 
-    public record PermissionRequestDto(String user, PermissionType permissionType, PermissionStatus permissionStatus){};
+    public record PermissionRequestDto(int reqId,String user, PermissionType permissionType, PermissionStatus permissionStatus){};
+
+    @Override
+    public boolean isPending(int reqId){
+        return permissionRequests.get(reqId).permissionStatus.equals(PermissionStatus.PENDING);
+    }
 }
 

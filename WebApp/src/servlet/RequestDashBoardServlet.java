@@ -1,6 +1,5 @@
 package servlet;
 
-import constant.Constants;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,15 +9,14 @@ import shticell.manager.sheet.SheetManager;
 
 import java.io.IOException;
 
-import static constant.Constants.GSON;
+import static constant.Constants.*;
 
-@WebServlet(urlPatterns = Constants.REQUEST_DASHBOARD)
+@WebServlet(urlPatterns = REQUEST_DASHBOARD)
 public class RequestDashBoardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         SheetManager sheetManager = ServletUtils.GetSheetManager(getServletContext());
-        String sheetName = req.getParameter("sheetName");
-        System.out.println("try to get " +sheetName + "sheet requestDashBoard");
+        String sheetName = req.getParameter(SHEET_NAME);
         resp.getWriter().write(GSON.toJson(sheetManager.GetRequestDashBoard(sheetName)));
     }
 }

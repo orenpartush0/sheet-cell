@@ -2,7 +2,7 @@
 <?import javafx.scene.layout.*?>
 
 
-<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="sheetpage.app.DashBoard">
+<BorderPane fx:id="root" xmlns:fx="http://javafx.com/fxml" fx:controller="sheetpage.app.AppController">
     <top>
         <fx:include fx:id="topComponent" source="../top/top.fxml"/>
     </top>

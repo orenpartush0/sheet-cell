@@ -5,13 +5,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import constant.Constants;
 import servlet.utils.ServletUtils;
 import shticell.manager.user.UserManager;
 
 import java.io.IOException;
 
-@WebServlet(urlPatterns = "/user")
+import static constant.Constants.USER;
+import static constant.Constants.USER_NAME;
+
+@WebServlet(urlPatterns = USER)
 public class UserServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -19,7 +21,7 @@ public class UserServlet extends HttpServlet {
         UserManager userManager = ServletUtils.GetUserManager(getServletContext());
         String userFromSession = SessionUtils.GetUserName(req);
         if(userFromSession == null) {
-            String userName = req.getParameter(Constants.USER);
+            String userName = req.getParameter(USER_NAME);
             if(userName == null || userName.isEmpty()) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }else{
@@ -27,7 +29,7 @@ public class UserServlet extends HttpServlet {
                     resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
                     resp.getOutputStream().print("User already exists");
                 }else {
-                    req.getSession(true).setAttribute(Constants.USER, userName);
+                    req.getSession(true).setAttribute(USER_NAME, userName);
                 }
             }
         }

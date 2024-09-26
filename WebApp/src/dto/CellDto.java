@@ -7,13 +7,13 @@ import java.util.ArrayList;
 
 
 public record CellDto(Coordinate coordinate, int LatestSheetVersionUpdated, String originalValue,
-                      EffectiveValueDto effectiveValue, ArrayList<Coordinate> dependsOn,
+                      String effectiveValue, ArrayList<Coordinate> dependsOn,
                       ArrayList<Coordinate> influenceOn)
 {
     public CellDto(Cell cellImpl)
     {
         this(cellImpl.GetCellCoordinate(), cellImpl.GetVersion(), cellImpl.GetOriginalValue()
-                , new EffectiveValueDto(cellImpl.GetEffectiveValue())
+                , cellImpl.GetEffectiveValue().getValue().toString()
                 , cellImpl.GetDependsOnCoordinates(), cellImpl.GetInfluenceOnCoordinates());
     }
 }

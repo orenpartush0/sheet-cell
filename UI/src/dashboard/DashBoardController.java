@@ -3,10 +3,11 @@ package dashboard;
 import Connector.Connector;
 import constant.Constants;
 import dashboard.dialog.sheet.SheetDialogController;
+import dto.AddRequestDto;
+import dto.UpdateRequestDto;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,6 +22,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
+import sheetpage.app.AppController;
 import shticell.manager.enums.PermissionStatus;
 import shticell.manager.enums.PermissionType;
 import util.HttpClientUtil;
@@ -47,13 +49,16 @@ public class DashBoardController {
     public ComboBox permissionComboBox;
 
     @FXML
+    public Button acceptPermissionButton;
+
+    @FXML
+    public Button denyPermissionButton;
+
+    @FXML
     private Button viewSheetButton;
 
     @FXML
     private Button requestPermissionButton;
-
-    @FXML
-    private Button ackDenyPermissionButton;
 
     @FXML
     private TableColumn<SheetData, String> ownerColumn;
@@ -71,6 +76,9 @@ public class DashBoardController {
     private TableView<SheetData> sheetsTable;
 
     @FXML
+    public TableColumn reqIdColumn;
+
+    @FXML
     private TableColumn<PermissionRequest, String> userColumn;
 
     @FXML
@@ -79,7 +87,7 @@ public class DashBoardController {
     @FXML
     private TableColumn<PermissionRequest, String> statusColumn;
 
-    private Stage stage;
+    private Stage dashboardStage;
 
     private ObservableList<SheetData> sheetData;
     private ObservableList<PermissionRequest> permissionRequests;
@@ -97,7 +105,8 @@ public class DashBoardController {
     public void initialize() {
         permissionComboBox.disableProperty().bind(comboBoxEnableProp.not());
         requestPermissionButton.disableProperty().bind(requestPermissionEnableProp.not());
-        ackDenyPermissionButton.disableProperty().bind(ackDenyEnableProp.not());
+        acceptPermissionButton.disableProperty().bind(ackDenyEnableProp.not());
+        denyPermissionButton.disableProperty().bind(ackDenyEnableProp.not());
         viewSheetButton.disableProperty().bind(viewSheetEnableProp.not());
         selectedSheet.textProperty().bind(selectedSheetTextProp);
         ownerColumn.setCellValueFactory(new PropertyValueFactory<>("owner"));
@@ -105,12 +114,14 @@ public class DashBoardController {
         sizeColumn.setCellValueFactory(new PropertyValueFactory<>("size"));
         permissionCol.setCellValueFactory(new PropertyValueFactory<>("permissionType"));
         userColumn.setCellValueFactory(new PropertyValueFactory<>("user"));
+        reqIdColumn.setCellValueFactory(new PropertyValueFactory<>("reqId"));
         permissionColumn.setCellValueFactory(new PropertyValueFactory<>("permissionType"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("permissionStatus"));
         userNameLabel.textProperty().bind(userNameProp);
-        viewSheetButton.setOnAction(e -> viewSheet());
+        viewSheetButton.setOnAction(e -> {try {viewSheetHandle();} catch (IOException ex) {throw new RuntimeException(ex);}});
         requestPermissionButton.setOnAction(e -> requestPermission());
-        ackDenyPermissionButton.setOnAction(e -> ackDenyPermission());
+        acceptPermissionButton.setOnAction(e-> ackDenyPermission(true));
+        denyPermissionButton.setOnAction(e->ackDenyPermission(false));
         sheetsTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             SheetData sheetData = sheetsTable.getSelectionModel().getSelectedItem();
             if (sheetData != null) {
@@ -140,12 +151,14 @@ public class DashBoardController {
 
         requestTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             SheetData sheetData = sheetsTable.getSelectionModel().getSelectedItem();
-            ackDenyEnableProp.set(sheetData != null && sheetData.permissionType == PermissionType.OWNER);
+            PermissionRequest permissionRequest = requestTable.getSelectionModel().getSelectedItem();
+            ackDenyEnableProp.set(sheetData != null && permissionRequest !=null &&
+                    sheetData.permissionType == PermissionType.OWNER && permissionRequest.permissionStatus == PermissionStatus.PENDING);
         });
     }
 
-    public void setStage(Stage _stage) {
-        stage = _stage;
+    public void setStage(Stage _dashboardStage) {
+        dashboardStage = _dashboardStage;
     }
 
     public void setName(String name){
@@ -158,12 +171,15 @@ public class DashBoardController {
 
     private void requestPermission() {
         SheetData sheetData = sheetsTable.getSelectionModel().getSelectedItem();
+        PermissionRequest permissionRequest = requestTable.getSelectionModel().getSelectedItem();
+
         if(permissionComboBox.getSelectionModel().getSelectedItem() != null){
             PermissionType permissionType = PermissionType.valueOf(permissionComboBox.getSelectionModel().getSelectedItem().toString());
+
             if (sheetData != null) {
                 System.out.println(sheetData.sheetName);
-                HttpClientUtil.runAsync( Constants.ADD_REQUEST + "?" + Constants.SHEET + "=" + sheetData.sheetName,
-                        Constants.PUT, permissionType, new Callback() {
+                HttpClientUtil.runAsync( Constants.ADD_REQUEST + "?" + Constants.SHEET_NAME + "=" + sheetData.sheetName,
+                        Constants.PUT, new AddRequestDto(requestTable.getItems().size(),permissionType), new Callback() {
                             @Override
                             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                             }
@@ -177,8 +193,25 @@ public class DashBoardController {
 
     }
 
-    private void ackDenyPermission() {
+    private void ackDenyPermission(boolean isAck) {
+        int reqId = requestTable.getSelectionModel().getSelectedIndex();
+        SheetData sheetData = sheetsTable.getSelectionModel().getSelectedItem();
 
+        if (reqId >= 0 && sheetData != null) {
+            System.out.println(reqId);
+            System.out.println(sheetData.sheetName);
+            HttpClientUtil.runAsync(
+                    Constants.UPDATE_REQUEST + "?" + Constants.SHEET_NAME + "=" + sheetData.sheetName,
+                    Constants.PUT,
+                    new UpdateRequestDto(reqId, isAck),
+                    new Callback() {
+                        @Override
+                        public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {}
+                        @Override
+                        public void onFailure(@NotNull Call call, @NotNull IOException e) {}
+                    }
+            );
+        }
     }
 
     private void setSheetListRefresher(){
@@ -233,14 +266,20 @@ public class DashBoardController {
     }
 
     public static class PermissionRequest {
+        private final int reqId;
         private final String user;
         private final PermissionType permissionType;
         private final PermissionStatus permissionStatus;
 
-        public PermissionRequest(String user, PermissionType _permissionType, PermissionStatus _permissionStatus ) {
+        public PermissionRequest(int reqId,String user, PermissionType _permissionType, PermissionStatus _permissionStatus ) {
+            this.reqId = reqId;
             this.user = user;
             this.permissionType = _permissionType;
             this.permissionStatus = _permissionStatus;
+        }
+
+        public String getReqId() {
+            return String.valueOf(reqId);
         }
 
         public String getUser() {
@@ -293,7 +332,7 @@ public class DashBoardController {
         timer.cancel();
         timer = new Timer();
         ListRefresher sheetlistRefresher = new ListRefresher<>(
-                Constants.REQUEST_DASHBOARD + "?" + Constants.SHEET + "=" + sheetName,
+                Constants.REQUEST_DASHBOARD + "?" + Constants.SHEET_NAME + "=" + sheetName,
                 this::updateRequestDataTable,
                 PermissionRequest[].class
         );
@@ -311,4 +350,24 @@ public class DashBoardController {
             }
         });
     }
+
+    private void viewSheetHandle() throws IOException {
+        SheetData sheetData = sheetsTable.getSelectionModel().getSelectedItem();
+        if(sheetData != null){
+            dashboardStage.close();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/sheetpage/app/app.fxml"));
+            Parent root = loader.load();
+            AppController sheetController = loader.getController();
+            Stage sheetStage = new Stage();
+            sheetStage.setTitle("Sheet");
+            sheetStage.initModality(Modality.APPLICATION_MODAL);
+            sheetStage.setScene(new Scene(root));
+            sheetController.SetStages(dashboardStage,sheetStage);
+            sheetController.SetSheetName(sheetData.sheetName);
+            sheetController.SetPermission(sheetData.permissionType);
+            sheetStage.showAndWait();
+        }
+    }
+
+
 }

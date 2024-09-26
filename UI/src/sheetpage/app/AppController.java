@@ -2,28 +2,39 @@ package sheetpage.app;
 
 import Connector.Connector;
 import dto.SheetDto;
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import okhttp3.Response;
 import sheetpage.sheet.SheetController;
 import sheetpage.top.TopController;
+import shticell.manager.enums.PermissionType;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.range.Range;
+import util.HttpClientUtil;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import static constant.Constants.*;
+
 public class AppController {
 
     public BorderPane root;
+
     @FXML private TopController topComponentController;
     @FXML private SheetController sheetComponentController;
 
     public SheetDto sheet;
+    public Stage dashboardStage;
+    public Stage sheetStage;
+    private PermissionType permissionType;
+    private String sheetName;
 
     @FXML
     public void initialize() {
@@ -31,37 +42,20 @@ public class AppController {
         sheetComponentController.setAppController(this);
     }
 
-    public void importFile(String path) {
-        try {
-            Connector.SetSheet(path);
-            topComponentController.clearVersion();
-            topComponentController.addVersion();
-            sheetComponentController.clearSheet();
-            fillSheet();
-            topComponentController.EnableButtons();
-        }
-        catch (Exception e) {
-            topComponentController.setPreviousPath();
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("An error occurred while importing the file.");
-            alert.setContentText(e.getMessage());
-            Platform.runLater(alert::showAndWait);
-        }
-    }
 
-    private void fillSheet(){
-        sheet = Connector.getSheet();
+    private void fillSheet() throws IOException {
+        Response res = HttpClientUtil.runSync(
+                SHEET + "?" + SHEET_NAME + "=" + sheetName,
+                GET,
+                null
+        );
+
+        System.out.println(res.body().string());
+        sheet = GSON.fromJson(res.body().string(), SheetDto.class);
+        System.out.println(sheet.cells());
         sheetComponentController.fillSheet(sheet);
         topComponentController.addRangesToComboBox(Connector.getRanges().stream().map(Range::rangeName).toList());
-    }
 
-    public void createNewSheet(String sheetName, int numColumns, int numRows){
-        //Connector.SetSheet(new SheetDto(sheetName,1,numColumns,numRows,100,30));
-        sheetComponentController.clearSheet();
-        fillSheet();
-        topComponentController.clearVersion();
-        topComponentController.addVersion();
     }
 
     public void updateCell(Coordinate coordinate, String value) {
@@ -92,7 +86,6 @@ public class AppController {
 
     public void addRange(String rangeName,Coordinate startCoordinate,Coordinate endCoordinate){
         Connector.AddRange(new Range(rangeName,startCoordinate,endCoordinate));
-        fillSheet();
     }
 
     public Range GetRange(String rangeName) {
@@ -166,4 +159,19 @@ public class AppController {
         SheetDto sheetDto = Connector.applyDynamicCalculate(coordinate, numStr);
         sheetComponentController.fillSheet(sheetDto);
     }
+
+    public void SetStages(Stage dashboardStage, Stage sheetStage) {
+        this.dashboardStage = dashboardStage;
+        this.sheetStage = sheetStage;
+    }
+
+    public void SetPermission(PermissionType permissionType) {
+        this.permissionType = permissionType;
+    }
+
+    public void SetSheetName(String sheetName) throws IOException {
+        this.sheetName = sheetName;
+        fillSheet();
+    }
+
 }

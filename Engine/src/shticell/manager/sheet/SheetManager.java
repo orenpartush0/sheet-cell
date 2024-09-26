@@ -17,7 +17,7 @@ import shticell.util.Sort;
 import java.util.*;
 
 public class SheetManager {
-    private final Map<String, Sheet> sheets = new HashMap<>();
+    private final Map<String, Sheet> sheets = new LinkedHashMap<>();
     private final Map<String, SheetPermissionData> sheetPermissionDataMap = new HashMap<>();
 
     public void SetSheet(String userName, SheetDto sheetDto) {
@@ -93,12 +93,16 @@ public class SheetManager {
         return sheetPermissionDataMap.get(sheetName).GetPermissionRequests();
     }
 
-    public void AddRequestPermission(String sheetName, String userName, PermissionType permissionType){
-        sheetPermissionDataMap.get(sheetName).AddPermissionRequest(new SheetPermissionDataImpl.PermissionRequestDto(userName, permissionType, PermissionStatus.PENDING));
+    public void AddRequestPermission(int reqId,String sheetName, String userName, PermissionType permissionType){
+        sheetPermissionDataMap.get(sheetName).AddPermissionRequest(new SheetPermissionDataImpl.PermissionRequestDto(reqId,userName, permissionType, PermissionStatus.PENDING));
     }
 
-    public void UpdateRequestStatus(String sheetName,String user,int reqId, Boolean accept){
-        sheetPermissionDataMap.get(sheetName).UpdateRequestStatus(user,reqId,accept);
+    public void UpdateRequestStatus(String sheetName,int reqId, Boolean accept){
+        sheetPermissionDataMap.get(sheetName).UpdateRequestStatus(reqId,accept);
+    }
+
+    public boolean isReqPending(String sheetName,int reqId){
+        return sheetPermissionDataMap.get(sheetName).isPending(reqId);
     }
 
     public boolean isPermit(String sheetName, String user, PermissionType permissionType){
