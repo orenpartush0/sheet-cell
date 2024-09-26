@@ -1,13 +1,15 @@
 package util;
 
+import constant.Constants;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static constant.Constants.BASE_URL;
 import static constant.Constants.GSON;
+import static constant.URL.BASE_URL;
+
 
 public class HttpClientUtil {
     private final static OkHttpClient HTTP_CLIENT = new OkHttpClient.Builder().
@@ -33,7 +35,7 @@ public class HttpClientUtil {
         MediaType mediaType = MediaType.parse("application/json");
         RequestBody body = null;
 
-        if (!method.equalsIgnoreCase("GET") && objToJson != null) {
+        if (!method.equalsIgnoreCase(Constants.GET) && objToJson != null) {
             body = RequestBody.create(mediaType, GSON.toJson(objToJson));
         }
 

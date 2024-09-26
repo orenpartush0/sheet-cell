@@ -4,14 +4,12 @@ package shticell.manager.sheet.sheetWithPermission;
 import shticell.manager.enums.PermissionStatus;
 import shticell.manager.enums.PermissionType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SheetPermissionDataImpl implements SheetPermissionData {
     private final Map<String, PermissionType> permissions = new HashMap<String, PermissionType>();
-    private final Map<Integer, PermissionRequestDto> permissionRequests = new HashMap<>();
+    private final Map<Integer, PermissionRequestDto> permissionRequests = new TreeMap<>();
 
     @Override
     public void AddPermission(String user, PermissionType permission) {
@@ -52,7 +50,12 @@ public class SheetPermissionDataImpl implements SheetPermissionData {
 
     @Override
     public List<PermissionRequestDto> GetPermissionRequests(){
-        return new ArrayList<>(permissionRequests.values());
+        return permissionRequests.
+                entrySet().
+                stream().
+                sorted(Map.Entry.comparingByKey()).
+                map(Map.Entry::getValue).
+                collect(Collectors.toList());
     }
 
 

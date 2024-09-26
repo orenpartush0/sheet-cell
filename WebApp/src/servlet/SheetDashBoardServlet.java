@@ -11,8 +11,9 @@ import shticell.manager.sheet.SheetManager;
 import java.io.IOException;
 
 import static constant.Constants.GSON;
+import static constant.Constants.SHEET_DASHBOARD;
 
-@WebServlet("/sheetDashBoard")
+@WebServlet(urlPatterns = SHEET_DASHBOARD)
 public class SheetDashBoardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {

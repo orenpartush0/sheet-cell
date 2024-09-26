@@ -1,5 +1,6 @@
 package dashboard;
 
+import constant.Constants;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -10,6 +11,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static constant.Constants.GSON;
+
 
 public class ListRefresher<T> extends TimerTask {
     private final Consumer<List<T>> listConsumer;
@@ -24,7 +26,7 @@ public class ListRefresher<T> extends TimerTask {
 
     @Override
     public void run() {
-        HttpClientUtil.runAsync(endPointAndParameters, "GET", null, new Callback() {
+        HttpClientUtil.runAsync(endPointAndParameters, Constants.GET, null, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 // handle failure
@@ -38,4 +40,5 @@ public class ListRefresher<T> extends TimerTask {
             }
         });
     }
+
 }

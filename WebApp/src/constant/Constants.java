@@ -25,4 +25,16 @@ public class Constants {
             .registerTypeAdapter(UpdateCellDto.class, new UpdateCellDtoDeserializer())
             .registerTypeAdapter(RequestDto.class,new RequestDtoDeserializer())
             .create();
+
+
+
+    public final static String PUT = "PUT";
+    public final static String GET = "GET";
+    public final static String DELETE = "DELETE";
+
+
+    public final static String REQUEST_DASHBOARD = "/requestDashBoard";
+    public final static String SHEET_DASHBOARD = "/sheetDashboard";
+    public final static String ADD_REQUEST = "/addRequest";
+    public final static String ADD_USER = "/user";
 }
