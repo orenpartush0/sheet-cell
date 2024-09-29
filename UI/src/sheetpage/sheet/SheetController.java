@@ -1,15 +1,14 @@
 package sheetpage.sheet;
 
+import constant.UIConstants;
 import dto.SheetDto;
 import javafx.animation.PauseTransition;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
@@ -44,6 +43,10 @@ public class SheetController {
         rightLeftScroller.hvalueProperty().addListener((obs, oldVal, newVal) -> gridPaneTop.setLayoutX(Math.max(0, -newVal.doubleValue() * (gridPaneSheet.getWidth() - rightLeftScroller.getViewportBounds().getWidth()))));
     }
 
+    public void BindEditAble(SimpleBooleanProperty editAble){
+        sheetTextFields.values().stream().map(TextInputControl::editableProperty).forEach(disProp->disProp.bind(editAble));
+    }
+
     private double xOffset;
     private double yOffset;
     private double initialWidth;
@@ -57,12 +60,6 @@ public class SheetController {
         this.appController = appController;
     }
 
-    public void clearSheet() {
-        isSheetLoaded = false;
-        gridPaneSheet.getChildren().clear();
-        gridPaneTop.getChildren().clear();
-        gridPaneLeft.getChildren().clear();
-    }
     public void printRowAndColumnsLabels(SheetDto sheet, GridPane gridPaneLeft, GridPane gridPaneTop) {
         for (int row = 1; row <= sheet.numberOfRows(); row++) {
             Label rowLabel = new Label(String.valueOf(row));
@@ -102,10 +99,10 @@ public class SheetController {
     }
 
     private String configStr(String str) {
-        if (str.equalsIgnoreCase("true")) {
-            return "True";
-        } else if (str.equalsIgnoreCase("false")) {
-            return "False";
+        if (str.equalsIgnoreCase(UIConstants.TRUE)) {
+            return UIConstants.TRUE;
+        } else if (str.equalsIgnoreCase(UIConstants.FALSE)) {
+            return UIConstants.FALSE;
         }
 
         try {

@@ -1,27 +1,25 @@
 package sheetpage.app;
 
-import Connector.Connector;
+import apiConnector.Connector;
 import dto.SheetDto;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
-import okhttp3.Response;
+import okhttp3.*;
+import org.jetbrains.annotations.NotNull;
 import sheetpage.sheet.SheetController;
 import sheetpage.top.TopController;
 import shticell.manager.enums.PermissionType;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.range.Range;
-import util.HttpClientUtil;
-
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
-import static constant.Constants.*;
 
 public class AppController {
 
@@ -30,38 +28,50 @@ public class AppController {
     @FXML private TopController topComponentController;
     @FXML private SheetController sheetComponentController;
 
+    public Map<String,Range> ranges = new HashMap<>();
     public SheetDto sheet;
-    public Stage dashboardStage;
     public Stage sheetStage;
-    private PermissionType permissionType;
+    public Stage dashBoardStage;
     private String sheetName;
+
+    private final SimpleBooleanProperty editable = new SimpleBooleanProperty(true);
+
 
     @FXML
     public void initialize() {
         topComponentController.setAppController(this);
         sheetComponentController.setAppController(this);
+        topComponentController.BindEditAble(editable);
     }
 
 
-    private void fillSheet() throws IOException {
-        Response res = HttpClientUtil.runSync(
-                SHEET + "?" + SHEET_NAME + "=" + sheetName,
-                GET,
-                null
-        );
-
-        System.out.println(res.body().string());
-        sheet = GSON.fromJson(res.body().string(), SheetDto.class);
-        System.out.println(sheet.cells());
+    public void fillSheet() throws IOException {
+        sheet = Connector.getSheet(sheetName);
         sheetComponentController.fillSheet(sheet);
-        topComponentController.addRangesToComboBox(Connector.getRanges().stream().map(Range::rangeName).toList());
+        sheetComponentController.BindEditAble(editable);
+        topComponentController.addVersions(sheet.version());
+        Connector.getRanges(sheet.Name(), new Connector.RangesCallback(){
+            @Override
+            public void onSuccess(List<Range> rangesFromServer) {
+                List<String> rangeNames = rangesFromServer.stream()
+                        .map(Range::rangeName)
+                        .toList();
+                topComponentController.addRangesToComboBox(rangeNames);
+                ranges.clear();
+                rangesFromServer.forEach(range->ranges.put(range.rangeName(), range));
+            }
 
+            @Override
+            public void onFailure(Exception e) {}
+        });
     }
+
+
 
     public void updateCell(Coordinate coordinate, String value) {
         try {
-            Connector.UpdateCellByCoordinate(coordinate, value);
-            topComponentController.addVersion();
+            Connector.UpdateCellByCoordinate(sheetName,coordinate, value);
+            fillSheet();
         }
         catch (Exception e){
             showError(e.getMessage());
@@ -69,13 +79,13 @@ public class AppController {
     }
 
     public SheetDto GetSheet(){
-        return Connector.getSheet();
+        return sheet;
     }
 
     public void cellClicked(Coordinate coordinate,String style,Pos pos){
-        topComponentController.setOnMouseCoordinate(Connector.GetCellByCoordinate(coordinate),style,pos);//need to improve
-        List<Coordinate> influenceOn = Connector.getSheet().cells().get(coordinate).influenceOn();
-        List<Coordinate> dependsOn = Connector.getSheet().cells().get(coordinate).dependsOn();
+        topComponentController.setOnMouseCoordinate(sheet.cells().get(coordinate),style,pos);
+        List<Coordinate> influenceOn = sheet.cells().get(coordinate).influenceOn();
+        List<Coordinate> dependsOn = sheet.cells().get(coordinate).dependsOn();
         sheetComponentController.PaintCellsBorder(influenceOn,"Green");
         sheetComponentController.PaintCellsBorder(dependsOn,"Blue");
     }
@@ -85,19 +95,43 @@ public class AppController {
     }
 
     public void addRange(String rangeName,Coordinate startCoordinate,Coordinate endCoordinate){
-        Connector.AddRange(new Range(rangeName,startCoordinate,endCoordinate));
-    }
+        Connector.AddRange(new Range(rangeName,startCoordinate,endCoordinate),sheetName, new Callback() {
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    Platform.runLater(() -> {
+                        ranges.put(rangeName, new Range(rangeName, startCoordinate, endCoordinate));
+                        List<String> rangeNames = ranges
+                                .values()
+                                .stream()
+                                .map(Range::rangeName)
+                                .toList();
 
-    public Range GetRange(String rangeName) {
-        return Connector.GetRangeDto(rangeName);
+
+                        topComponentController.addRangesToComboBox(rangeNames);
+                    });
+                }else{
+                    Platform.runLater(()-> {
+                        try {
+                            showError(response.body().string());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {}
+        });
     }
 
     public void removePaint(){
         sheetComponentController.removeBorderPaint();
     }
 
-    public SheetDto getSheetByVersion(int version){
-        return Connector.GetSheetByVersion(version);
+    public SheetDto getSheetByVersion(int version) throws IOException {
+        return Connector.GetSheetByVersion(version,sheetName);
     }
 
     public int getNumOfCols(){
@@ -108,15 +142,39 @@ public class AppController {
         return sheet.numberOfRows();
     }
 
-    public Map<Integer, List<String>> getValuesInColumns(Range range ){
-        return Connector.getValuesInColumn(range);
-    }
-    public SheetDto applyFilter(Range range ,Map<Integer, List<String>> filters) {
-        return Connector.applyFilter(range,filters);
+    public SheetDto applyFilter(Range range ,Map<Integer, List<String>> filters) throws IOException {
+        return Connector.applyFilter(sheetName,range,filters);
     }
 
-    public void removeRange(String rangeName) throws Exception{
-        Connector.removeRange(rangeName);
+    public void removeRange(String rangeName){
+        Connector.removeRange(rangeName, sheetName, new Callback() {
+            @Override
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {}
+
+            @Override
+            public void onResponse(@NotNull Call call, @NotNull Response response){
+                    Platform.runLater(() -> {
+                        ranges.remove(rangeName);
+                        List<String> rangeNames = ranges
+                                .values()
+                                .stream()
+                                .map(Range::rangeName)
+                                .toList();
+
+
+                        topComponentController.addRangesToComboBox(rangeNames);
+                    });
+                    if(!response.isSuccessful()){
+                    Platform.runLater(()-> {
+                        try {
+                            showError(response.body().string());
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                }
+            }
+        });
     }
 
     public static void showError(String message) {
@@ -143,8 +201,8 @@ public class AppController {
         sheetComponentController.createNewSheetInDifferentWindows(sheet);
     }
 
-    public SheetDto applySort(Queue<String> cols,Range range){
-        return Connector.applySort(cols,range);
+    public SheetDto applySort(Queue<String> cols,Range range) throws IOException {
+        return Connector.applySort(cols,range,sheetName);
     }
 
     public void setDefaultStyle(Coordinate coordinate){
@@ -160,18 +218,21 @@ public class AppController {
         sheetComponentController.fillSheet(sheetDto);
     }
 
-    public void SetStages(Stage dashboardStage, Stage sheetStage) {
-        this.dashboardStage = dashboardStage;
+    public void SetStages(Stage sheetStage,Stage dashBoardStage) {
         this.sheetStage = sheetStage;
+        this.dashBoardStage = dashBoardStage;
     }
 
     public void SetPermission(PermissionType permissionType) {
-        this.permissionType = permissionType;
+        editable.set(permissionType.getPermissionLevel() >= PermissionType.WRITER.getPermissionLevel());
     }
 
-    public void SetSheetName(String sheetName) throws IOException {
+    public void SetSheetName(String sheetName) {
         this.sheetName = sheetName;
-        fillSheet();
     }
 
+    public void OnBackHandler(){
+        sheetStage.close();
+        dashBoardStage.show();
+    }
 }

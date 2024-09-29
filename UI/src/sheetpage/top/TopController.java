@@ -49,13 +49,9 @@ public class TopController {
     @FXML
     private ComboBox<String> rangesComboBox;
     @FXML
-    private Button plus;
-    @FXML
     private Button minus;
     @FXML
-    private Button filterButton;
-    @FXML
-    private Button sortButton;
+    private Button plus;
     @FXML
     private ColorPicker textColorPicker;
     @FXML
@@ -76,7 +72,6 @@ public class TopController {
     public Button incrementButton;
 
 
-    private final SimpleBooleanProperty isSheetLoaded = new SimpleBooleanProperty(false);
     private final SimpleStringProperty originalValue = new SimpleStringProperty("");
     private final SimpleIntegerProperty lastUpdate = new SimpleIntegerProperty(0);
     private final SimpleStringProperty cellId = new SimpleStringProperty("");
@@ -86,20 +81,31 @@ public class TopController {
         originalValueTextField.textProperty().bind(originalValue);
         lastUpdateTextField.textProperty().bind(Bindings.format("%d", lastUpdate));
         cellIdTextField.textProperty().bind(cellId);
-        SheetVersionComboBox.disableProperty().bind(isSheetLoaded.not());
-        rangesComboBox.disableProperty().bind(isSheetLoaded.not());
         rangesComboBox.setVisibleRowCount(5);
         SheetVersionComboBox.setVisibleRowCount(5);
-        plus.disableProperty().bind(isSheetLoaded.not());
-        minus.disableProperty().bind(isSheetLoaded.not());
-        filterButton.disableProperty().bind(isSheetLoaded.not());
-        sortButton.disableProperty().bind(isSheetLoaded.not());
         SheetVersionComboBox.getItems().add("Version");
         SheetVersionComboBox.setOnAction(event -> {
-            if (!SheetVersionComboBox.getValue().equals("Version")) {
-                handleVersionSelected(SheetVersionComboBox.getValue());
-                SheetVersionComboBox.setValue("Version");
+            if(SheetVersionComboBox.getValue() != null){
+                if (!SheetVersionComboBox.getValue().equals("Version")) {
+                    try {handleVersionSelected(SheetVersionComboBox.getValue());
+                    } catch (IOException e) {throw new RuntimeException(e);}
+                    SheetVersionComboBox.setValue("Version");
+                }
             }
+        });
+
+        rangesComboBox.setOnAction(event -> {
+            String selectedRange = rangesComboBox.getSelectionModel().getSelectedItem();
+            appController.removePaint();
+            handleRangeSelected(selectedRange);
+            minus.setOnMouseClicked(mouseEvent -> {
+                appController.removePaint();
+                try {
+                    appController.removeRange(selectedRange);
+                } catch (Exception e) {
+                    AppController.showError(e.getMessage());
+                }
+            });
         });
 
         textColorPicker.setOnAction(event -> {
@@ -133,6 +139,11 @@ public class TopController {
         makeNumericOnly(stepTextField);
     }
 
+    public void BindEditAble(SimpleBooleanProperty editAble){
+        plus.visibleProperty().bind(editAble);
+        minus.visibleProperty().bind(editAble);
+    }
+
     private void makeNumericOnly(TextField textField) {
         textField.textProperty().addListener(new ChangeListener<String>() {
             @Override
@@ -159,10 +170,6 @@ public class TopController {
         this.appController = appController;
     }
 
-
-//    public void EnableButtons() {
-//        isSheetLoaded.set(true);
-//    }
 
     private Color extractColorFromStyle(String style, String colorProperty) {
         Pattern pattern = Pattern.compile(colorProperty + ":\\s*([^;]+)");
@@ -224,7 +231,6 @@ public class TopController {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/sheetpage/top/dialog/filter/createFilterDialog.fxml"));
         Parent root = loader.load();
         FilterDialogController controller = loader.getController();
-        controller.setAppController(appController);
         controller.setBoundaries(appController.getNumOfRows(), appController.getNumOfCols());
         controller.fillData();
         Stage dialogStage = new Stage();
@@ -256,33 +262,15 @@ public class TopController {
     }
 
     private void handleRangeSelected(String selectedItem) {
-        appController.PaintCells(appController.GetRange(selectedItem).getRangeCellsCoordinate(), "pink");
+        if(appController.ranges.get(selectedItem) != null){
+            appController.PaintCells(appController.ranges.get(selectedItem).getRangeCellsCoordinate(),"pink");
+        }
     }
 
     public void addRangesToComboBox(List<String> ranges) {
         clearRangeComboBox();
-        rangesComboBox.getItems().add("Range");
         ranges.forEach(this::addRangeToComboBox);
 
-        rangesComboBox.setOnAction(event -> {
-            String selectedRange = rangesComboBox.getSelectionModel().getSelectedItem();
-            if (!Objects.equals(selectedRange, rangesComboBox.getItems().getFirst())) {
-                appController.removePaint();
-                handleRangeSelected(selectedRange);
-
-                minus.setOnMouseClicked(mouseEvent -> {
-                    appController.removePaint();
-                    try {
-                        appController.removeRange(selectedRange);
-                        rangesComboBox.getItems().remove(selectedRange);
-                    } catch (Exception e) {
-                        AppController.showError(e.getMessage());
-                    }
-                });
-            } else {
-                appController.removePaint();
-            }
-        });
     }
 
     private void addRangeToComboBox(String rangeName) {
@@ -293,16 +281,15 @@ public class TopController {
         rangesComboBox.getItems().clear();
     }
 
-    public void addVersion() {
-        SheetVersionComboBox.getItems().add(String.valueOf(SheetVersionComboBox.getItems().size()));
-    }
-
-    public void clearVersion() {
+    public void addVersions(int version) {
         SheetVersionComboBox.getItems().clear();
         SheetVersionComboBox.getItems().add("Version");
+        for(int i = 1 ; i <= version ;i++){
+            SheetVersionComboBox.getItems().add(String.valueOf(i));
+        }
     }
 
-    private void handleVersionSelected(String selectedItem) {
+    private void handleVersionSelected(String selectedItem) throws IOException {
         SheetDto sheetByVersionVersion = appController.getSheetByVersion(Integer.parseInt(selectedItem));
         appController.createNewSheetInDifferentWindows(sheetByVersionVersion);
     }
@@ -351,8 +338,9 @@ public class TopController {
         }
     }
 
-    public void onBackHandler(ActionEvent event) {
-
+    @FXML
+    public void OnBackHandler() {
+        appController.OnBackHandler();
     }
 }
 

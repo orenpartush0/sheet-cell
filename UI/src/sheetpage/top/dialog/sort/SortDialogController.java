@@ -18,6 +18,7 @@ import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.range.Range;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.IntStream;
 
@@ -57,7 +58,7 @@ public class SortDialogController {
     private String getColLetter(int colNum) { return String.valueOf((char) ('A' + colNum - 1)); }
 
     @FXML
-    public void ApplySort() {
+    public void ApplySort() throws IOException {
        SheetDto sheet = appController.applySort(pickedCols,getRange());
        appController.createNewSheetInDifferentWindows(sheet);
     }

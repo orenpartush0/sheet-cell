@@ -1,6 +1,6 @@
 package dashboard;
 
-import Connector.Connector;
+import apiConnector.Connector;
 import constant.Constants;
 import dashboard.dialog.sheet.SheetDialogController;
 import dto.AddRequestDto;
@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
+
+import static constant.UIConstants.PUT;
 
 
 public class DashBoardController {
@@ -165,9 +167,6 @@ public class DashBoardController {
         userNameProp.set(name);
     }
 
-    private void viewSheet() {
-
-    }
 
     private void requestPermission() {
         SheetData sheetData = sheetsTable.getSelectionModel().getSelectedItem();
@@ -179,7 +178,7 @@ public class DashBoardController {
             if (sheetData != null) {
                 System.out.println(sheetData.sheetName);
                 HttpClientUtil.runAsync( Constants.ADD_REQUEST + "?" + Constants.SHEET_NAME + "=" + sheetData.sheetName,
-                        Constants.PUT, new AddRequestDto(requestTable.getItems().size(),permissionType), new Callback() {
+                        PUT, new AddRequestDto(requestTable.getItems().size(),permissionType), new Callback() {
                             @Override
                             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                             }
@@ -202,7 +201,7 @@ public class DashBoardController {
             System.out.println(sheetData.sheetName);
             HttpClientUtil.runAsync(
                     Constants.UPDATE_REQUEST + "?" + Constants.SHEET_NAME + "=" + sheetData.sheetName,
-                    Constants.PUT,
+                    PUT,
                     new UpdateRequestDto(reqId, isAck),
                     new Callback() {
                         @Override
@@ -321,7 +320,7 @@ public class DashBoardController {
         SheetDialogController controller = loader.getController();
         Stage dialogStage = new Stage();
         dialogStage.setTitle("SheetData Details");
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.initModality(Modality.WINDOW_MODAL);
         dialogStage.setScene(new Scene(root));
         dialogStage.setHeight(240);
         controller.setDialogStage(dialogStage);
@@ -359,13 +358,16 @@ public class DashBoardController {
             Parent root = loader.load();
             AppController sheetController = loader.getController();
             Stage sheetStage = new Stage();
+            sheetStage.setWidth(1200);
+            sheetStage.setHeight(600);
             sheetStage.setTitle("Sheet");
-            sheetStage.initModality(Modality.APPLICATION_MODAL);
+            sheetStage.initModality(Modality.WINDOW_MODAL);
             sheetStage.setScene(new Scene(root));
-            sheetController.SetStages(dashboardStage,sheetStage);
+            sheetController.SetStages(sheetStage,dashboardStage);
             sheetController.SetSheetName(sheetData.sheetName);
+            sheetController.fillSheet();
             sheetController.SetPermission(sheetData.permissionType);
-            sheetStage.showAndWait();
+            sheetStage.show();
         }
     }
 

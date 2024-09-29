@@ -17,7 +17,7 @@
 <VBox stylesheets="@Top.css" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sheetpage.top.TopController">
 
     <HBox id="box" spacing="10">
-            <Button text="Back" onAction="#onBackHandler"/>
+            <Button text="Back" onAction="#OnBackHandler"/>
     </HBox>
 
     <HBox spacing="10"> <!-- Corrected padding -->
@@ -38,13 +38,13 @@
 
         <ComboBox fx:id="rangesComboBox" promptText="Range" />
 
-        <Button fx:id="plus" onAction="#addRangeAction" style="-fx-background-color: lightblue;" text="+" />
+        <Button fx:id = "plus" onAction="#addRangeAction" style="-fx-background-color: lightblue;" text="+" />
 
         <Button fx:id="minus" style="-fx-background-color:  #FFA07A;" text="-" />
 
-        <Button fx:id="filterButton" onAction="#onFilter" style="-fx-background-color: lightgray;" text="Filter" />
+        <Button onAction="#onFilter" style="-fx-background-color: lightgray;" text="Filter" />
 
-        <Button fx:id="sortButton" onAction="#onSort" style="-fx-background-color: lightgray;" text="Sort" />
+        <Button onAction="#onSort" style="-fx-background-color: lightgray;" text="Sort" />
 
 
         <Region HBox.hgrow="ALWAYS" />

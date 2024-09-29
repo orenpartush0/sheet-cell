@@ -46,4 +46,6 @@ public interface Sheet extends Cloneable, Serializable,SheetToFilter {
     String GetOriginalValue(Coordinate coordinate);
 
     void applyDynamicCalculate(Coordinate coordinate, String numStr);
+
+    boolean IsRangeInUse(String rangeName);
 }

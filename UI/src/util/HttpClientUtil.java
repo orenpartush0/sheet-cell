@@ -5,10 +5,9 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static constant.Constants.GET;
 import static constant.Constants.GSON;
-import static constant.URL.BASE_URL;
+import static constant.UIConstants.BASE_URL;
+import static constant.UIConstants.GET;
 
 public class HttpClientUtil {
     private final static OkHttpClient HTTP_CLIENT = new OkHttpClient.Builder().

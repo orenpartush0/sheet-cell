@@ -66,6 +66,13 @@ public class RangeDialogController {
             isValid = false;
         }
 
+        if(appController.ranges.containsKey(rangeNameField.getText())){
+            Label errorLabel = new Label("Range name in use!\n");
+            errorLabel.setStyle("-fx-text-fill: red;");
+            errorBox.getChildren().add(errorLabel);
+            isValid = false;
+        }
+
         if (!CoordinateFactory.isValidCoordinate(startPointField.getText())) {
             Label errorLabel = new Label("No valid start point!\n");
             errorLabel.setStyle("-fx-text-fill: red;");

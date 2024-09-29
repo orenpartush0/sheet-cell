@@ -14,27 +14,6 @@ import java.util.stream.IntStream;
 
 public interface Filter {
 
-    static Map<Integer, List<String>> getValuesInColumn(SheetToFilter sheet, Range range) {
-        return sheet.GetCells().entrySet().stream()
-                .filter(entry -> range.containsCell(entry.getKey()))
-                .collect(Collectors.groupingBy(
-                        entry -> entry.getKey().col(),
-                        Collectors.mapping(
-                                entry -> entry.getValue().GetEffectiveValue().getValue().toString(),
-                                Collectors.filtering(
-                                        value -> !value.isEmpty(),
-                                        Collectors.toSet()
-                                )
-                        )
-                ))
-                .entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> new ArrayList<>(entry.getValue())
-                ));
-    }
-
-
 
     private static boolean passesFilter(int row,SheetToFilter sheet,  Map<Integer, List<String>> filters){
         return filters.

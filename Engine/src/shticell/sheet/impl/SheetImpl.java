@@ -208,5 +208,10 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     public void applyDynamicCalculate(Coordinate coordinate, String numStr){
         try{cells.get(coordinate).UpdateCell(numStr,version);} catch (Exception ignored){}
     }
+
+    @Override
+    public boolean IsRangeInUse(String rangeName){
+        return ranges.containsKey(rangeName);
+    }
 }
 

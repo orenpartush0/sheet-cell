@@ -7,67 +7,59 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import servlet.utils.ServletUtils;
+import servlet.utils.SessionUtils;
+import shticell.manager.enums.PermissionType;
 import shticell.manager.sheet.SheetManager;
 import shticell.sheet.range.Range;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import static constant.Constants.*;
 
-@WebServlet(urlPatterns = "/range")
+@WebServlet(urlPatterns = RANGE)
 public class RangeServlet extends HttpServlet {
-
-    private final String MANAGER = "manager";
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
-        if (sheetManager == null) {
-            sheetManager = new SheetManager();
-            getServletContext().setAttribute(MANAGER, sheetManager);
-       }
+        SheetManager sheetManager = ServletUtils.GetSheetManager(getServletContext());
+        String sheetName = req.getParameter(SHEET_NAME);
+        String userName = SessionUtils.GetUserName(req);
 
-        String sheetName = req.getParameter("sheetName");
         BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
-        GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
-        builder.registerTypeAdapter(Range.class, new RangeDeserializer());
-        Gson gson = builder.create();
-        Range range = gson.fromJson(reader, Range.class);
-        sheetManager.AddRange(sheetName,range);
-    }
+        Range range = GSON.fromJson(reader, Range.class);
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
-        if (sheetManager == null) {
-            sheetManager = new SheetManager();
-            getServletContext().setAttribute(MANAGER, sheetManager);
+        if(sheetName != null && !sheetName.isEmpty() && sheetManager.isPermit(sheetName,userName, PermissionType.WRITER)) {
+            if(!sheetManager.isRangeInUse(sheetName,range.rangeName())){
+                sheetManager.AddRange(sheetName, range);
+            }
+            else{
+                resp.sendError(HttpServletResponse.SC_CONFLICT,"Range already exist");
+            }
+
+        }else{
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
         }
 
-
-        String sheetName = req.getParameter("sheetName");
-        String rangeName = req.getParameter("rangeName");
-        Gson gson  = new Gson();
-
-        resp.getWriter().write(gson.toJson(sheetManager.GetRangeDto(sheetName,rangeName)));
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
-        if (sheetManager == null) {
-            sheetManager = new SheetManager();
-            getServletContext().setAttribute(MANAGER, sheetManager);
+        SheetManager sheetManager = ServletUtils.GetSheetManager(getServletContext());
+        String userName = SessionUtils.GetUserName(req);
+        String sheetName = req.getParameter(SHEET_NAME);
+        String rangeName = req.getParameter(RANGE_NAME);
+        if(!sheetName.isEmpty() && !rangeName.isEmpty() && sheetManager.isPermit(sheetName,userName, PermissionType.WRITER)
+        && sheetManager.isRangeInUse(sheetName,rangeName)){
+            try {
+                sheetManager.removeRange(sheetName, rangeName);
+            } catch (Exception e) {
+                resp.sendError(HttpServletResponse.SC_FORBIDDEN,"Range in use");
+            }
+        }else{
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN,"Range not found");
         }
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
-        String sheetName = req.getParameter("sheetName");
-        String rangeName = req.getParameter("rangeName");
-        Gson gson  = new Gson();
-
-        try {
-            sheetManager.removeRange(sheetName,rangeName);
-        } catch (Exception e) { throw new RuntimeException(e);}
     }
 
 }

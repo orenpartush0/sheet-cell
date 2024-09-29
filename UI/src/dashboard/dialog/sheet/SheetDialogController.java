@@ -1,13 +1,7 @@
 package dashboard.dialog.sheet;
 
-import Connector.Connector;
+import constant.Constants;
 import dto.SheetDto;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import sheetpage.app.AppController;
-import sheetpage.top.TopController;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -16,6 +10,8 @@ import javafx.stage.Stage;
 import util.HttpClientUtil;
 
 import java.io.IOException;
+
+import static constant.UIConstants.PUT;
 
 public class SheetDialogController {
 
@@ -33,7 +29,7 @@ public class SheetDialogController {
             int numColumns = getNumColumns();
             int numRows = getNumRows();
 
-            boolean isSuccessful = HttpClientUtil.runSync("/sheet","PUT",
+            boolean isSuccessful = HttpClientUtil.runSync(Constants.SHEET,PUT,
                     new SheetDto(sheetName,1,numColumns,numRows,100,30)).isSuccessful();
 
             if(isSuccessful){

@@ -11,6 +11,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 import static constant.Constants.GSON;
+import static constant.UIConstants.GET;
 
 
 public class ListRefresher<T> extends TimerTask {
@@ -26,7 +27,7 @@ public class ListRefresher<T> extends TimerTask {
 
     @Override
     public void run() {
-        HttpClientUtil.runAsync(endPointAndParameters, Constants.GET, null, new Callback() {
+        HttpClientUtil.runAsync(endPointAndParameters, GET, null, new Callback() {
             @Override
             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 // handle failure

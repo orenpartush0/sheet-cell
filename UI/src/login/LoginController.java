@@ -60,7 +60,7 @@ public class LoginController {
                 DashBoardController dashBoardcontroller = loader.getController();
                 Stage dashboardStage = new Stage();
                 dashboardStage.setTitle("DashBoard");
-                dashboardStage.initModality(Modality.APPLICATION_MODAL);
+                dashboardStage.initModality(Modality.WINDOW_MODAL);
                 dashboardStage.setScene(new Scene(root));
                 dashBoardcontroller.setStage(dashboardStage);
                 dashBoardcontroller.setName(usernameField.getText());

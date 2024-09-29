@@ -1,37 +1,36 @@
 package servlet;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import deserializer.SortDtoDeserializer;
 import dto.SortDto;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import servlet.utils.ServletUtils;
+import servlet.utils.SessionUtils;
+import shticell.manager.enums.PermissionType;
 import shticell.manager.sheet.SheetManager;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-@WebServlet(urlPatterns = "/sort")
+import static constant.Constants.*;
+
+@WebServlet(urlPatterns = SORT)
 public class SortServlet extends HttpServlet {
-    private final String MANAGER = "manager";
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        SheetManager sheetManager = (SheetManager) getServletContext().getAttribute(MANAGER);
-        if (sheetManager == null) {
-            sheetManager = new SheetManager();
-            getServletContext().setAttribute(MANAGER, sheetManager);
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        SheetManager sheetManager = ServletUtils.GetSheetManager(getServletContext());
+        String user = SessionUtils.GetUserName(req);
+        String sheetName = req.getParameter(SHEET_NAME);
+        if(sheetName!=null && !sheetName.isEmpty() && sheetManager.isPermit(sheetName,user, PermissionType.READER)){
+            BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
+            SortDto sortDto = GSON.fromJson(reader, SortDto.class);
+            resp.getWriter().write(GSON.toJson(sheetManager.applySort(sheetName,sortDto.cols(),sortDto.range())));
+        }
+        else{
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
         }
 
-        String sheetName = req.getParameter("sheetName");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
-        GsonBuilder builder = new GsonBuilder().setPrettyPrinting();
-        builder.registerTypeAdapter(SortDto.class, new SortDtoDeserializer());
-        Gson gson = builder.create();
-        SortDto sortDto = gson.fromJson(reader, SortDto.class);
-        resp.getWriter().write(gson.toJson(sheetManager.applySort(sheetName,sortDto.cols(),sortDto.range())));
     }
 }

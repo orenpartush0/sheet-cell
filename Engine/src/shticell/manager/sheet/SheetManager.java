@@ -12,6 +12,7 @@ import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.exception.LoopConnectionException;
 import shticell.sheet.impl.SheetImpl;
 import shticell.sheet.range.Range;
+import shticell.util.Filter;
 import shticell.util.Sort;
 
 import java.util.*;
@@ -36,6 +37,10 @@ public class SheetManager {
 
     public SheetDto getSheet(String sheetName){
         return new SheetDto(sheets.get(sheetName));
+    }
+
+    public Sheet GetSheetToFilter(String sheetName){
+        return sheets.get(sheetName);
     }
 
     public CellDto GetCellByCoordinate(String sheetName,Coordinate coordinate){
@@ -64,6 +69,10 @@ public class SheetManager {
 
     public SheetDto applySort(String sheetName,Queue<String> cols,Range range){
         return Sort.SortRange(sheets.get(sheetName),cols,range);
+    }
+
+    public SheetDto applyFilter(String sheetName,Range range,Map<Integer,List<String>> filters){
+        return Filter.getFilteredSheetDto(sheets.get(sheetName),range,filters);
     }
 
     public SheetDto applyDynamicCalculate(String sheetName,Coordinate coordinate , String numStr){
@@ -107,5 +116,9 @@ public class SheetManager {
 
     public boolean isPermit(String sheetName, String user, PermissionType permissionType){
         return sheetPermissionDataMap.get(sheetName).isPermit(user,permissionType);
+    }
+
+    public boolean isRangeInUse(String sheetName,String rangeName){
+        return sheets.get(sheetName).IsRangeInUse(rangeName);
     }
 }

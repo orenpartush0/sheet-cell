@@ -15,12 +15,7 @@ public class SortDtoDeserializer implements JsonDeserializer<SortDto> {
         JsonObject jsonObject = json.getAsJsonObject();
 
         // Deserialize Range
-        JsonObject rangeJson = jsonObject.getAsJsonObject("range");
-        String rangeName = rangeJson.get("rangeName").getAsString();
-        String startCellCoordinate = rangeJson.get("startCellCoordinate").getAsString();
-        String endCellCoordinate = rangeJson.get("endCellCoordinate").getAsString();
-        Range range = new Range(rangeName, CoordinateFactory.getCoordinate(startCellCoordinate),
-                CoordinateFactory.getCoordinate(endCellCoordinate));
+        Range range = context.deserialize(jsonObject.get("range"), Range.class);
 
         // Deserialize cols (Queue<String>)
         Queue<String> cols = context.deserialize(jsonObject.getAsJsonArray("cols"), LinkedList.class);

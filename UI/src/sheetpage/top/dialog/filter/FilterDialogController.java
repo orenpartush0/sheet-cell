@@ -16,10 +16,12 @@ import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.coordinate.CoordinateFactory;
 import shticell.sheet.range.Range;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class FilterDialogController {
@@ -71,7 +73,7 @@ public class FilterDialogController {
 
     private String getColLetter(int colNum) { return String.valueOf((char) ('A' + colNum - 1)); }
 
-    public void ApplyFilter() {
+    public void ApplyFilter() throws IOException {
         Map<Integer, List<String>> filters = new HashMap<>();
 
         checked.forEach((key, map) -> map.forEach((val, isChecked)-> {
@@ -139,7 +141,7 @@ public class FilterDialogController {
         keyColumnComboBox.setOnAction(actionEvent -> {
             if (isInputValid()) {
                 colsValues = needToBeUpdated
-                        ? appController.getValuesInColumns(getRange())
+                        ? getValuesInColumn(getRange())
                         : colsValues;
                 valuesListView.getItems().clear();
                 setColValue(colsValues.get(getSelectedColNumber()));
@@ -198,6 +200,26 @@ public class FilterDialogController {
     public void setBoundaries(int _numOfRows, int _numOfCols) {
         numOfCols = _numOfCols;
         numOfRows = _numOfRows;
+    }
+
+    private Map<Integer, List<String>> getValuesInColumn(Range range) {
+        return appController.sheet.cells().entrySet().stream()
+                .filter(entry -> range.containsCell(entry.getKey()))
+                .collect(Collectors.groupingBy(
+                        entry -> entry.getKey().col(),
+                        Collectors.mapping(
+                                entry -> entry.getValue().effectiveValue(),
+                                Collectors.filtering(
+                                        value -> !value.isEmpty(),
+                                        Collectors.toSet()
+                                )
+                        )
+                ))
+                .entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> new ArrayList<>(entry.getValue())
+                ));
     }
 
 }

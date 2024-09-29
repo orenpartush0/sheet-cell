@@ -1,6 +1,6 @@
 package servlet;
 
-import SessionUtils.SessionUtils;
+import servlet.utils.SessionUtils;
 import dto.UpdateRequestDto;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
