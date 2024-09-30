@@ -1,9 +1,6 @@
 package sheetpage.app;
 
 import apiConnector.Connector;
-import constant.Constants;
-import dashboard.DashBoardController;
-import dashboard.ListRefresher;
 import dto.SheetDto;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -15,6 +12,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
+import sheetpage.app.pull.NeedToBeUpdatedRefresher;
 import sheetpage.sheet.SheetController;
 import sheetpage.top.TopController;
 import shticell.manager.enums.PermissionType;
@@ -57,6 +55,7 @@ public class AppController implements Closeable {
 
     public void SetNeedToBeUpdated(boolean isNeed){
         isNeedToBeUpdated = isNeed;
+        topComponentController.setUpdateVisible(isNeed);
     }
 
     private void setSheetListRefresher(){

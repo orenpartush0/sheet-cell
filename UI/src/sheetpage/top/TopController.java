@@ -33,11 +33,16 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static constant.UIConstants.NEED_TO_UPDATE_MESSAGE;
+
 public class TopController {
     private AppController appController;
 
     private int counter = 0;
 
+
+    @FXML
+    private Button updateButton;
     @FXML
     private TextField originalValueTextField;
     @FXML
@@ -99,11 +104,15 @@ public class TopController {
             appController.removePaint();
             handleRangeSelected(selectedRange);
             minus.setOnMouseClicked(mouseEvent -> {
-                appController.removePaint();
-                try {
-                    appController.removeRange(selectedRange);
-                } catch (Exception e) {
-                    AppController.showError(e.getMessage());
+                if(!appController.GetNeedToBeUpdated()) {
+                    appController.removePaint();
+                    try {
+                        appController.removeRange(selectedRange);
+                    } catch (Exception e) {
+                        AppController.showError(e.getMessage());
+                    }
+                }else{
+                    AppController.showError(NEED_TO_UPDATE_MESSAGE);
                 }
             });
         });
@@ -137,6 +146,10 @@ public class TopController {
         makeNumericOnly(toTextField);
         makeNumericOnly(fromTextField);
         makeNumericOnly(stepTextField);
+    }
+
+    public void setUpdateVisible(boolean bool){
+        updateButton.visibleProperty().set(bool);
     }
 
     public void BindEditAble(SimpleBooleanProperty editAble){
@@ -211,54 +224,66 @@ public class TopController {
     }
 
     public void onSort() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/sheetpage/top/dialog/sort/createSortDialog.fxml"));
-        Parent root = loader.load();
-        SortDialogController controller = loader.getController();
-        controller.setAppController(appController);
-        controller.setBoundaries(appController.getNumOfCols(), appController.getNumOfRows());
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setScene(new Scene(root));
-        dialogStage.setTitle("Sort");
-        controller.setDialogStage(dialogStage);
-        controller.setAppController(appController);
-        dialogStage.showAndWait();
+        if(!appController.GetNeedToBeUpdated()) {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/sheetpage/top/dialog/sort/createSortDialog.fxml"));
+            Parent root = loader.load();
+            SortDialogController controller = loader.getController();
+            controller.setAppController(appController);
+            controller.setBoundaries(appController.getNumOfCols(), appController.getNumOfRows());
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setTitle("Sort");
+            controller.setDialogStage(dialogStage);
+            controller.setAppController(appController);
+            dialogStage.showAndWait();
+        }else {
+            AppController.showError(NEED_TO_UPDATE_MESSAGE);
+        }
     }
 
 
     @FXML
     public void onFilter() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/sheetpage/top/dialog/filter/createFilterDialog.fxml"));
-        Parent root = loader.load();
-        FilterDialogController controller = loader.getController();
-        controller.setBoundaries(appController.getNumOfRows(), appController.getNumOfCols());
-        controller.fillData();
-        Stage dialogStage = new Stage();
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setScene(new Scene(root));
-        dialogStage.setTitle("Filter");
-        controller.setDialogStage(dialogStage);
-        controller.setAppController(appController);
-        dialogStage.showAndWait();
+        if(!appController.GetNeedToBeUpdated()) {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/sheetpage/top/dialog/filter/createFilterDialog.fxml"));
+            Parent root = loader.load();
+            FilterDialogController controller = loader.getController();
+            controller.setBoundaries(appController.getNumOfRows(), appController.getNumOfCols());
+            controller.fillData();
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setTitle("Filter");
+            controller.setDialogStage(dialogStage);
+            controller.setAppController(appController);
+            dialogStage.showAndWait();
+        }else {
+            AppController.showError(NEED_TO_UPDATE_MESSAGE);
+        }
     }
 
     @FXML
     public void addRangeAction() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/sheetpage/top/dialog/range/createRangeDialog.fxml"));
-        Parent root = loader.load();
+        if (!appController.GetNeedToBeUpdated()) {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/sheetpage/top/dialog/range/createRangeDialog.fxml"));
+            Parent root = loader.load();
 
-        RangeDialogController controller = loader.getController();
-        controller.setBoundaries(appController.getNumOfRows(), appController.getNumOfCols());
-        controller.setAppController(appController);
-        controller.setTopController(this);
-        Stage dialogStage = new Stage();
-        dialogStage.setTitle("Range Details");
-        dialogStage.initModality(Modality.APPLICATION_MODAL);
-        dialogStage.setScene(new Scene(root));
-        dialogStage.setHeight(240);
-        dialogStage.setWidth(350);
-        controller.setDialogStage(dialogStage);
-        dialogStage.showAndWait();
+            RangeDialogController controller = loader.getController();
+            controller.setBoundaries(appController.getNumOfRows(), appController.getNumOfCols());
+            controller.setAppController(appController);
+            controller.setTopController(this);
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle("Range Details");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setHeight(240);
+            dialogStage.setWidth(350);
+            controller.setDialogStage(dialogStage);
+            dialogStage.showAndWait();
+        }else{
+            AppController.showError(NEED_TO_UPDATE_MESSAGE);
+        }
     }
 
     private void handleRangeSelected(String selectedItem) {
@@ -341,6 +366,11 @@ public class TopController {
     @FXML
     public void OnBackHandler() {
         appController.OnBackHandler();
+        appController.close();
+    }
+
+    public void UpdateSheetHandler() throws IOException {
+        appController.fillSheet();
     }
 }
 

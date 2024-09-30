@@ -3,7 +3,6 @@ package shticell.jaxb;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.*;
 import shticell.jaxb.schema.STLCell;
 import shticell.jaxb.schema.STLRange;
 import shticell.jaxb.schema.STLSheet;
@@ -32,11 +31,16 @@ public class SchemBaseJaxb {
     }
 
     private static STLSheet deserializeFrom(InputStream in) throws JAXBException {
-        JAXBContext jc = JAXBContext.newInstance(STLSheet.class);
-        Unmarshaller u = jc.createUnmarshaller();
-        STLSheet unmarshal = (STLSheet) u.unmarshal(in);
-        return unmarshal;
-        
+        try{
+            JAXBContext jc = JAXBContext.newInstance(STLSheet.class);
+            Unmarshaller u = jc.createUnmarshaller();
+            STLSheet unmarshal = (STLSheet) u.unmarshal(in);
+            return unmarshal;
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            throw e;
+        }
     }
 
     private static void checkRowsAndCols(int rows, int cols) {

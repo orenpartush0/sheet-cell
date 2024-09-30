@@ -1,11 +1,17 @@
 package util;
 
+import jakarta.xml.bind.JAXBContext;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import static constant.Constants.GSON;
+import static constant.Constants.UPLOAD_SHEET_XML_FORMAT;
 import static constant.UIConstants.BASE_URL;
 import static constant.UIConstants.GET;
 
@@ -62,9 +68,29 @@ public class HttpClientUtil {
         return HTTP_CLIENT.newCall(request).execute();
     }
 
+
+
+    public static Response UploadFile(File file) throws IOException {
+
+        RequestBody body =
+                new MultipartBody.Builder()
+                        .addFormDataPart("file", file.getName(), RequestBody.create(file, MediaType.parse("text/plain")))
+                        .build();
+
+        Request request = new Request.Builder()
+                .url(BASE_URL + UPLOAD_SHEET_XML_FORMAT)
+                .post(body)
+                .build();
+
+        return HTTP_CLIENT.newCall(request).execute();
+    }
+
+
+
     public static void shutdown() {
         System.out.println("Shutting down HTTP CLIENT");
         HTTP_CLIENT.dispatcher().executorService().shutdown();
         HTTP_CLIENT.connectionPool().evictAll();
     }
+
 }

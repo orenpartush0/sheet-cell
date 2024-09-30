@@ -10,6 +10,7 @@
         <element id="directory" name="lib">
           <element id="artifact" artifact-name="Engine" />
           <element id="library" level="project" name="gson-2.1-javadoc" />
+          <element id="library" level="project" name="angus-activation" />
         </element>
       </element>
     </root>

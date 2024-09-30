@@ -3,6 +3,7 @@ package shticell.manager.sheet;
 import dto.CellDto;
 import dto.SheetDataDto;
 import dto.SheetDto;
+import shticell.jaxb.SchemBaseJaxb;
 import shticell.manager.enums.PermissionStatus;
 import shticell.manager.enums.PermissionType;
 import shticell.manager.sheet.sheetWithPermission.SheetPermissionData;
@@ -15,6 +16,7 @@ import shticell.sheet.range.Range;
 import shticell.util.Filter;
 import shticell.util.Sort;
 
+import java.io.InputStream;
 import java.util.*;
 
 public class SheetManager {
@@ -29,6 +31,17 @@ public class SheetManager {
         sheets.put(sheetDto.Name(), sheet);
         sheetPermissionDataMap.put(sheetDto.Name(),new SheetPermissionDataImpl());
         sheetPermissionDataMap.get(sheetDto.Name()).AddPermission(userName,PermissionType.OWNER);
+    }
+
+    public void UploadSheetXml(String userName, InputStream in) throws Exception {
+        Sheet sheet =  SchemBaseJaxb.CreateSheetFromXML(in);
+        String sheetName = sheet.GetSheetName();
+        if(sheets.containsKey(sheetName)) {
+            throw new RuntimeException("Sheet already exists");
+        }
+        sheets.put(sheet.GetSheetName(),sheet);
+        sheetPermissionDataMap.put(sheetName,new SheetPermissionDataImpl());
+        sheetPermissionDataMap.get(sheetName).AddPermission(userName,PermissionType.OWNER);
     }
 
     public int GetNumOfChanges(String sheetName){

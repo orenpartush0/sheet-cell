@@ -1,17 +1,20 @@
 <component name="libraryTable">
   <library name="angus-activation">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/mod/angus-activation.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/mod/jaxb-core.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/mod/jakarta.activation-api.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/mod/jaxb-xjc.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/mod/jakarta.xml.bind-api.jar!/" />
-      <root url="jar://$PROJECT_DIR$/lib/mod/jaxb-impl.jar!/" />
       <root url="jar://$PROJECT_DIR$/lib/mod/jaxb-jxc.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/mod/jaxb-impl.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/mod/jaxb-core.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/mod/jakarta.xml.bind-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/mod/jakarta.activation-api.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/mod/angus-activation.jar!/" />
+      <root url="file://$PROJECT_DIR$" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
       <root url="jar://$PROJECT_DIR$/lib/mod/jaxb-xjc.jar!/" />
+      <root url="file://$PROJECT_DIR$/Engine/src" />
+      <root url="file://$PROJECT_DIR$/WebApp/src" />
     </SOURCES>
   </library>
 </component>

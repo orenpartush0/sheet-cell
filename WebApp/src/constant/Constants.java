@@ -49,4 +49,5 @@ public class Constants {
     public final static String SORT = "/sort";
     public final static String RANGE = "/range";
     public final static String NEED_TO_BE_UPDATED = "/needToBeUpdated";
+    public final static String UPLOAD_SHEET_XML_FORMAT = "/uploadXmlSheet";
 }

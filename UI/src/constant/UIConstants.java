@@ -11,4 +11,7 @@ public class UIConstants {
     public final static String GET = "GET";
     public final static String DELETE = "DELETE";
     public final static String POST = "POST";
+
+
+    public final static String NEED_TO_UPDATE_MESSAGE = "You need to update the sheet in order to perform the action.";
 }

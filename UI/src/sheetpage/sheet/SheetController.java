@@ -22,6 +22,8 @@ import java.text.NumberFormat;
 import java.util.*;
 import java.util.stream.IntStream;
 
+import static constant.UIConstants.NEED_TO_UPDATE_MESSAGE;
+
 public class SheetController {
 
     private AppController appController;
@@ -176,8 +178,12 @@ public class SheetController {
     }
 
     private void handleCellAction(TextField cellField, Coordinate coordinate) {
-        appController.updateCell(coordinate, cellField.getText());
-        fillSheet(appController.GetSheet());
+        if(!appController.GetNeedToBeUpdated()) {
+            appController.updateCell(coordinate, cellField.getText());
+            fillSheet(appController.GetSheet());
+        }else {
+            AppController.showError(NEED_TO_UPDATE_MESSAGE);
+        }
     }
 
     private void cellClicked(Coordinate coordinate) {

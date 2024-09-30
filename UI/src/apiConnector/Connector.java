@@ -6,13 +6,18 @@ import dto.FilterDto;
 import dto.SheetDto;
 import dto.SortDto;
 import dto.UpdateCellDto;
+import jakarta.xml.bind.JAXBContext;
+import javafx.application.Platform;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import sheetpage.app.AppController;
+import shticell.jaxb.SchemBaseJaxb;
+import shticell.sheet.api.Sheet;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.range.Range;
 import util.HttpClientUtil;
-import java.io.IOException;
+
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.*;
 
@@ -27,8 +32,10 @@ public class Connector {
         void onFailure(Exception e);
     }
 
-
-    public static void SetSheet(String path) throws Exception {
+    public static void SetSheet(File file) throws Exception {
+        if(!HttpClientUtil.UploadFile(file).isSuccessful()){
+            AppController.showError("Invalid xml file");
+        };
     }
 
     public static SheetDto applyFilter(String sheetName ,Range range , Map<Integer, List<String>> filters) throws IOException {
@@ -40,12 +47,6 @@ public class Connector {
 
         return GSON.fromJson(res.body().string(),SheetDto.class);
     }
-
-//    private SheetData GetSheetFromXML(String fileName) throws Exception {
-//        File file = new File(fileName);
-//        InputStream inputStream = new FileInputStream(file);
-//        return SchemBaseJaxb.CreateSheetFromXML(inputStream);
-//    }
 
     public static void UpdateCellByCoordinate(String sheetName ,Coordinate coordinate, String newValue) throws NumberFormatException, IOException {
         Response res = HttpClientUtil.runSync(

@@ -3,6 +3,7 @@ package dashboard;
 import apiConnector.Connector;
 import constant.Constants;
 import dashboard.dialog.sheet.SheetDialogController;
+import dashboard.pull.ListRefresher;
 import dto.AddRequestDto;
 import dto.UpdateRequestDto;
 import javafx.application.Platform;
@@ -302,14 +303,13 @@ public class DashBoardController implements Closeable {
     private void handleLoadFile() throws Exception {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Resource File");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML or BIN Files", "*.xml", "*.bin"));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML", "*.xml"));
         File initialDirectory = new File(System.getProperty("user.home"));
         fileChooser.setInitialDirectory(initialDirectory);
         File selectedFile = fileChooser.showOpenDialog(null);
 
         if (selectedFile != null) {
-            String filePath = selectedFile.getAbsolutePath();
-            Connector.SetSheet(filePath);
+            Connector.SetSheet(selectedFile);
         }
     }
 

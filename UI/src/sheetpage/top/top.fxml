@@ -14,10 +14,12 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox stylesheets="@Top.css" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sheetpage.top.TopController">
+<VBox stylesheets="@Top.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sheetpage.top.TopController">
 
-    <HBox id="box" spacing="10">
-            <Button text="Back" onAction="#OnBackHandler"/>
+    <HBox id="box" prefHeight="62.0" prefWidth="1171.0" spacing="10">
+       <Button onAction="#OnBackHandler" prefHeight="30.0" prefWidth="110.0" text="DashBoard" />
+      <Region prefHeight="32.0" prefWidth="907.0" />
+       <Button fx:id="updateButton" alignment="TOP_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#UpdateSheetHandler" prefHeight="30.0" prefWidth="114.0" text="Update Sheet" visible="false" />
     </HBox>
 
     <HBox spacing="10"> <!-- Corrected padding -->
@@ -38,7 +40,7 @@
 
         <ComboBox fx:id="rangesComboBox" promptText="Range" />
 
-        <Button fx:id = "plus" onAction="#addRangeAction" style="-fx-background-color: lightblue;" text="+" />
+        <Button fx:id="plus" onAction="#addRangeAction" style="-fx-background-color: lightblue;" text="+" />
 
         <Button fx:id="minus" style="-fx-background-color:  #FFA07A;" text="-" />
 
@@ -135,7 +137,7 @@
                   <HBox.margin>
                      <Insets bottom="5.0" right="10.0" />
                   </HBox.margin></TextField>
-                    <Button fx:id="incrementButton"  onAction="#clickOnIncrementButton" disable="true" prefHeight="16.0" prefWidth="94.0" text="Increment">
+                    <Button fx:id="incrementButton" disable="true" onAction="#clickOnIncrementButton" prefHeight="16.0" prefWidth="94.0" text="Increment">
                   <HBox.margin>
                      <Insets bottom="5.0" />
                   </HBox.margin></Button>

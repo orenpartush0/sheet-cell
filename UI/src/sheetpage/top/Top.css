@@ -136,3 +136,9 @@
 #plus:hover, #minus:hover {
     -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 7, 0, 3, 3); /* Enhanced shadow on hover */
 }
+
+#updateButton {
+    -fx-background-color: #ff0000;
+    -fx-effect: none;
+    -fx-translate-y: 2px;
+}
