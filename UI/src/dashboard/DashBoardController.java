@@ -27,6 +27,7 @@ import shticell.manager.enums.PermissionStatus;
 import shticell.manager.enums.PermissionType;
 import util.HttpClientUtil;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -36,7 +37,7 @@ import java.util.Timer;
 import static constant.UIConstants.PUT;
 
 
-public class DashBoardController {
+public class DashBoardController implements Closeable {
 
     @FXML
     public TableView<PermissionRequest> requestTable;
@@ -91,9 +92,8 @@ public class DashBoardController {
 
     private Stage dashboardStage;
 
-    private ObservableList<SheetData> sheetData;
-    private ObservableList<PermissionRequest> permissionRequests;
-    private Timer timer = new Timer();
+    private Timer sheetTimer = new Timer();
+    private Timer requestTimer = new Timer();
 
     //Properties
     private final SimpleStringProperty selectedSheetTextProp = new SimpleStringProperty("");
@@ -205,7 +205,7 @@ public class DashBoardController {
                     new UpdateRequestDto(reqId, isAck),
                     new Callback() {
                         @Override
-                        public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {}
+                        public void onResponse(@NotNull Call call, @NotNull Response response) {}
                         @Override
                         public void onFailure(@NotNull Call call, @NotNull IOException e) {}
                     }
@@ -219,7 +219,7 @@ public class DashBoardController {
                 this::updateSheetDataTable,
                 SheetData[].class
         );
-        new Timer().schedule(sheetlistRefresher,0,1000);
+        sheetTimer.schedule(sheetlistRefresher,0,1000);
     }
 
     private void updateSheetDataTable(List<SheetData> sheetDataLst){
@@ -328,14 +328,14 @@ public class DashBoardController {
     }
 
     private void clickOnSheetHandle(String sheetName){
-        timer.cancel();
-        timer = new Timer();
+        requestTimer.cancel();
+        requestTimer = new Timer();
         ListRefresher sheetlistRefresher = new ListRefresher<>(
                 Constants.REQUEST_DASHBOARD + "?" + Constants.SHEET_NAME + "=" + sheetName,
                 this::updateRequestDataTable,
                 PermissionRequest[].class
         );
-        timer.schedule(sheetlistRefresher,0,2000);
+        requestTimer.schedule(sheetlistRefresher,0,2000);
     }
 
     private void updateRequestDataTable(List<PermissionRequest> permissionRequestsLst){
@@ -372,4 +372,13 @@ public class DashBoardController {
     }
 
 
+    @Override
+    public void close() {
+        if (sheetTimer != null) {
+            sheetTimer.cancel();
+        }
+        if (requestTimer != null){
+            requestTimer.cancel();
+        }
+    }
 }

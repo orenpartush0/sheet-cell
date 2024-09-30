@@ -1,6 +1,9 @@
 package sheetpage.app;
 
 import apiConnector.Connector;
+import constant.Constants;
+import dashboard.DashBoardController;
+import dashboard.ListRefresher;
 import dto.SheetDto;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -17,23 +20,27 @@ import sheetpage.top.TopController;
 import shticell.manager.enums.PermissionType;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.range.Range;
+
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.*;
 
 
-public class AppController {
+public class AppController implements Closeable {
 
     public BorderPane root;
 
     @FXML private TopController topComponentController;
     @FXML private SheetController sheetComponentController;
 
+    private boolean isNeedToBeUpdated = false;
     public Map<String,Range> ranges = new HashMap<>();
     public SheetDto sheet;
     public Stage sheetStage;
     public Stage dashBoardStage;
     private String sheetName;
 
+    private final Timer timer = new Timer();
     private final SimpleBooleanProperty editable = new SimpleBooleanProperty(true);
 
 
@@ -42,6 +49,21 @@ public class AppController {
         topComponentController.setAppController(this);
         sheetComponentController.setAppController(this);
         topComponentController.BindEditAble(editable);
+    }
+
+    public boolean GetNeedToBeUpdated(){
+        return isNeedToBeUpdated;
+    }
+
+    public void SetNeedToBeUpdated(boolean isNeed){
+        isNeedToBeUpdated = isNeed;
+    }
+
+    private void setSheetListRefresher(){
+        NeedToBeUpdatedRefresher needToBeUpdatedRefresher =
+                new NeedToBeUpdatedRefresher(this::SetNeedToBeUpdated,sheetName);
+
+        timer.schedule(needToBeUpdatedRefresher,0,1000);
     }
 
 
@@ -229,10 +251,16 @@ public class AppController {
 
     public void SetSheetName(String sheetName) {
         this.sheetName = sheetName;
+        setSheetListRefresher();
     }
 
     public void OnBackHandler(){
         sheetStage.close();
         dashBoardStage.show();
+    }
+
+    @Override
+    public void close() {
+        timer.cancel();
     }
 }

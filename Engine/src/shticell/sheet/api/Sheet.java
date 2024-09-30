@@ -13,6 +13,10 @@ import java.util.Map;
 public interface Sheet extends Cloneable, Serializable,SheetToFilter {
     String GetSheetName();
 
+    int GetNumOfChanges();
+
+    void IncreaseNumOfChanges();
+
     int GetVersion();
 
     int GetNumberOfRows();

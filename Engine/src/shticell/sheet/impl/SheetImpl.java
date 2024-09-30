@@ -21,6 +21,7 @@ import java.util.stream.IntStream;
 public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable ,Cloneable {
     private final int INITIAL_VERSION = 1;
     private final String sheetName;
+    private int numOfChanges = 0;
     private int version = INITIAL_VERSION;
     Map<Coordinate, Cell> cells = new HashMap<>();
     Map<String, RangeWithCounter> ranges = new HashMap<>();
@@ -48,6 +49,16 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     {
         this(sheetTitle,_numberOfRows,_numberOfColumns,_rowHeight,_columnWidth);
         cells = _cells;
+    }
+
+    @Override
+    public int GetNumOfChanges(){
+        return numOfChanges;
+    }
+
+    @Override
+    public void IncreaseNumOfChanges(){
+        numOfChanges++;
     }
 
     @Override
@@ -86,7 +97,10 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     }
 
     public void UpdateCellByCoordinate(Coordinate coordinate, String newValue) throws LoopConnectionException {
-        try{cells.get(coordinate).UpdateCell(newValue,++version);}
+        try{
+            cells.get(coordinate).UpdateCell(newValue,++version);
+            numOfChanges++;
+        }
         catch (LoopConnectionException | RuntimeException e){version--; throw e;}
     }
 
@@ -158,6 +172,7 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
         }
 
 
+        numOfChanges++;
         ranges.put(rangeDto.rangeName(),new RangeWithCounterImpl(new Range(rangeDto.rangeName(),rangeDto.startCellCoordinate(),rangeDto.endCellCoordinate()),0));
     }
 
@@ -196,6 +211,7 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
             throw new RuntimeException("Range in use");
         }
 
+        numOfChanges++;
         ranges.remove(rangeName);
     }
 
@@ -213,5 +229,6 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     public boolean IsRangeInUse(String rangeName){
         return ranges.containsKey(rangeName);
     }
+
 }
 

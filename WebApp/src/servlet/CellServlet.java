@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import static constant.Constants.GSON;
+import static constant.Constants.VERSION;
 
 @WebServlet(urlPatterns = Constants.CELL)
 public class CellServlet extends HttpServlet {
@@ -31,6 +32,8 @@ public class CellServlet extends HttpServlet {
             UpdateCellDto updateCellDto = GSON.fromJson(reader, UpdateCellDto.class);
             try {
                 sheetManager.UpdateCellByCoordinate(sheetName, updateCellDto.coordinate(), updateCellDto.newValue());
+                int numOfChanges = sheetManager.GetNumOfChanges(sheetName);
+                req.getSession(true).setAttribute(VERSION, numOfChanges);
             } catch (LoopConnectionException e) {
                 resp.sendError(500, e.getMessage());
             }

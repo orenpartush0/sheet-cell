@@ -2,12 +2,21 @@ package servlet.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-import constant.Constants;
+
+import static constant.Constants.*;
 
 public class SessionUtils {
     public static String GetUserName(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        Object sessionAttribute = session != null ? session.getAttribute(Constants.USER_NAME) : null;
+        Object sessionAttribute = session != null ? session.getAttribute(USER_NAME) : null;
         return sessionAttribute != null ? sessionAttribute.toString() : null;
     }
+
+    public static Integer GetSheetVersionUserPossess(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        Object sessionAttribute = session != null ? session.getAttribute(VERSION) : null;
+        return sessionAttribute != null ? (Integer) sessionAttribute : null;
+    }
+
+
 }

@@ -32,6 +32,8 @@ public class RangeServlet extends HttpServlet {
         if(sheetName != null && !sheetName.isEmpty() && sheetManager.isPermit(sheetName,userName, PermissionType.WRITER)) {
             if(!sheetManager.isRangeInUse(sheetName,range.rangeName())){
                 sheetManager.AddRange(sheetName, range);
+                int numOfChanges = sheetManager.GetNumOfChanges(sheetName);
+                req.getSession(true).setAttribute(VERSION, numOfChanges);
             }
             else{
                 resp.sendError(HttpServletResponse.SC_CONFLICT,"Range already exist");
@@ -53,6 +55,8 @@ public class RangeServlet extends HttpServlet {
         && sheetManager.isRangeInUse(sheetName,rangeName)){
             try {
                 sheetManager.removeRange(sheetName, rangeName);
+                int numOfChanges = sheetManager.GetNumOfChanges(sheetName);
+                req.getSession(true).setAttribute(VERSION, numOfChanges);
             } catch (Exception e) {
                 resp.sendError(HttpServletResponse.SC_FORBIDDEN,"Range in use");
             }

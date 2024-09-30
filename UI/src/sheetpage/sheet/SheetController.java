@@ -33,6 +33,7 @@ public class SheetController {
     @FXML public ScrollPane upDownScroller;
     @FXML public ScrollPane rightLeftScroller;
 
+
     private final String defaultCellStyle = new TextField().styleProperty().toString();
     private final Map<Coordinate,SimpleStringProperty> sheetData = new HashMap<>();
     private final Map<Coordinate,TextField> sheetTextFields = new HashMap<>();

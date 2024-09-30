@@ -17,6 +17,9 @@ public class Constants {
     public static final String VERSION = "version";
     public static final String RANGE_NAME = "rangeName";
 
+
+    public static final int NOT_FOUND = -1;
+
     public static final Gson GSON = new GsonBuilder().
             setPrettyPrinting()
             .registerTypeAdapter(Coordinate.class, new CoordinateDeserializer())
@@ -45,4 +48,5 @@ public class Constants {
     public final static String FILTER = "/filter";
     public final static String SORT = "/sort";
     public final static String RANGE = "/range";
+    public final static String NEED_TO_BE_UPDATED = "/needToBeUpdated";
 }

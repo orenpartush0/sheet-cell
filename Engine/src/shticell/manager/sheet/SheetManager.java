@@ -31,6 +31,14 @@ public class SheetManager {
         sheetPermissionDataMap.get(sheetDto.Name()).AddPermission(userName,PermissionType.OWNER);
     }
 
+    public int GetNumOfChanges(String sheetName){
+       return sheets.get(sheetName).GetNumOfChanges();
+    }
+
+    public void IncreaseNumOfChanges(String sheetName){
+        sheets.get(sheetName).IncreaseNumOfChanges();
+    }
+
     public void UpdateCellByCoordinate(String sheetName,Coordinate coordinate, String newValue) throws LoopConnectionException {
         sheets.get(sheetName).UpdateCellByCoordinate(coordinate,newValue);
     }
