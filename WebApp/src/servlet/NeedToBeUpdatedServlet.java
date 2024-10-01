@@ -27,8 +27,6 @@ public class NeedToBeUpdatedServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
             boolean result = (numOfChanges < sheetManager.GetNumOfChanges(sheetName));
-            System.out.println("i am also here");
-            System.out.println(GSON.toJson(result));
             resp.getWriter().write(GSON.toJson(result));
         }
     }

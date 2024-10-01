@@ -19,16 +19,21 @@ import shticell.util.Sort;
 import java.io.InputStream;
 import java.util.*;
 
+
 public class SheetManager {
     private final Map<String, Sheet> sheets = new LinkedHashMap<>();
     private final Map<String, SheetPermissionData> sheetPermissionDataMap = new HashMap<>();
 
+    public final Object SHEET_LOCK = new Object();
+
     public void SetSheet(String userName, SheetDto sheetDto) {
         Sheet sheet = new SheetImpl(sheetDto.Name(),sheetDto.numberOfRows(),sheetDto.numberOfColumns(),sheetDto.rowsHeight(),sheetDto.colsWidth());
-        if(sheets.containsKey(sheetDto.Name())) {
-            throw new RuntimeException("Sheet already exists");
+        synchronized (SHEET_LOCK) {
+            if (sheets.containsKey(sheetDto.Name())) {
+                throw new RuntimeException("Sheet already exists");
+            }
+            sheets.put(sheetDto.Name(), sheet);
         }
-        sheets.put(sheetDto.Name(), sheet);
         sheetPermissionDataMap.put(sheetDto.Name(),new SheetPermissionDataImpl());
         sheetPermissionDataMap.get(sheetDto.Name()).AddPermission(userName,PermissionType.OWNER);
     }
@@ -36,10 +41,12 @@ public class SheetManager {
     public void UploadSheetXml(String userName, InputStream in) throws Exception {
         Sheet sheet =  SchemBaseJaxb.CreateSheetFromXML(in);
         String sheetName = sheet.GetSheetName();
-        if(sheets.containsKey(sheetName)) {
-            throw new RuntimeException("Sheet already exists");
+        synchronized (SHEET_LOCK) {
+            if (sheets.containsKey(sheetName)) {
+                throw new RuntimeException("Sheet already exists");
+            }
+            sheets.put(sheet.GetSheetName(), sheet);
         }
-        sheets.put(sheet.GetSheetName(),sheet);
         sheetPermissionDataMap.put(sheetName,new SheetPermissionDataImpl());
         sheetPermissionDataMap.get(sheetName).AddPermission(userName,PermissionType.OWNER);
     }
@@ -48,12 +55,8 @@ public class SheetManager {
        return sheets.get(sheetName).GetNumOfChanges();
     }
 
-    public void IncreaseNumOfChanges(String sheetName){
-        sheets.get(sheetName).IncreaseNumOfChanges();
-    }
-
-    public void UpdateCellByCoordinate(String sheetName,Coordinate coordinate, String newValue) throws LoopConnectionException {
-        sheets.get(sheetName).UpdateCellByCoordinate(coordinate,newValue);
+    public void UpdateCellByCoordinate(String sheetName,Coordinate coordinate, String newValue,String userName) throws LoopConnectionException {
+        sheets.get(sheetName).UpdateCellByCoordinate(coordinate,newValue,userName);
     }
 
     public SheetDto getSheet(String sheetName){
@@ -98,12 +101,18 @@ public class SheetManager {
 
     public SheetDto applyDynamicCalculate(String sheetName,Coordinate coordinate , String numStr){
         Sheet sheet = sheets.get(sheetName);
-        String currentOriginalValue = sheet.GetOriginalValue(coordinate);
-        sheet.applyDynamicCalculate(coordinate,numStr);
-        SheetDto newSheetDto = new SheetDto(sheet);
-        sheet.applyDynamicCalculate(coordinate,currentOriginalValue);
+        sheet.GetSheetReadWriteLock().writeLock().lock();
+        try {
+            String currentOriginalValue = sheet.GetOriginalValue(coordinate);
+            sheet.applyDynamicCalculate(coordinate, numStr);
+            SheetDto newSheetDto = new SheetDto(sheet);
+            sheet.applyDynamicCalculate(coordinate, currentOriginalValue);
 
-        return newSheetDto;
+
+            return newSheetDto;
+        }finally {
+            sheet.GetSheetReadWriteLock().writeLock().unlock();
+        }
     }
 
     public List<SheetDataDto> GetSheetsDashBoard(String user){
@@ -123,8 +132,8 @@ public class SheetManager {
         return sheetPermissionDataMap.get(sheetName).GetPermissionRequests();
     }
 
-    public void AddRequestPermission(int reqId,String sheetName, String userName, PermissionType permissionType){
-        sheetPermissionDataMap.get(sheetName).AddPermissionRequest(new SheetPermissionDataImpl.PermissionRequestDto(reqId,userName, permissionType, PermissionStatus.PENDING));
+    public void AddRequestPermission(String sheetName, String userName, PermissionType permissionType){
+        sheetPermissionDataMap.get(sheetName).AddPermissionRequest(userName, permissionType, PermissionStatus.PENDING);
     }
 
     public void UpdateRequestStatus(String sheetName,int reqId, Boolean accept){

@@ -25,9 +25,7 @@ public class UpdateRequestStatusServlet extends HttpServlet {
         String sheetName = req.getParameter(SHEET_NAME);
         BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
         UpdateRequestDto updateRequestDto = GSON.fromJson(reader, UpdateRequestDto.class);;
-        if(sheetManager.isReqPending(sheetName, updateRequestDto.reqId()) &&
-                sheetManager.isPermit(sheetName,userName, PermissionType.OWNER)){
-
+        if(sheetManager.isPermit(sheetName,userName, PermissionType.OWNER)){
             sheetManager.UpdateRequestStatus(sheetName, updateRequestDto.reqId(), updateRequestDto.approved());
         }else{
             resp.sendError(HttpServletResponse.SC_FORBIDDEN);

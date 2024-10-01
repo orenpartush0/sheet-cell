@@ -14,9 +14,9 @@ public class RangeWithCounterImpl implements RangeWithCounter {
 
     public void SetRange(Range _range) { this.range = _range; }
 
-    public int GetCounter() { return counter; }
+    public synchronized int GetCounter() { return counter; }
 
-    public void AddUsing() { counter++; }
+    public synchronized void AddUsing() { counter++; }
 
-    public void RemoveUsing() {counter--; }
+    public synchronized void RemoveUsing() {counter--; }
 }

@@ -2,12 +2,12 @@ package servlet;
 
 
 import servlet.utils.SessionUtils;
-import dto.AddRequestDto;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import servlet.utils.ServletUtils;
+import shticell.manager.enums.PermissionType;
 import shticell.manager.sheet.SheetManager;
 
 import java.io.BufferedReader;
@@ -26,9 +26,9 @@ public class AddRequestServlet extends HttpServlet {
         String sheetName = req.getParameter(SHEET_NAME);
         if(!sheetManager.getSheetOwner(sheetName).equals(userName)){
             BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
-            AddRequestDto addRequestDto = GSON.fromJson(reader, AddRequestDto.class);
-            System.out.println("Req ID: " + addRequestDto.reqId() + " " + userName + " request " + addRequestDto.permissionType() + " permission for sheet: " + sheetName);
-            sheetManager.AddRequestPermission(addRequestDto.reqId(),sheetName, userName,addRequestDto.permissionType());
+            PermissionType permissionType = GSON.fromJson(reader, PermissionType.class);
+            System.out.println(userName + " request " + permissionType.toString() + " permission for sheet: " + sheetName);
+            sheetManager.AddRequestPermission(sheetName, userName,permissionType);
         }else{
             resp.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }

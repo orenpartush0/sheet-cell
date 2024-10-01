@@ -4,7 +4,6 @@ import apiConnector.Connector;
 import constant.Constants;
 import dashboard.dialog.sheet.SheetDialogController;
 import dashboard.pull.ListRefresher;
-import dto.AddRequestDto;
 import dto.UpdateRequestDto;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -35,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Timer;
 
+import static constant.Constants.SHEET_DASHBOARD;
 import static constant.UIConstants.PUT;
 
 
@@ -179,7 +179,7 @@ public class DashBoardController implements Closeable {
             if (sheetData != null) {
                 System.out.println(sheetData.sheetName);
                 HttpClientUtil.runAsync( Constants.ADD_REQUEST + "?" + Constants.SHEET_NAME + "=" + sheetData.sheetName,
-                        PUT, new AddRequestDto(requestTable.getItems().size(),permissionType), new Callback() {
+                        PUT, permissionType, new Callback() {
                             @Override
                             public void onFailure(@NotNull Call call, @NotNull IOException e) {
                             }
@@ -194,7 +194,7 @@ public class DashBoardController implements Closeable {
     }
 
     private void ackDenyPermission(boolean isAck) {
-        int reqId = requestTable.getSelectionModel().getSelectedIndex();
+        int reqId = requestTable.getSelectionModel().getSelectedIndex() + 1;
         SheetData sheetData = sheetsTable.getSelectionModel().getSelectedItem();
 
         if (reqId >= 0 && sheetData != null) {
@@ -216,7 +216,7 @@ public class DashBoardController implements Closeable {
 
     private void setSheetListRefresher(){
         ListRefresher sheetlistRefresher = new ListRefresher<>(
-                Constants.SHEET_DASHBOARD,
+                SHEET_DASHBOARD,
                 this::updateSheetDataTable,
                 SheetData[].class
         );
@@ -358,7 +358,7 @@ public class DashBoardController implements Closeable {
             Parent root = loader.load();
             AppController sheetController = loader.getController();
             Stage sheetStage = new Stage();
-            sheetStage.setWidth(1200);
+            sheetStage.setWidth(1400);
             sheetStage.setHeight(600);
             sheetStage.setTitle("Sheet");
             sheetStage.initModality(Modality.WINDOW_MODAL);

@@ -14,7 +14,10 @@ public interface Cell extends Serializable ,Cloneable {
     EffectiveValue GetEffectiveValue();
     Coordinate GetCellCoordinate();
     int GetVersion();
-    void UpdateCell(String newOriginalValue, int sheetVersion) throws LoopConnectionException;
+
+    String GetUserName();
+
+    void UpdateCell(String newOriginalValue, int sheetVersion, String user) throws LoopConnectionException;
     CellConnection GetConnections();
     boolean IsChangedInThisVersion(int version);
     Cell GetCellBySheetVersion(int version);

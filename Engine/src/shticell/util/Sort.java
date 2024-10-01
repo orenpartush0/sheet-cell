@@ -28,7 +28,7 @@ public interface Sort {
             for (int col = 1; col <= sheet.GetNumberOfColumns(); col++) {
                 Coordinate oldCoordinate = CoordinateFactory.getCoordinate(oldRowIndex, col);
                 Coordinate newCoordinate = CoordinateFactory.getCoordinate(newRowIndex+1, col);
-                try{sheetInRange.UpdateCellByCoordinate(newCoordinate, sheet.GetCell(oldCoordinate).GetEffectiveValue().getValue().toString());}
+                try{sheetInRange.UpdateCellByCoordinate(newCoordinate, sheet.GetCell(oldCoordinate).GetEffectiveValue().getValue().toString(),sheet.GetCell(oldCoordinate).GetUserName());}
                 catch (Exception ignored){};
 
             }

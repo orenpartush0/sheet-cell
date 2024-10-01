@@ -16,10 +16,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import static constant.Constants.GSON;
-import static constant.Constants.VERSION;
+import static constant.Constants.*;
 
-@WebServlet(urlPatterns = Constants.CELL)
+@WebServlet(urlPatterns = CELL)
 public class CellServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -31,7 +30,7 @@ public class CellServlet extends HttpServlet {
             BufferedReader reader = new BufferedReader(new InputStreamReader(req.getInputStream()));
             UpdateCellDto updateCellDto = GSON.fromJson(reader, UpdateCellDto.class);
             try {
-                sheetManager.UpdateCellByCoordinate(sheetName, updateCellDto.coordinate(), updateCellDto.newValue());
+                sheetManager.UpdateCellByCoordinate(sheetName, updateCellDto.coordinate(), updateCellDto.newValue(),user);
                 int numOfChanges = sheetManager.GetNumOfChanges(sheetName);
                 req.getSession(true).setAttribute(VERSION, numOfChanges);
             } catch (LoopConnectionException e) {

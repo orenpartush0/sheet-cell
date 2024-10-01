@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface HasSheetData extends Serializable {
     EffectiveValue GetCellEffectiveValue(Coordinate coordinate);
-    void UpdateDependentCells(List<Coordinate> cellsList);
+    void UpdateDependentCells(List<Coordinate> cellsList,String user);
     CellConnection GetCellConnections(Coordinate coordinate);
     boolean IsCoordinateInSheet(Coordinate coordinate);
     boolean IsRangeInSheet(String rangeName);

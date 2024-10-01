@@ -33,6 +33,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static constant.UIConstants.FALSE;
 import static constant.UIConstants.NEED_TO_UPDATE_MESSAGE;
 
 public class TopController {
@@ -41,6 +42,8 @@ public class TopController {
     private int counter = 0;
 
 
+    @FXML
+    private TextField userTextField;
     @FXML
     private Button updateButton;
     @FXML
@@ -74,15 +77,18 @@ public class TopController {
     @FXML
     public TextField stepTextField;
     @FXML
-    public Button incrementButton;
+    public Button dynamicButton;
+    @FXML
+    public Slider dynamicSlider;
 
-
+    private final SimpleStringProperty userProperty = new SimpleStringProperty("");
     private final SimpleStringProperty originalValue = new SimpleStringProperty("");
     private final SimpleIntegerProperty lastUpdate = new SimpleIntegerProperty(0);
     private final SimpleStringProperty cellId = new SimpleStringProperty("");
 
     @FXML
     public void initialize() {
+        userTextField.textProperty().bind(userProperty);
         originalValueTextField.textProperty().bind(originalValue);
         lastUpdateTextField.textProperty().bind(Bindings.format("%d", lastUpdate));
         cellIdTextField.textProperty().bind(cellId);
@@ -98,6 +104,13 @@ public class TopController {
                 }
             }
         });
+        dynamicSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            int step = Integer.parseInt(stepTextField.getText());
+            double adjustedValue = Math.round(newValue.doubleValue() / step) * step;
+            dynamicSlider.setValue(adjustedValue);
+        });
+
+
 
         rangesComboBox.setOnAction(event -> {
             String selectedRange = rangesComboBox.getSelectionModel().getSelectedItem();
@@ -146,6 +159,35 @@ public class TopController {
         makeNumericOnly(toTextField);
         makeNumericOnly(fromTextField);
         makeNumericOnly(stepTextField);
+
+        dynamicSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            try {
+                appController.applyDynamicCalculate(CoordinateFactory.getCoordinate(cellId.getValue()), String.valueOf(newValue));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
+        });
+
+        fromTextField.setOnMouseClicked(e->{
+            dynamicButton.managedProperty().set(true);
+            dynamicSlider.managedProperty().set(false);
+            dynamicButton.visibleProperty().set(true);
+            dynamicSlider.visibleProperty().set(false);
+        });
+        toTextField.setOnMouseClicked(e->{
+            dynamicButton.managedProperty().set(true);
+            dynamicSlider.managedProperty().set(false);
+            dynamicButton.visibleProperty().set(true);
+            dynamicSlider.visibleProperty().set(false);
+        });
+        stepTextField.setOnMouseClicked(e->{
+            dynamicButton.managedProperty().set(true);
+            dynamicSlider.managedProperty().set(false);
+            dynamicButton.visibleProperty().set(true);
+            dynamicSlider.visibleProperty().set(false);
+        });
+
     }
 
     public void setUpdateVisible(boolean bool){
@@ -195,13 +237,17 @@ public class TopController {
     }
 
     public void setOnMouseCoordinate(CellDto cell, String style, Pos pos) {
+        dynamicButton.visibleProperty().set(true);
+        dynamicSlider.visibleProperty().set(false);
+        dynamicSlider.managedProperty().set(false);
+        dynamicButton.managedProperty().set(true);
         cellId.set(cell.coordinate().toString());
         originalValue.set(cell.originalValue());
+        userProperty.set(cell.userName());
         lastUpdate.set(cell.LatestSheetVersionUpdated());
         textColorPicker.disableProperty().set(false);
         defaultStyleButton.disableProperty().set(false);
         functionButton.disableProperty().set(false);
-        incrementButton.disableProperty().set(false);
         toTextField.disableProperty().set(false);
         fromTextField.disableProperty().set(false);
         stepTextField.disableProperty().set(false);
@@ -212,7 +258,6 @@ public class TopController {
         textColorPicker.setValue(textColor);
         backgroundColorPicker.setValue(backgroundColor);
         alignmentComboBox.setValue(convertFromPos(pos));
-        counter = 0;
     }
 
     private String convertFromPos(Pos pos) {
@@ -345,23 +390,30 @@ public class TopController {
     }
 
 
-    public void clickOnIncrementButton() throws IOException {
-        if(!fromTextField.getText().isEmpty() && !toTextField.getText().isEmpty() && !stepTextField.getText().isEmpty()) {
+    @FXML
+    public void showSlider() throws IOException {
+        if (!fromTextField.getText().isEmpty() && !toTextField.getText().isEmpty() && !stepTextField.getText().isEmpty()) {
             int from = Integer.parseInt(fromTextField.getText());
             int to = Integer.parseInt(toTextField.getText());
             int step = Integer.parseInt(stepTextField.getText());
 
-            if(from > to || to - from < step){
-                AppController.showError("Invalid increment");
-            }
-            else{
-                counter = (from + step * counter) > to ?  0 : counter;
-                String toCalc = String.valueOf(from + step * counter );
-                appController.applyDynamicCalculate(CoordinateFactory.getCoordinate(cellId.getValue()), toCalc);
-                counter++;
+            if (from > to || to - from < step) {
+                AppController.showError("Invalid arguments");
+            } else {
+                dynamicSlider.setMin(from);  // Set min first
+                dynamicSlider.setMax(to);    // Set max after min
+                dynamicSlider.setValue(from);  // Set value last, after min and max are set
+
+                dynamicSlider.setBlockIncrement(step); // Set block increment to the step size
+                dynamicSlider.setMajorTickUnit(step);
+                dynamicButton.managedProperty().set(false);
+                dynamicSlider.visibleProperty().set(true);
+                dynamicSlider.managedProperty().set(true);
+                dynamicButton.visibleProperty().set(false);
             }
         }
     }
+
 
     @FXML
     public void OnBackHandler() {

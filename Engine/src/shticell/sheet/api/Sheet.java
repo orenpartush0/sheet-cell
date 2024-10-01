@@ -9,13 +9,14 @@ import shticell.sheet.range.Range;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReadWriteLock;
 
 public interface Sheet extends Cloneable, Serializable,SheetToFilter {
     String GetSheetName();
 
-    int GetNumOfChanges();
+    ReadWriteLock GetSheetReadWriteLock();
 
-    void IncreaseNumOfChanges();
+    int GetNumOfChanges();
 
     int GetVersion();
 
@@ -27,9 +28,7 @@ public interface Sheet extends Cloneable, Serializable,SheetToFilter {
 
     Cell GetCell(Coordinate coordinate);
 
-    void UpdateCellByCoordinate(Coordinate coordinate, String newValue) throws LoopConnectionException;
-
-    List<Integer> GetCountOfChangesPerVersion();
+    void UpdateCellByCoordinate(Coordinate coordinate, String newValue,String userName) throws LoopConnectionException;
 
     SheetImpl GetSheetByVersion(int version);
 

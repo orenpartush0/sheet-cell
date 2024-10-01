@@ -3,7 +3,6 @@ package shticell.manager.sheet.sheetWithPermission;
 
 import shticell.manager.enums.PermissionStatus;
 import shticell.manager.enums.PermissionType;
-
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -11,14 +10,19 @@ public class SheetPermissionDataImpl implements SheetPermissionData {
     private final Map<String, PermissionType> permissions = new HashMap<String, PermissionType>();
     private final Map<Integer, PermissionRequestDto> permissionRequests = new TreeMap<>();
 
+    private final Object lock = new Object();
+
     @Override
     public void AddPermission(String user, PermissionType permission) {
         permissions.put(user, permission);
     }
 
     @Override
-    public void AddPermissionRequest(PermissionRequestDto permissionRequestDto) {
-        permissionRequests.put(permissionRequests.keySet().size() , permissionRequestDto);
+    public void AddPermissionRequest( String userName, PermissionType permissionType, PermissionStatus permissionStatus) {
+        synchronized (lock) {
+            int reqId = permissionRequests.keySet().size() + 1;
+            permissionRequests.put(reqId , new PermissionRequestDto(reqId, userName, permissionType, permissionStatus));
+        }
     }
 
     @Override
@@ -27,17 +31,22 @@ public class SheetPermissionDataImpl implements SheetPermissionData {
     }
 
     @Override
-    public void UpdateRequestStatus(int reqId, Boolean accept){
+    public synchronized void UpdateRequestStatus(int reqId, Boolean accept) {
+        if(isPending(reqId)) {
+            permissionRequests.computeIfPresent(reqId,
+                    (k, val) -> new PermissionRequestDto(reqId, val.user, val.permissionType,
+                            accept ? PermissionStatus.APPROVED : PermissionStatus.REJECTED));
 
-        permissionRequests.computeIfPresent(reqId,
-                (k, val) -> new PermissionRequestDto(val.reqId, val.user, val.permissionType,
-                        accept ? PermissionStatus.APPROVED : PermissionStatus.REJECTED));
 
-
-        if(permissionRequests.containsKey(reqId) && accept){
-            String userAskPermission = permissionRequests.get(reqId).user;
-            AddPermission(userAskPermission,permissionRequests.get(reqId).permissionType);
+            if (permissionRequests.containsKey(reqId) && accept) {
+                String userAskPermission = permissionRequests.get(reqId).user;
+                AddPermission(userAskPermission, permissionRequests.get(reqId).permissionType);
+            }
         }
+        else {
+            throw new RuntimeException();
+        }
+
     }
 
     @Override
@@ -70,7 +79,7 @@ public class SheetPermissionDataImpl implements SheetPermissionData {
     public record PermissionRequestDto(int reqId,String user, PermissionType permissionType, PermissionStatus permissionStatus){};
 
     @Override
-    public boolean isPending(int reqId){
+    public synchronized boolean isPending(int reqId){
         return permissionRequests.get(reqId).permissionStatus.equals(PermissionStatus.PENDING);
     }
 }

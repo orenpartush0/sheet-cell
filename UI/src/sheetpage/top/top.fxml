@@ -8,50 +8,55 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox stylesheets="@Top.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sheetpage.top.TopController">
+<VBox prefHeight="182.0" prefWidth="1379.0" stylesheets="@Top.css" xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sheetpage.top.TopController">
 
-    <HBox id="box" prefHeight="62.0" prefWidth="1171.0" spacing="10">
+    <HBox id="box" prefHeight="62.0" prefWidth="1394.0" spacing="10">
        <Button onAction="#OnBackHandler" prefHeight="30.0" prefWidth="110.0" text="DashBoard" />
       <Region prefHeight="32.0" prefWidth="907.0" />
        <Button fx:id="updateButton" alignment="TOP_RIGHT" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#UpdateSheetHandler" prefHeight="30.0" prefWidth="114.0" text="Update Sheet" visible="false" />
     </HBox>
 
-    <HBox spacing="10"> <!-- Corrected padding -->
-        <Label style="-fx-background-color: lightgray;" text="Selected Cell ID:">
+    <HBox minWidth="-Infinity" prefHeight="34.0" prefWidth="1390.0" spacing="10"> <!-- Corrected padding -->
+        <Label prefHeight="30.0" prefWidth="137.0" style="-fx-background-color: lightgray;" text="Selected Cell ID:">
          <HBox.margin>
             <Insets left="5.0" />
          </HBox.margin></Label>
 
-        <TextField fx:id="cellIdTextField" disable="true" prefWidth="35" />
+        <TextField fx:id="cellIdTextField" disable="true" minHeight="-Infinity" minWidth="-Infinity" prefHeight="34.0" prefWidth="55.0" />
 
-        <Label style="-fx-background-color: lightgray;" text="Last update cell version:" />
+        <Label prefHeight="30.0" prefWidth="190.0" style="-fx-background-color: lightgray;" text="Last update cell version:" />
 
-        <TextField fx:id="lastUpdateTextField" disable="true" prefHeight="0.0" prefWidth="35" />
+        <TextField fx:id="lastUpdateTextField" disable="true" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="34.0" prefWidth="72.0" />
 
-        <Label prefWidth="138.0" style="-fx-background-color: lightgray;" text="Original Cell Value:" />
+        <Label prefHeight="30.0" prefWidth="152.0" style="-fx-background-color: lightgray;" text="Original Cell Value:" />
 
-        <TextField fx:id="originalValueTextField" editable="false" />
+        <TextField fx:id="originalValueTextField" editable="false" prefHeight="33.0" prefWidth="90.0" />
 
-        <ComboBox fx:id="rangesComboBox" promptText="Range" />
+        <Label prefHeight="30.0" prefWidth="110.0" style="-fx-background-color: lightgray;" text="Updated by:" />
+
+        <TextField fx:id="userTextField" editable="false" prefHeight="33.0" prefWidth="90.0" />
+
+        <ComboBox fx:id="rangesComboBox" prefHeight="31.0" prefWidth="103.0" promptText="Range" />
 
         <Button fx:id="plus" onAction="#addRangeAction" style="-fx-background-color: lightblue;" text="+" />
 
         <Button fx:id="minus" style="-fx-background-color:  #FFA07A;" text="-" />
 
-        <Button onAction="#onFilter" style="-fx-background-color: lightgray;" text="Filter" />
+        <Button onAction="#onFilter" prefHeight="30.0" prefWidth="68.0" style="-fx-background-color: lightgray;" text="Filter" />
 
-        <Button onAction="#onSort" style="-fx-background-color: lightgray;" text="Sort" />
+        <Button onAction="#onSort" prefHeight="30.0" prefWidth="59.0" style="-fx-background-color: lightgray;" text="Sort" />
 
 
         <Region HBox.hgrow="ALWAYS" />
 
-        <ComboBox fx:id="SheetVersionComboBox" promptText="Sheet Version">
+        <ComboBox fx:id="SheetVersionComboBox" prefHeight="31.0" prefWidth="147.0" promptText="Sheet Version">
          <HBox.margin>
             <Insets right="5.0" />
          </HBox.margin></ComboBox>
@@ -103,7 +108,7 @@
                </VBox.margin></Button>
             </VBox>
 
-            <VBox alignment="CENTER">
+            <VBox alignment="CENTER" prefHeight="71.0" prefWidth="139.0">
                 <Button fx:id="functionButton" disable="true" onAction="#onFunction" text="Create Function">
                <VBox.margin>
                   <Insets bottom="5.0" left="17.0" />
@@ -111,36 +116,41 @@
             </VBox>
 
 
-            <VBox alignment="CENTER">
-                <HBox alignment="CENTER" prefHeight="18.0" prefWidth="442.0" AnchorPane.topAnchor="10.0">
-                    <Label text="From:">
+            <VBox alignment="CENTER" prefHeight="71.0" prefWidth="608.0">
+                <HBox alignment="CENTER" prefHeight="38.0" prefWidth="550.0" AnchorPane.topAnchor="10.0">
+                    <Label prefHeight="30.0" prefWidth="70.0" text="From:">
                   <HBox.margin>
                      <Insets bottom="5.0" />
-                  </HBox.margin></Label>
+                  </HBox.margin>
+               </Label>
                     <TextField fx:id="fromTextField" disable="true" prefHeight="33.0" prefWidth="50.0">
                   <HBox.margin>
                      <Insets bottom="5.0" />
-                  </HBox.margin></TextField>
-                    <Label text="To:">
+                  </HBox.margin>
+               </TextField>
+                    <Label prefHeight="30.0" prefWidth="58.0" text="To:">
                   <HBox.margin>
                      <Insets bottom="5.0" />
-                  </HBox.margin></Label>
+                  </HBox.margin>
+               </Label>
                     <TextField fx:id="toTextField" disable="true" prefHeight="33.0" prefWidth="50.0">
                   <HBox.margin>
                      <Insets bottom="5.0" />
-                  </HBox.margin></TextField>
-                    <Label text="Step:">
+                  </HBox.margin>
+               </TextField>
+                    <Label prefHeight="30.0" prefWidth="66.0" text="Step:">
                   <HBox.margin>
                      <Insets bottom="5.0" />
-                  </HBox.margin></Label>
+                  </HBox.margin>
+               </Label>
                     <TextField fx:id="stepTextField" disable="true" prefHeight="33.0" prefWidth="50.0">
                   <HBox.margin>
                      <Insets bottom="5.0" right="10.0" />
-                  </HBox.margin></TextField>
-                    <Button fx:id="incrementButton" disable="true" onAction="#clickOnIncrementButton" prefHeight="16.0" prefWidth="94.0" text="Increment">
-                  <HBox.margin>
-                     <Insets bottom="5.0" />
-                  </HBox.margin></Button>
+                  </HBox.margin>
+               </TextField>
+               <Region prefHeight="38.0" prefWidth="24.0" />
+               <Slider fx:id="dynamicSlider" blockIncrement="0.0" managed="false" prefHeight="14.0" prefWidth="134.0" visible="false" />
+               <Button fx:id="dynamicButton" mnemonicParsing="false" onAction="#showSlider" prefHeight="30.0" prefWidth="157.0" text="Dyanamic calculate" />
                <VBox.margin>
                   <Insets left="40.0" />
                </VBox.margin>

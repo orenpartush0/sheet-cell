@@ -16,7 +16,8 @@ import shticell.sheet.range.RangeWithCounterImpl;
 
 import java.io.Serializable;
 import java.util.*;
-import java.util.stream.IntStream;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable ,Cloneable {
     private final int INITIAL_VERSION = 1;
@@ -29,6 +30,11 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     private final int numberOfColumns;
     private final int rowHeight;
     private final int columnWidth;
+
+    public final  ReadWriteLock sheetReadWriteLock = new ReentrantReadWriteLock();
+    public final  Object RANGE_LOCK = new Object();
+    public final  Object NUM_OF_CHANGE_LOCK = new Object();
+
 
     public SheetImpl(String _sheetName, int _numberOfRows, int _numberOfColumns, int _rowHeight, int _columnWidth) {
         sheetName = _sheetName;
@@ -52,17 +58,38 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     }
 
     @Override
+    public ReadWriteLock GetSheetReadWriteLock(){
+        return sheetReadWriteLock;
+    }
+
+    @Override
     public int GetNumOfChanges(){
         return numOfChanges;
     }
 
-    @Override
-    public void IncreaseNumOfChanges(){
-        numOfChanges++;
+    private void DecreaseNumOfChanges(){
+        synchronized (NUM_OF_CHANGE_LOCK) {
+            numOfChanges--;
+        }
+    }
+
+
+    private void IncreaseNumOfChanges(){
+        synchronized (NUM_OF_CHANGE_LOCK) {
+            numOfChanges++;
+        }
     }
 
     @Override
-    public int GetVersion() {return version;}
+    public int GetVersion() {
+        sheetReadWriteLock.readLock().lock();
+        try {
+            return version;
+        }
+        finally {
+            sheetReadWriteLock.readLock().unlock();
+        }
+    }
 
     @Override
     public String GetSheetName() {return sheetName;}
@@ -74,10 +101,26 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
     public int GetNumberOfColumns() {return numberOfColumns;}
 
     @Override
-    public Map<Coordinate, Cell> GetCells() { return cells; }
+    public Map<Coordinate, Cell> GetCells() {
+        sheetReadWriteLock.readLock().lock();
+        try {
+            return cells;
+        }
+        finally {
+            sheetReadWriteLock.readLock().unlock();
+        }
+    }
 
     @Override
-    public Cell GetCell(Coordinate coordinate) { return cells.get(coordinate);}
+    public Cell GetCell(Coordinate coordinate) {
+        sheetReadWriteLock.readLock().lock();
+        try {
+            return cells.get(coordinate);
+        }
+        finally {
+            sheetReadWriteLock.readLock().unlock();
+        }
+    }
 
     @Override
     public int GetColsWidth() {return columnWidth;}
@@ -87,46 +130,45 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
 
     @Override
     public EffectiveValue GetCellEffectiveValue(Coordinate coordinate) {
-        return cells.get(coordinate).GetEffectiveValue();
+        sheetReadWriteLock.readLock().lock();
+        try {
+            return cells.get(coordinate).GetEffectiveValue();
+        }
+        finally {
+            sheetReadWriteLock.readLock().unlock();
+        }
     }
 
     @Override
     public void UpdateCellByCoordinateWithOutVersionUpdate(Coordinate coordinate, String newValue) throws LoopConnectionException {
-        try{cells.get(coordinate).UpdateCell(newValue,version);}
-        catch (LoopConnectionException | RuntimeException e){throw e;}
+        cells.get(coordinate).UpdateCell(newValue,version,cells.get(coordinate).GetUserName());
     }
 
-    public void UpdateCellByCoordinate(Coordinate coordinate, String newValue) throws LoopConnectionException {
+    @Override
+    public void UpdateCellByCoordinate(Coordinate coordinate, String newValue,String userName) throws LoopConnectionException {
+        sheetReadWriteLock.writeLock().lock();
         try{
-            cells.get(coordinate).UpdateCell(newValue,++version);
-            numOfChanges++;
+            cells.get(coordinate).UpdateCell(newValue, ++version,userName);
+            IncreaseNumOfChanges();
         }
-        catch (LoopConnectionException | RuntimeException e){version--; throw e;}
+        catch (LoopConnectionException | RuntimeException e){
+            version--;
+            DecreaseNumOfChanges();
+            throw e;
+        }
+        finally {
+            sheetReadWriteLock.writeLock().unlock();
+        }
     }
 
-    @Override
-    public List<Integer> GetCountOfChangesPerVersion(){
-        List<Integer> changes = new ArrayList<>(Collections.nCopies(version,0));
-        final int from = 2;
-        final int to = version + 1;
 
-        for (Map.Entry<Coordinate, Cell> entry : cells.entrySet()) {
-            IntStream.range(from,to).forEach(i -> {
-                if (entry.getValue().IsChangedInThisVersion(i)) {
-                    changes.set(i - 1, changes.get(i - 1) + 1);
-                }
-            });
-        }
 
-        return changes;
-    }
-
-    @Override
-    public void UpdateDependentCells(List<Coordinate> coordinates) {
+    @Override//dont need to synchronize
+    public void UpdateDependentCells(List<Coordinate> coordinates,String user) {
         coordinates.forEach(cellCoordinate -> {
             try {
                 Cell cellImplNeedToBeUpdated = cells.get(cellCoordinate);
-                cellImplNeedToBeUpdated.UpdateCell(cellImplNeedToBeUpdated.GetOriginalValue(), version);
+                cellImplNeedToBeUpdated.UpdateCell(cellImplNeedToBeUpdated.GetOriginalValue(), version,user);
             }
             catch (Exception e) {
                 throw new RuntimeException(e);
@@ -136,7 +178,12 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
 
     @Override
     public CellConnection GetCellConnections(Coordinate coordinate) {
-        return cells.get(coordinate).GetConnections();
+        sheetReadWriteLock.readLock().lock();
+        try {
+            return cells.get(coordinate).GetConnections();
+        }finally {
+            sheetReadWriteLock.readLock().unlock();
+        }
     }
 
     @Override
@@ -164,16 +211,15 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
 
     @Override
     public void AddRange(Range rangeDto){
-        if(ranges.containsKey(rangeDto.rangeName()) || ranges.values().stream().map(RangeWithCounter::GetRange).anyMatch(range->range.equals(rangeDto))){
-            throw new RuntimeException("Range already exists");
+        synchronized (RANGE_LOCK) {
+            if (ranges.containsKey(rangeDto.rangeName()) || ranges.values().stream().map(RangeWithCounter::GetRange).anyMatch(range -> range.equals(rangeDto))) {
+                throw new RuntimeException("Range already exists");
+            } else if (!cells.containsKey(rangeDto.endCellCoordinate()) || !cells.containsKey(rangeDto.startCellCoordinate())) {
+                throw new RuntimeException("Range out of bounds");
+            }
+            ranges.put(rangeDto.rangeName(), new RangeWithCounterImpl(new Range(rangeDto.rangeName(), rangeDto.startCellCoordinate(), rangeDto.endCellCoordinate()), 0));
         }
-        else if(!cells.containsKey(rangeDto.endCellCoordinate()) || !cells.containsKey(rangeDto.startCellCoordinate())){
-            throw new RuntimeException("Range out of bounds");
-        }
-
-
-        numOfChanges++;
-        ranges.put(rangeDto.rangeName(),new RangeWithCounterImpl(new Range(rangeDto.rangeName(),rangeDto.startCellCoordinate(),rangeDto.endCellCoordinate()),0));
+        IncreaseNumOfChanges();
     }
 
     @Override
@@ -181,7 +227,7 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
         return ranges.get(rangeName).GetRange();
     }
 
-    @Override
+    @Override//dont need to synchronize
     public void UseRange(Coordinate coordinate,Range range) {
         cells.get(coordinate).UseRange(range);
         ranges.get(range.rangeName()).AddUsing();
@@ -207,27 +253,38 @@ public class SheetImpl implements HasSheetData, Sheet, SheetToXML, Serializable 
 
     @Override
     public void RemoveRange(String rangeName) {
-        if(ranges.get(rangeName).GetCounter() != 0){
-            throw new RuntimeException("Range in use");
+        synchronized (RANGE_LOCK) {
+            if(ranges.containsKey(rangeName)){
+                if (ranges.get(rangeName).GetCounter() != 0) {
+                    throw new RuntimeException("Range in use");
+                }
+                ranges.remove(rangeName);
+            }
         }
+        IncreaseNumOfChanges();
 
-        numOfChanges++;
-        ranges.remove(rangeName);
     }
 
     @Override
     public String GetOriginalValue(Coordinate coordinate){
-        return cells.get(coordinate).GetOriginalValue();
+        sheetReadWriteLock.readLock().lock();
+        try {
+            return cells.get(coordinate).GetOriginalValue();
+        }finally {
+            sheetReadWriteLock.readLock().unlock();
+        }
     }
 
     @Override
     public void applyDynamicCalculate(Coordinate coordinate, String numStr){
-        try{cells.get(coordinate).UpdateCell(numStr,version);} catch (Exception ignored){}
+        try{cells.get(coordinate).UpdateCell(numStr,version,cells.get(coordinate).GetUserName());} catch (Exception ignored){}
     }
 
     @Override
     public boolean IsRangeInUse(String rangeName){
-        return ranges.containsKey(rangeName);
+        synchronized (RANGE_LOCK) {
+            return ranges.containsKey(rangeName);
+        }
     }
 
 }

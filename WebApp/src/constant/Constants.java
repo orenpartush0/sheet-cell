@@ -9,6 +9,9 @@ import dto.CoordinateDeserializer;
 import shticell.sheet.coordinate.Coordinate;
 import shticell.sheet.range.Range;
 
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 public class Constants {
     public static final String USER_MANAGER = "userManager";
     public static final String SHEET_MANAGER = "sheetManager";
@@ -28,7 +31,6 @@ public class Constants {
             .registerTypeAdapter(SortDto.class, new SortDtoDeserializer())
             .registerTypeAdapter(UpdateCellDto.class, new UpdateCellDtoDeserializer())
             .registerTypeAdapter(UpdateRequestDto.class,new RequestDtoDeserializer())
-            .registerTypeAdapter(AddRequestDto.class,new AddRequestDtoDeserializer())
             .registerTypeAdapter(CellDto.class, new CellDtoDeserializer())
             .registerTypeAdapter(FilterDto.class, new FilterDtoDeserializer())
             .create();
@@ -51,4 +53,6 @@ public class Constants {
     public final static String NEED_TO_BE_UPDATED = "/needToBeUpdated";
     public final static String UPLOAD_SHEET_XML_FORMAT = "/uploadXmlSheet";
     public final static String DYNAMIC_CALCULATE = "/dynamicCalculate";
+
+
 }

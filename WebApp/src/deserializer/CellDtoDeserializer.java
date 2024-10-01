@@ -16,7 +16,8 @@ public class CellDtoDeserializer implements JsonDeserializer<CellDto> {
         String effectiveValue = jsonObject.get("effectiveValue").getAsString();
         ArrayList<Coordinate> dependsOn = context.deserialize(jsonObject.get("dependsOn"), ArrayList.class);
         ArrayList<Coordinate> influenceOn = context.deserialize(jsonObject.get("influenceOn"), ArrayList.class);
+        String userName = jsonObject.get("userName").getAsString();
 
-        return new CellDto(coordinate, latestSheetVersionUpdated, originalValue, effectiveValue, dependsOn, influenceOn);
+        return new CellDto(coordinate, latestSheetVersionUpdated, originalValue, effectiveValue, dependsOn, influenceOn,userName);
     }
 }

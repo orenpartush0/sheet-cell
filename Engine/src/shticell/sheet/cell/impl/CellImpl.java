@@ -34,6 +34,7 @@ public class CellImpl implements Cell, Serializable {
     private int LatestSheetVersionUpdated;
     private CellConnection connections = new CellConnectionImpl(coordinate);
     private Map<String, RangeWithCounter> usedRanges = new HashMap<>();
+    private String userName = "";
 
     public CellImpl(){};
 
@@ -109,7 +110,12 @@ public class CellImpl implements Cell, Serializable {
     }
 
     @Override
-    public void UpdateCell(String newOriginalValue, int sheetVersion) throws  LoopConnectionException{
+    public String GetUserName(){
+        return userName;
+    }
+
+    @Override
+    public void UpdateCell(String newOriginalValue, int sheetVersion,String user) throws  LoopConnectionException{
         List<CellConnection> removed = new ArrayList<>(connections.ClearDependsOn());
         EffectiveValue preUpdateEffectiveValue = effectiveValue.Clone();
         Map<String, RangeWithCounter> preUpdateUsedRanges = clearUsedRanges();
@@ -118,7 +124,7 @@ public class CellImpl implements Cell, Serializable {
         try
         {
             effectiveValue = parseEffectiveValue(newOriginalValue);
-            sheet.UpdateDependentCells(connections.GetSortedInfluenceOn().stream().map(CellConnection::GetCellCoordinate).toList());
+            sheet.UpdateDependentCells(connections.GetSortedInfluenceOn().stream().map(CellConnection::GetCellCoordinate).toList(),user);
         }
         catch (ArithmeticException e){
             effectiveValue = new EffectiveValueImpl(NAN, ValueType.NAN);
@@ -136,6 +142,7 @@ public class CellImpl implements Cell, Serializable {
             throw e;
         }
 
+        userName = user;
         LatestSheetVersionUpdated = sheetVersion;
         originalValue = newOriginalValue;
         cellByVersion.put(sheetVersion, this.clone());
