@@ -1,31 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="login.LoginController">
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
 
-    <center>
-        <VBox alignment="CENTER" spacing="15">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="login.LoginController">
+    <children>
+        <AnchorPane layoutX="224.0" layoutY="76.0" prefHeight="249.0" prefWidth="310.0" style="-fx-background-radius: 25; -fx-background-color: white;">
             <children>
-                <Label text="Login" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+                <JFXTextField fx:id="usernameField" layoutX="72.0" layoutY="53.0" prefHeight="25.0" prefWidth="174.0" promptText="Enter Login">
+                    <focusColor>
+                        <LinearGradient endX="1.0" endY="1.0">
+                            <stops>
+                                <Stop>
+                                    <color>
+                                        <Color red="0.9803921580314636" green="0.8039215803146362" blue="0.40784314274787903" />
+                                    </color>
+                                </Stop>
+                                <Stop offset="1.0">
+                                    <color>
+                                        <Color red="0.9882352948188782" green="0.4627451002597809" blue="0.7019608020782471" />
+                                    </color>
+                                </Stop>
+                            </stops>
+                        </LinearGradient>
+                    </focusColor>
+                </JFXTextField>
 
-                <GridPane hgap="10" vgap="10" alignment="CENTER">
-                    <padding>
-                        <Insets top="20" right="20" bottom="20" left="20"/>
-                    </padding>
-
-                    <Label text="Username:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
-                    <TextField fx:id="usernameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-
-                </GridPane>
-
-                <Button text="Submit" fx:id="submitButton"/>
-
-                <!-- Error message label for displaying errors in red -->
-                <Label fx:id="errorMessage" style="-fx-text-fill: red;" visible="false"/>
-
+                <JFXButton onAction="#handleLogin" buttonType="RAISED" layoutX="112.0" layoutY="176.0" prefHeight="41.0" prefWidth="87.0" styleClass="colorBackground" stylesheets="@color.css" text="Login" />
             </children>
-        </VBox>
-    </center>
-</BorderPane>
+        </AnchorPane>
+        <AnchorPane fx:id="sideBar" layoutX="31.0" layoutY="53.0" prefHeight="295.0" prefWidth="220.0" style="-fx-background-radius: 25;" styleClass="colorBackground" stylesheets="@color.css">
+            <children>
+                <JFXButton layoutX="182.0" layoutY="14.0"  text="X" />
+            </children>
+        </AnchorPane>
+    </children>
+</AnchorPane>

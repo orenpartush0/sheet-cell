@@ -1,5 +1,6 @@
 package login;
 
+import com.jfoenix.controls.JFXTextField;
 import dashboard.DashBoardController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -11,6 +12,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import okhttp3.*;
+import sheetpage.app.AppController;
 import util.HttpClientUtil;
 
 import java.io.IOException;
@@ -19,40 +21,26 @@ import java.io.IOException;
 public class LoginController {
 
     @FXML
-    private TextField usernameField;
-
-    @FXML
-    private Button submitButton;
+    private JFXTextField usernameField;
 
     @FXML
     private Label errorMessage;
 
     private Stage stage;
 
-    @FXML
-    public void initialize() {
-        submitButton.setOnAction(e -> {
-            try { handleLogin(); } catch (IOException ex) {
-                displayError("Unexpected error occurred. Please try again.");
-            }
-        });
-    }
-
     public void setStage(Stage _stage) {
         stage = _stage;
     }
 
-    private void handleLogin() throws IOException {
-        submitButton.setDisable(true);
+    @FXML
+    public void handleLogin() throws IOException {
         String userName = usernameField.getText();
         if (userName.isEmpty()) {
-            displayError("Username cannot be empty");
+            AppController.showError("Username cannot be empty");
         } else {
             Response response =HttpClientUtil.runSync("/user?userName=" + userName, "PUT",null);
             if (!response.isSuccessful()) {
-                submitButton.setDisable(false);
-                clearError();
-                displayError("Login failed. User already exist.");
+                AppController.showError("Login failed. User already exist.");
             }else {
                 stage.close();
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/dashboard/DashBoard.fxml"));
@@ -69,13 +57,4 @@ public class LoginController {
         }
     }
 
-    private void displayError(String message) {
-        errorMessage.setText(message);
-        errorMessage.setVisible(true);
-    }
-
-    private void clearError() {
-        errorMessage.setText("");
-        errorMessage.setVisible(false);
-    }
 }

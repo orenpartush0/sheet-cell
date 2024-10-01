@@ -12,5 +12,6 @@
     <orderEntry type="library" exported="" name="okio-2.8.0" level="project" />
     <orderEntry type="module" module-name="WebApp" exported="" />
     <orderEntry type="module" module-name="Engine" exported="" />
+    <orderEntry type="library" exported="" name="jfoenix-21.0.0" level="project" />
   </component>
 </module>

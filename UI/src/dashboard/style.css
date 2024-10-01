@@ -1,0 +1,57 @@
+.colorBackground {
+    -fx-background-color: linear-gradient(to right, #F5E1A3, #F7A7B2); /* Example gradient */
+    -fx-text-fill: white; /* Adjust text color if necessary */
+    -fx-font-weight: bold; /* Make button text bold */
+    -fx-background-radius: 25; /* Rounded corners */
+}
+
+
+/* TableView Styles */
+.table-view {
+    -fx-background-color: white;
+    -fx-background-radius: 25;
+    -fx-border-color: #CCCCCC;
+    -fx-border-radius: 25;
+    -fx-pref-height: 200; /* Adjust this value as necessary */
+    -fx-pref-width: 400; /* Match this with your FXML layout */
+}
+
+/* TableColumn Header Styles */
+.table-view .column-header {
+    -fx-background-color: #F0F0F0; /* Header background color */
+    -fx-font-weight: bold; /* Bold font for headers */
+    -fx-text-fill: #333333; /* Text color for headers */
+}
+
+/* TableCell Styles */
+.table-view .table-row-cell {
+    -fx-padding: 5; /* Padding inside cells */
+}
+
+
+/* ComboBox Styles */
+.combo-box {
+    -fx-background-color: white; /* צבע הרקע של ה-ComboBox */
+    -fx-border-color: #CCCCCC; /* צבע הגבול */
+    -fx-border-radius: 5; /* רדיוס לפינות */
+    -fx-background-radius: 5; /* רדיוס לפינות */
+    -fx-padding: 5; /* ריווח פנימי */
+    -fx-font-size: 14px; /* גודל הפונט */
+}
+
+/* ComboBox Popup Styles */
+.combo-box .list-view {
+    -fx-background-color: white; /* צבע הרקע של התפריט הנפתח */
+    -fx-border-color: #CCCCCC; /* צבע הגבול של התפריט הנפתח */
+}
+
+/* ComboBox Selected Item Style */
+.combo-box .list-view .list-cell:hover {
+    -fx-background-color: #E0E0E0; /* צבע רקע כאשר מצפים על פריט */
+}
+
+/* ComboBox Selected Item Style */
+.combo-box .list-view .list-cell:selected {
+    -fx-background-color: #B0D0F0; /* צבע רקע כאשר פריט נבחר */
+    -fx-text-fill: black; /* צבע טקסט כאשר פריט נבחר */
+}
