@@ -234,8 +234,8 @@ public class AppController implements Closeable {
         sheetComponentController.createFunc(func,coordinate);
     }
 
-    public void applyDynamicCalculate(Coordinate coordinate, String numStr){
-        SheetDto sheetDto = Connector.applyDynamicCalculate(coordinate, numStr);
+    public void applyDynamicCalculate(Coordinate coordinate, String numStr) throws IOException {
+        SheetDto sheetDto = Connector.applyDynamicCalculate(coordinate, numStr,sheetName);
         sheetComponentController.fillSheet(sheetDto);
     }
 

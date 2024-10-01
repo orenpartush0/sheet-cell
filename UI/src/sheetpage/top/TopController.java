@@ -345,7 +345,7 @@ public class TopController {
     }
 
 
-    public void clickOnIncrementButton() {
+    public void clickOnIncrementButton() throws IOException {
         if(!fromTextField.getText().isEmpty() && !toTextField.getText().isEmpty() && !stepTextField.getText().isEmpty()) {
             int from = Integer.parseInt(fromTextField.getText());
             int to = Integer.parseInt(toTextField.getText());

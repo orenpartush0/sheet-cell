@@ -17,7 +17,6 @@ import static constant.Constants.USER_NAME;
 public class UserServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        System.out.println("User try to login");
         UserManager userManager = ServletUtils.GetUserManager(getServletContext());
         String userFromSession = SessionUtils.GetUserName(req);
         if(userFromSession == null) {
@@ -25,11 +24,12 @@ public class UserServlet extends HttpServlet {
             if(userName == null || userName.isEmpty()) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND);
             }else{
-                if(!userManager.addUser(userName)){
-                    resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                    resp.getOutputStream().print("User already exists");
-                }else {
-                    req.getSession(true).setAttribute(USER_NAME, userName);
+                synchronized (this) {
+                    if (!userManager.addUser(userName)) {
+                        resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    } else {
+                        req.getSession(true).setAttribute(USER_NAME, userName);
+                    }
                 }
             }
         }

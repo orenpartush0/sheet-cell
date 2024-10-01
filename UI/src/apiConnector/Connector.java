@@ -146,8 +146,14 @@ public class Connector {
         return GSON.fromJson(res.body().string(), SheetDto.class);
     }
 
-    public static SheetDto applyDynamicCalculate(Coordinate coordinate , String numStr){
-        return null;
+    public static SheetDto applyDynamicCalculate(Coordinate coordinate , String numStr, String sheetName) throws IOException {
+        Response res = HttpClientUtil.runSync(
+                DYNAMIC_CALCULATE + "?" + SHEET_NAME + "=" + sheetName,
+                POST,
+                new UpdateCellDto(coordinate,numStr)
+        );
+
+        return GSON.fromJson(res.body().string(), SheetDto.class);
     }
 
 }
