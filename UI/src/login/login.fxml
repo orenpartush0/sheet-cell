@@ -11,7 +11,7 @@
     <children>
         <AnchorPane layoutX="224.0" layoutY="76.0" prefHeight="249.0" prefWidth="310.0" style="-fx-background-radius: 25; -fx-background-color: white;">
             <children>
-                <JFXTextField fx:id="usernameField" layoutX="72.0" layoutY="53.0" prefHeight="25.0" prefWidth="174.0" promptText="Enter Login">
+                <JFXTextField fx:id="usernameField" layoutX="72.0" layoutY="53.0" prefHeight="25.0" prefWidth="174.0" promptText="Enter Username">
                     <focusColor>
                         <LinearGradient endX="1.0" endY="1.0">
                             <stops>
